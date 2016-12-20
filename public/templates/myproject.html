@@ -1,0 +1,20 @@
+<div class="container">
+
+  <h1>My Project</h1>
+
+  <!-- upload -->
+  <form action="/api/upload" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <input type="file" name="myFile">
+      <input type="text" name="width" value="50%" style="display: none">
+      <input type="text" name="width" value="1" style="display: none">
+    </div>
+    <button type="submit" class="btn btn-primary">Upload File</button>
+  </form>
+
+  <!-- Download -->
+    <form class="download" method="get" action="/upload/356b849cb67d23b8a5231ffd9e67f0da.mp3">
+      <button class="btn btn-primary" type="submit">Download!</button>
+    </form>
+
+</div>

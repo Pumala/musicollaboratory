@@ -1,76 +1,86 @@
-var app = angular.module('music_app', ['ui.router', 'ngCookies']);
-
-app.config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider
-  .state({
-    name: 'home',
-    url: '/',
-    templateController: 'templates/home.html',
-    controller: 'HomeController'
-  })
-  .state({
-    name: 'login',
-    url: '/login',
-    templateController: 'templates/login.html',
-    controller: 'LoginController'
-  })
-  .state({
-    name: 'signup',
-    url: '/signup',
-    templateController: 'templates/signup.html',
-    controller: 'SignupController'
-  })
-  .state({
-    name: 'projects',
-    url: '/projects',
-    templateController: 'templates/projects.html',
-    controller: 'ProjectsController'
-  })
-
-  $urlRouterProvider.otherwise('/');
-
-})
-
-app.factory('MusicFactory', function($http) {
-  var service = {};
-
-  service.uploads = function(file) {
-    var url = '/api/upload';
-    return $http({
-      method: 'POST',
-      url: url
-    });
-  };
-
-  return service;
-})
-
-app.controller('HomeController', function($scope, $state) {
-
-});
-
-app.controller('SignupController', function($scope, $state) {
-
-});
-
-app.controller('LoginController', function($scope, $state) {
-
-});
-
-
-app.controller('ProjectsController', function($scope, MusicFactory) {
-  console.log('hellow inside the projects');
-  // $scope.uploadFile = function(file) {
-  //   MusicFactory.uploads(file)
-  //     .then(function(results) {
-  //       console.log('Here are the file results:', results);
-  //     })
-  //     .catch(function(err) {
-  //       console.log('Error uploading files...:', err.message);
-  //     });
-  // }
-
-});
+// var app = angular.module('music_app', ['ui.router', 'ngCookies']);
+//
+// app.config(function($stateProvider, $urlRouterProvider) {
+//   $stateProvider
+//   .state({
+//     name: 'home',
+//     url: '/',
+//     templateController: 'templates/home.html',
+//     controller: 'HomeController'
+//   })
+//   .state({
+//     name: 'login',
+//     url: '/login',
+//     templateController: 'templates/login.html',
+//     controller: 'LoginController'
+//   })
+//   .state({
+//     name: 'signup',
+//     url: '/signup',
+//     templateController: 'templates/signup.html',
+//     controller: 'SignupController'
+//   })
+//   .state({
+//     name: 'projects',
+//     url: '/projects',
+//     templateController: 'templates/projects.html',
+//     controller: 'ProjectsController'
+//   })
+//   .state({
+//     name: 'newproject',
+//     url: '/new/project',
+//     templateController: 'templates/new_project.html',
+//     controller: 'NewProjectsController'
+//   });
+//
+//   $urlRouterProvider.otherwise('/');
+//
+// })
+//
+// app.factory('MusicFactory', function($http) {
+//   var service = {};
+//
+//   service.uploads = function(file) {
+//     var url = '/api/upload';
+//     return $http({
+//       method: 'POST',
+//       url: url
+//     });
+//   };
+//
+//   return service;
+// })
+//
+// app.controller('HomeController', function($scope, $state) {
+//
+// });
+//
+// app.controller('SignupController', function($scope, $state) {
+//
+// });
+//
+// app.controller('LoginController', function($scope, $state) {
+//
+// });
+//
+//
+// app.controller('ProjectsController', function($scope, MusicFactory) {
+//   console.log('hellow inside the projects');
+//   // $scope.uploadFile = function(file) {
+//   //   MusicFactory.uploads(file)
+//   //     .then(function(results) {
+//   //       console.log('Here are the file results:', results);
+//   //     })
+//   //     .catch(function(err) {
+//   //       console.log('Error uploading files...:', err.message);
+//   //     });
+//   // }
+//
+// });
+//
+// app.controller('NewProjectsController', function($scope, MusicFactory) {
+//   console.log('reached new projects controller');
+// });
 
 // 'use strict';
 //

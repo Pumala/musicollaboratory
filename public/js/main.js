@@ -26,8 +26,26 @@ app.config(function($stateProvider, $urlRouterProvider) {
   .state({
     name: "projects",
     url: "/projects",
-    templateUrl: "templates/projects.html",
+    templateUrl: "templates/allprojects.html",
     controller: "ProjectsController"
+  })
+  .state({
+    name: "search",
+    url: "/search",
+    templateUrl: "templates/search.html",
+    controller: "SearchController"
+  })
+  .state({
+    name: 'newproject',
+    url: '/new/project',
+    templateUrl: 'templates/new_project.html',
+    controller: 'NewProjectsController'
+  })
+  .state({
+    name: "myproject",
+    url: "/myproject/{project_id}",
+    templateUrl: "templates/myproject.html",
+    controller: "MyProjectsController"
   })
   .state({
     name: "profile",
@@ -38,6 +56,31 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
   $urlRouterProvider.otherwise('/');
 });
+
+app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
+  var service = {};
+
+  service.addNewProject = function(newProjectInfo) {
+    var url = '/api/new/project';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: newProjectInfo
+    });
+  };
+
+  service.allProjects = function() {
+    var url = '/api/search/projects';
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  }
+
+  return service;
+
+});
+
 
 
 app.controller('HomeController', function($scope, $state) {
@@ -52,8 +95,23 @@ app.controller('LoginController', function($scope, $state) {
 
 });
 
-app.controller('LoginController', function($scope, $state) {
+app.controller('SearchController', function($scope, $state, $sce, MusicFactory) {
 
+  $scope.getAudioUrl = function(fileHash) {
+    return $sce.trustAsResourceUrl('/upload/' + fileHash + '.mp3');
+  };
+
+  MusicFactory.allProjects()
+    .then(function(results) {
+      $scope.allProjects = results.data;
+      console.log('here are all the projects!!:', results);
+
+      // $scope.filePath = '/upload/' +
+
+    })
+    .catch(function(err) {
+      console.log('encountered error loading all projects:', err.message);
+    });
 });
 
 app.controller('ProjectsController', function($scope, $state) {
@@ -63,6 +121,55 @@ app.controller('ProjectsController', function($scope, $state) {
 
 });
 
+app.controller('NewProjectsController', function($scope, MusicFactory) {
+  $scope.hasMelody  = false;
+  $scope.hasLyrics = false;
+  $scope.hasVoice = false;
+  $scope.hasProduction = false;
+  $scope.needsMelody = false;
+  $scope.needsLyrics = false;
+  $scope.needsVoice = false;
+  $scope.needsProduction = false;
+
+  $scope.createProject = function() {
+    var newProject = {
+      name: $scope.projectName,
+      description: $scope.description,
+      has: [
+        { melody: $scope.hasMelody },
+        { lyrics: $scope.hasLyrics },
+        { voice: $scope.hasVoice },
+        { production: $scope.hasProduction }
+      ],
+      needs: [
+        {
+          melody: $scope.needsMelody
+        },
+        {
+          lyrics: $scope.needsLyrics
+        },
+        {
+          voice: $scope.needsVoice
+        },
+        {
+          production: $scope.needsProduction
+        }
+      ]
+    };
+    MusicFactory.addNewProject(newProject)
+      .then(function(results) {
+        console.log('resuls from adding new project:', results);
+      })
+      .catch(function(err) {
+        console.log('encountered error adding new project::', err.message);
+      });
+  }
+
+});
+
+app.controller('MyProjectsController', function($scope) {
+
+})
 
 // ====================
 // DIRECTIVES

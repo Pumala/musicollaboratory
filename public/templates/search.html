@@ -1,0 +1,46 @@
+<div class="container">
+
+  <h1>SEARCH RESULTS PAGE</h1>
+
+  <form>
+    <div class="form-group">
+      <input type="text" name="search" value="">
+    </div>
+    <button class="btn btn-primary" name="button">Search</button>
+  </form>
+
+  <div class="row" ng-repeat="project in allProjects">
+    <div class="col-sm-4">
+      <div class="well">
+        <h3>{{project.name}}</h3>
+        <p>{{project.files}}</p>
+         {{project.files[0]}}
+        <div ng-if="project.files[0]">
+          TOBY WAS HERE
+          <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
+          <!-- <audio controls="controls" preload="none">
+            <source src="/upload/{{project.files[0]}}" type="audio/mp3">
+          </audio> -->
+          <!-- <img ng-src="/upload/{{project.files[0]}}.mp3" controls> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <div class="row" ng-repeat="project in allProjects">
+    <div class="col-sm-4">
+      <div class="well">
+        <h3>{{project.name}}</h3>
+        <p>{{project.files}}</p>
+         {{project.files[0]}}
+        <div ng-if="project.files[0]">
+          TOBY WAS HERE
+          <img ng-src="/upload/{{project.files[0]}}.mp3" controls>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+
+</div>

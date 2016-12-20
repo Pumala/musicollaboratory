@@ -1,0 +1,71 @@
+<div class="container">
+
+  <h1>Create New Project</h1>
+
+  <form ng-submit="createProject()">
+    <div class="form-group">
+      <label for="projectName">Project Name: </label>
+      <input class="form-control" ng-model="projectName" type="text" name="projectName" value="">
+    </div>
+    <div class="form-group">
+      <label for="description">Description: </label><br>
+      <textarea ng-model="description" rows="8" cols="80"></textarea>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="well">
+          <h2>Has:</h2>
+          <div class="">
+            <label for="melody">Melody: </label>
+            <input ng-model="hasMelody" type="checkbox" name="melody" value="melody">
+          </div>
+          <div class="">
+            <label for="lyrics">Lyrics: </label>
+            <input ng-model="hasLyrics" type="checkbox" name="lyrics" value="lyrics">
+          </div>
+          <div class="">
+            <label for="voice">Voice: </label>
+            <input ng-model="hasVoice" type="checkbox" name="voice" value="voice">
+          </div>
+          <div class="">
+            <label for="production">Production: </label>
+            <input ng-model="hasProduction" type="checkbox" name="production" value="production">
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="well">
+          <h2>Needs:</h2>
+          <div class="">
+            <label for="melody">Melody: </label>
+            <input ng-model="needsMelody" type="checkbox" name="melody" value="melody">
+          </div>
+          <div class="">
+            <label for="lyrics">Lyrics: </label>
+            <input ng-model="needsLyrics" type="checkbox" name="lyrics" value="lyrics">
+          </div>
+          <div class="">
+            <label for="voice">Voice: </label>
+            <input ng-model="needsVoice" type="checkbox" name="voice" value="voice">
+          </div>
+          <div class="">
+            <label for="production">Production: </label>
+            <input ng-model="needsProduction" type="checkbox" name="production" value="production">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <form action="/api/upload" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <input type="file" name="myFile">
+      <input type="text" name="width" value="50%" style="display: none">
+      <input type="text" name="width" value="50%" style="display: none">
+    </div>
+    <button type="submit" class="btn btn-primary">Upload File</button>
+  </form>
+
+</div>
