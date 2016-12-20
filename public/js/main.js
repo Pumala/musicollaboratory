@@ -1,4 +1,4 @@
-var app = angular.module('musicollab_app', ['ui.router', 'ngCookies']);
+var app = angular.module('musicollab_app', ['ui.router', 'ngCookies', 'angularFileUpload']);
 
 // ====================
 // STATES
@@ -81,7 +81,15 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
 
 });
 
+app.controller('FileController', function($scope, FileUploader) {
+  var uploader = $scope.uploader = new FileUploader({
+    url: '/upload'
+  });
 
+  uploader.onCompleteAll = function() {
+    console.info('onCompleteAll');
+  };
+});
 
 app.controller('HomeController', function($scope, $state) {
 

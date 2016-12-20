@@ -99,9 +99,11 @@ app.get('/api/search/projects', function(request, response) {
     });
 });
 
-app.post('/api/upload', upload.single('myFile'), function(req, res) {
+app.post('/upload', upload.single('file'), function(req, res) {
 
-  // // hard-coded for now
+  console.log('reached this API');
+
+  // hard-coded for now
   var username = 'Lulu';
 
   var myFile = req.file;
