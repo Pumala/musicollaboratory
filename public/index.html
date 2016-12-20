@@ -2,16 +2,46 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Musicollaboratory</title>
+    <title>Twitter Clone</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <!-- FontAwesome CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
   </head>
-  <body ng-app="music_app">
+  <body ng-app="musicollab_app">
 
-    <h1>Musicollaboratory</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-inverse">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                     <i class="fa fa-bars"></i>
+                    </button>
+                    <a class="navbar-brand" ui-sref="home">
+                        <span class="logo-words">MusiCollaboratory</span>
+                    </a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ng-if="rootUsername">Welcome {{rootUsername}}!</a></li>
+                        <li><a ng-if="!rootUsername" ui-sref="signup">Sign up</a></li>
+                        <li><a ng-if="!rootUsername" ui-sref="login">Log in</a></li>
+                        <li><a ng-if="rootUsername" ui-sref="profile({username: rootUsername})">Profile</a></li>
+                        <li><a ng-if="rootUsername" ng-click="rootLogout()">Logout</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </nav>
+
+        </div>
+    </div>
+
+    <!-- <h1>Musicollaboratory!!!</h1> -->
 
     <ui-view></ui-view>
 
@@ -27,8 +57,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <!-- Custom JS -->
-    <script src="js/script.js"></script>
-
-    <script type="text/javascript" src="/js/script.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>

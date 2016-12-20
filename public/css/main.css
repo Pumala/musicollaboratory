@@ -1,0 +1,60 @@
+
+/********************************************
+                  BODY
+********************************************/
+html {
+  height: 100%;
+  width: 100%;
+}
+body {
+  height: 100%;
+}
+.banner {
+  background-image: url('../images/purple.jpg');
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+}
+/********************************************
+                  NAVBAR
+********************************************/
+.navbar {
+  border-radius: 0;
+  margin-bottom: 0;
+}
+.navbar-inverse .navbar-toggle {
+  color: #fff;
+  border-color: #fff;
+}
+
+/********************************************
+                  HOME PAGE
+********************************************/
+.banner h1 {
+  margin: 0;
+}
+/********************************************
+              LOGIN / SIGN UP PAGE
+********************************************/
+.login, .signup {
+  background-image: url('../images/red.jpg');
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+}
+.login h1, .signup h1 {
+  padding-top: 35px;
+}
+.userForm {
+  max-width: 450px;
+  margin: 70px auto;
+}
+/********************************************
+                  PROJECTS PAGE
+********************************************/

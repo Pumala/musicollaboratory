@@ -1,1 +1,17 @@
-<h1>Login</h1>
+<section class="login container">
+
+  <h1 class="text-center">Login</h1>
+
+  <form class="userForm" ng-submit="submitLogin()">
+    <div class="form-group">
+      <label for="">Username:</label>
+      <input class="form-control" ng-model="username" type="text" name="username" value="">
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input class="form-control" ng-model="password" type="password" name="password" value="">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+</section>

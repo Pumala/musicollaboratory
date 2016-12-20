@@ -1,21 +1,23 @@
 {
-  "name": "final_project",
+  "name": "updated_twitter",
   "version": "1.0.0",
-  "description": "music collaboration app",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "author": "Carolyn Lam and Kirk Abbott",
-  "license": "ISC",
+  "description": "",
+  "main": "back_end.js",
   "dependencies": {
     "bcrypt": "^1.0.1",
     "bcrypt-promise": "^2.0.0",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "mongoose": "^4.7.3",
+    "moment": "^2.17.1",
+    "mongoose": "^4.7.2",
+    "multer": "^1.2.1",
     "uuid": "^3.0.1"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carolyn Lam",
+  "license": "ISC"
 }
