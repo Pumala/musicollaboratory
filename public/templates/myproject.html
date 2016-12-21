@@ -1,13 +1,42 @@
 <div class="container">
 
-  <h1>My Project</h1>
+  <h1>{{project.name}}</h1>
+
+  <p>{{project.description}}</p>
+
+  <h2>Already has:</h2>
+  <ul ng-repeat="(type, checked) in project.existingTypes">
+    <li ng-show="project.existingTypes[type]">{{type}}</li>
+  </ul>
+
+  <h2>Seeking:</h2>
+  <ul ng-repeat="(type, checked) in project.seekingTypes">
+    <li ng-show="project.seekingTypes[type]">{{type}}</li>
+  </ul>
+
+  <form ng-submit="requestContribute()">
+    <div class="well">
+      <h2>Request to contribute</h2>
+      <div ng-repeat="(type, checked) in project.seekingTypes">
+        <!-- <div class="">
+          <label for=""></label>
+        </div> -->
+        <div ng-show="project.seekingTypes[type]">
+          <label for="">{{type}}</label>
+          <input ng-model="requestedTypes[type]" type="checkbox">
+        </div>
+      </div>
+      <textarea ng-model="description" name="name" rows="4" cols="40"></textarea>
+      <button type="submit" name="button">Submit</button>
+    </div>
+  </form>
 
   <!-- upload -->
   <form action="/api/upload" method="post" enctype="multipart/form-data">
     <div class="form-group">
       <input type="file" name="myFile">
       <input type="text" name="width" value="50%" style="display: none">
-      <input type="text" name="width" value="50%" style="display: none">
+      <input type="text" name="width" value="1" style="display: none">
     </div>
     <button type="submit" class="btn btn-primary">Upload File</button>
   </form>

@@ -70,12 +70,49 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
   };
 
   service.allProjects = function() {
-    var url = '/api/search/projects';
+    var url = '/api/search/allprojects';
     return $http({
       method: 'GET',
       url: url
     });
-  }
+  };
+
+  service.searchProjects = function(needsInfo) {
+    var url = '/api/search/projects';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: {
+        needsInfo: needsInfo
+      }
+    });
+  };
+
+  service.getProjectDetails = function(projectId) {
+    var url = '/api/project/' + projectId;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
+
+  service.sendRequest = function(requestInfo) {
+    var url = '/api/request';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: requestInfo
+    });
+  };
+
+  service.submitNewUser = function(newUserInfo) {
+    var url = '/api/signup';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: newUserInfo
+    });
+  };
 
   return service;
 
@@ -95,7 +132,28 @@ app.controller('HomeController', function($scope, $state) {
 
 });
 
-app.controller('SignupController', function($scope, $state) {
+app.controller('SignUpController', function($scope, $state, MusicFactory) {
+
+  $scope.submitSignUp = function() {
+    if ($scope.password === $scope.confirm_password) {
+      var signUpInfo = {
+        firstName: $scope.firstName,
+        lastName: $scope.lastName,
+        username: $scope.username,
+        email: $scope.email,
+        password: $scope.password
+      };
+    } else {
+      return;
+    }
+    MusicFactory.submitNewUser(signUpInfo)
+      .then(function(results) {
+        console.log('results submitting new user info:', results)
+      })
+      .catch(function(err) {
+        console.log('error submitting new user info:', err.message);
+      });
+  }
 
 });
 
@@ -104,18 +162,39 @@ app.controller('LoginController', function($scope, $state) {
 });
 
 app.controller('SearchController', function($scope, $state, $sce, MusicFactory) {
-
+  $scope.needsMelody = false;
+  $scope.needsLyrics = false;
+  $scope.needsVoice = false;
+  $scope.needsProduction = false;
   $scope.getAudioUrl = function(fileHash) {
-    return $sce.trustAsResourceUrl('/upload/' + fileHash + '.mp3');
+    return $sce.trustAsResourceUrl('/upload/' + fileHash);
+  };
+
+  $scope.searchProjects = function() {
+    var needsInfo = {
+      melody: $scope.needsMelody,
+      lyrics: $scope.needsLyrics,
+      voice: $scope.needsVoice,
+      production: $scope.needsProduction
+    };
+    MusicFactory.searchProjects(needsInfo)
+    .then(function(results) {
+      $scope.allProjects = results.data;
+      console.log('here are all the projects!!:', results.data);
+    })
+    .catch(function(err) {
+      console.log('encountered error loading all projects:', err.message);
+    });
+  }
+
+  $scope.reloadSearch = function() {
+    $state.reload();
   };
 
   MusicFactory.allProjects()
     .then(function(results) {
       $scope.allProjects = results.data;
       console.log('here are all the projects!!:', results);
-
-      // $scope.filePath = '/upload/' +
-
     })
     .catch(function(err) {
       console.log('encountered error loading all projects:', err.message);
@@ -143,26 +222,18 @@ app.controller('NewProjectsController', function($scope, MusicFactory) {
     var newProject = {
       name: $scope.projectName,
       description: $scope.description,
-      has: [
-        { melody: $scope.hasMelody },
-        { lyrics: $scope.hasLyrics },
-        { voice: $scope.hasVoice },
-        { production: $scope.hasProduction }
-      ],
-      needs: [
-        {
-          melody: $scope.needsMelody
-        },
-        {
-          lyrics: $scope.needsLyrics
-        },
-        {
-          voice: $scope.needsVoice
-        },
-        {
-          production: $scope.needsProduction
-        }
-      ]
+      has: {
+        melody: $scope.hasMelody,
+        lyrics: $scope.hasLyrics,
+        voice: $scope.hasVoice,
+        production: $scope.hasProduction
+      },
+      needs: {
+        melody: $scope.needsMelody,
+        lyrics: $scope.needsLyrics,
+        voice: $scope.needsVoice,
+        production: $scope.needsProduction
+      }
     };
     MusicFactory.addNewProject(newProject)
       .then(function(results) {
@@ -175,9 +246,52 @@ app.controller('NewProjectsController', function($scope, MusicFactory) {
 
 });
 
-app.controller('MyProjectsController', function($scope) {
+app.controller('MyProjectsController', function($scope, $stateParams, MusicFactory) {
+  $scope.projectId = $stateParams.project_id;
+  $scope.melody = false;
+  $scope.lyrics = false;
+  $scope.voice = false;
+  $scope.production = false;
 
-})
+  console.log($scope.projectId);
+
+  MusicFactory.getProjectDetails($scope.projectId)
+    .then(function(results) {
+      console.log('here are the project details::', results.data);
+      $scope.project = results.data;
+      $scope.owner = results.data.owner;
+      $scope.requestedTypes = {};
+    })
+    .catch(function(err) {
+      console.log('encountered errors loading my projects detail page', err.message);
+    });
+
+    // for now, hard code sender until we have a $rootScope username
+    $scope.username = "Lulu";
+
+    $scope.requestContribute = function() {
+
+      console.log('TYPE????:', $scope.checked)
+
+      console.log('requestedTypes', $scope.requestedTypes);
+      var requestTypes = {
+        sender: $scope.username,
+        owner: $scope.owner,
+        description: $scope.description,
+        request: $scope.requestedTypes
+      };
+      console.log('here are the request types::', requestTypes);
+
+      // MusicFactory.sendRequest(requestTypes)
+      //   .then(function(results) {
+      //     console.log('here are the request results:', results);
+      //   })
+      //   .catch(function(err) {
+      //     console.log('error processing request to project owner:', err.message);
+      //   });
+    }
+
+});
 
 // ====================
 // DIRECTIVES

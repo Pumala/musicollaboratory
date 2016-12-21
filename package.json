@@ -19,6 +19,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Carolyn Lam",
+  "author": "Carolyn Lam and Kirk Abbott",
   "license": "ISC"
 }

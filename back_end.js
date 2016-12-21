@@ -57,9 +57,35 @@ const User = mongoose.model( 'User', {
 const Project = mongoose.model('Project', {
   name: { type: String, required: true },
   description: String,
-  existingTypes: [String], // Melody, Lyrics, Voice, Production
-  seekingTypes: [String], // Melody, Lyrics, Voice, Production
-  files: [String] // uploading files ( mp3, lyrics ), // file hash name
+  existingTypes: {
+    melody: Boolean,
+    lyrics: Boolean,
+    voice: Boolean,
+    production: Boolean
+  }, // Melody, Lyrics, Voice, Production
+  seekingTypes: {
+    melody: Boolean,
+    lyrics: Boolean,
+    voice: Boolean,
+    production: Boolean
+  }, // Melody, Lyrics, Voice, Production
+  files: [String], // uploading files ( mp3, lyrics ), // file hash name
+  members: [String],
+  owner: String
+});
+
+const Request = mongoose.model('Request', {
+    senderName: { type: String, required: true },
+    projectOwner: { type: String, required: true },
+    requestTypes: {
+      melody: Boolean,
+      lyrics: Boolean,
+      voice: Boolean,
+      production: Boolean
+    }, // Melody, Lyrics, Voice, Production
+    projectId: ObjectId,
+    description: String,
+    date: Date
 });
 
 const File = mongoose.model('File', {
@@ -87,7 +113,7 @@ function getTypes(typesArr) {
   return arr;
 };
 
-app.get('/api/search/projects', function(request, response) {
+app.get('/api/search/allprojects', function(request, response) {
 
   Project.find().limit(20)
     .then(function(allProjects) {
@@ -97,6 +123,118 @@ app.get('/api/search/projects', function(request, response) {
     .catch(function(err) {
       console.log('encountered err finding all the projects:', err.message);
     });
+});
+
+app.post('/api/search/projects', function(request, response) {
+
+  var needsInfo = request.body.needsInfo;
+
+  var needsArr = getTypes([needsInfo]);
+  //
+  console.log(needsInfo);
+  console.log('Needs Arr:', needsArr);
+
+  // seekingTypes: {
+  //   melody: Boolean,
+  //   lyrics: Boolean,
+  //   voice: Boolean,
+  //   production: Boolean
+  // }, // Melody, Lyrics, Voice, Production
+
+  // Project.find({
+  //   $or: [
+  //     { seekingTypes.melody: needsInfo.melody }
+  //   ]
+  //     seekingTypes.melody: {
+  //       $in: [needsArr]
+  //     }
+  //   })
+  //   .then(function(results) {
+  //     console.log('projects results:', results);
+  //     return response.json(results);
+  //   })
+  //   .catch(function(err) {
+  //     console.log('error querying for projects:', err.message);
+  //   });
+
+  var conditions = [];
+
+  for (key in needsInfo) {
+    if (needsInfo[key]) {
+      var seek = "seekingTypes." + key;
+      var cond = {};
+      cond[seek] = needsInfo[key];
+      conditions.push(cond);
+    }
+  }
+
+  console.log('the CONDITIONS:', conditions);
+  // { 'seekingType.voice': true }
+
+  Project.find({
+      $or: conditions
+    })
+    .then(function(results) {
+      console.log('projects results:', results);
+      return response.json(results);
+    })
+    .catch(function(err) {
+      console.log('error querying for projects:', err.message);
+    });
+
+});
+
+app.post('/api/signup', function(request, response) {
+  console.log('SIGNUP INFO:', request.body);
+  var data = request.data;
+
+  var firstName = data.firstName;
+  var lastName = data.lastName;
+  var username = data.username;
+  var email = data.email;
+  var password = data.password;
+
+  var newUser = {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    password: password,
+    joined: new Date(),
+    bio: "",
+    musicanType: [],
+    projects: [],
+    token: ""
+  }
+
+  newUser.save();
+
+  // const User = mongoose.model( 'User', {
+  //   _id: { type: String, required: true, unique: true }, // username
+  //   firstName: { type: String, required: true },
+  //   lastName: { type: String, required: true },
+  //   email: { type: String, required: true },
+  //   password: { type: String },
+  //   joined: Date,
+  //   bio: String,
+  //   musicanType: [String], // Melody, Lyrics, Voice, Production
+  //   projects: [ObjectId], // Project Id
+  //   token: String // token
+  // });
+
+});
+
+app.get('/api/project/:projectid', function(request, response) {
+
+  var projectId = request.params.projectid;
+
+  Project.findOne({ _id: projectId })
+    .then(function(projectInfo) {
+      return response.json(projectInfo);
+    })
+    .catch(function(err) {
+      console.log('encountered errors retrieving project info from db:', err.message);
+    });
+
 });
 
 app.post('/upload', upload.single('file'), function(req, res) {
@@ -124,7 +262,7 @@ app.post('/upload', upload.single('file'), function(req, res) {
 
   newFile.save();
 
-  var projectId = "58599ec949ecd0b3d183b5ff";
+  var projectId = "5859c2268dc69cbea0550bd2";
 
   // make a query to find the project for which the file belongs to
   // then update its files array
@@ -150,26 +288,49 @@ app.post('/upload', upload.single('file'), function(req, res) {
   console.log('HOLA!!');
 });
 
+// Send request to project owner
+app.post('/api/request', function(request, response) {
+  // const Request = mongoose.model('Request', {
+  //     senderName: { type: String, required: true },
+  //     projectOwner: String,
+  //     requestTypes: String, // Melody, Lyrics, Voice, Production
+  //     projectId: ObjectId,
+  //     description: String,
+  //     date: Date
+  // });
+  console.log('request.body is:', request.body);
+  var projectOwner = request.body.owner;
+
+  var requestTypes = request.body.request;
+
+  var requestTypes = getTypes(requestTypes);
+
+  // var newRequest = new Request ({
+  //   senderName:
+  // })
+  console.log(requestTypes);
+
+});
+
 app.post('/api/new/project', function(request, response) {
 
   console.log(request.body);
+
+  //  hard code for now until we have sign up/login functionality set up
+  var owner = 'sunny';
 
   var results = request.body;
   var projectHas = results.has;
   var projectNeeds = results.needs;
 
-  var hasTypes = getTypes(projectHas);
-  var needsTypes = getTypes(projectNeeds);
-
-  console.log('has types???', hasTypes);
-  console.log('needs types???', needsTypes);
-
   var newProject = new Project({
     name: results.name,
     description: results.description,
-    existingTypes: hasTypes,
-    seekingTypes: needsTypes,
-    files: []
+    existingTypes: projectHas,
+    seekingTypes: projectNeeds,
+    files: [],
+    members: [owner],
+    owner: owner
   });
 
   newProject.save();
