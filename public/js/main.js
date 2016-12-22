@@ -63,17 +63,21 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
   $rootScope.factoryCookieData = $cookies.getObject('cookieData') ? $cookies.getObject('cookieData') : null;
   console.log('factory cookies?:', $cookies.getObject('cookieData'));
   if ($rootScope.factoryCookieData) {
-    $rootScope.rootUsername = $cookies.getObject('cookieData').userInfo._id;
-    $rootScope.rootToken = $cookies.getObject('cookieData').tokenInfo._id;
+    $rootScope.rootUsername = $cookies.getObject('cookieData')._id;
+    $rootScope.rootToken = $cookies.getObject('cookieData').token.id;
 
-    console.log('root token???', $cookies.getObject('cookieData').tokenInfo._id);
+    console.log('root token???', $cookies.getObject('cookieData').token.id);
   }
 
   $rootScope.rootLogout = function() {
-    var url = '/api/logout/' + $rootScope.rootToken;
+    var url = '/api/logout';
     return $http({
-      method: 'DELETE',
-      url: url
+      method: 'PUT',
+      url: url,
+      data: {
+        username: $rootScope.rootUsername,
+        token: $rootScope.rootToken
+      }
     })
     .then(function(results) {
       console.log(results);
@@ -87,7 +91,7 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
 
     })
     .catch(function(err) {
-      console.log('err logging out:', eerr.message);
+      console.log('err logging out:', err.message);
     })
   }
 
@@ -152,15 +156,26 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
       url: url,
       data: loginInfo
     });
-  }
+  };
+
+  service.getUserProfile = function() {
+    var url = "/api/profile/" + $rootScope.rootUsername;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
 
   return service;
 
 });
 
-app.controller('FileController', function($scope, FileUploader) {
+app.controller('FileController', function($scope, $rootScope, FileUploader) {
+  // var uploader = $scope.uploader = new FileUploader({
+  //   url: '/upload'
+  // });
   var uploader = $scope.uploader = new FileUploader({
-    url: '/upload'
+    url: '/upload/' + $rootScope.rootUsername
   });
 
   uploader.onCompleteAll = function() {
@@ -169,6 +184,19 @@ app.controller('FileController', function($scope, FileUploader) {
 });
 
 app.controller('HomeController', function($scope, $state) {
+
+});
+
+app.controller('UserController', function($scope, $state, MusicFactory) {
+
+  // makes a service call to pass data to the backend to render the user profile page
+  MusicFactory.getUserProfile()
+    .then(function(results) {
+      console.log('user profile results:', results);
+    })
+    .catch(function(err) {
+      console.log('encountered errors retrieving user profile data', err.message);
+    });
 
 });
 
@@ -188,12 +216,12 @@ app.controller('SignUpController', function($scope, $state, $rootScope, $cookies
     }
     MusicFactory.submitNewUser(signUpInfo)
       .then(function(results) {
-        // console.log('results submitting new user info:', results.data)
+        console.log('results submitting new user info:', results.data.userInfo);
         $rootScope.rootUsername = results.data.userInfo._id;
-        $rootScope.rootToken = results.data.tokenInfo._id;
+        $rootScope.rootToken = results.data.userInfo.token.id;
 
-        $cookies.putObject('cookieData', results.data);
-        $rootScope.factoryCookieData = $cookies.putObject('cookieData', results.data);
+        $cookies.putObject('cookieData', results.data.userInfo);
+        $rootScope.factoryCookieData = $cookies.putObject('cookieData', results.data.userInfo);
 
         $state.go('home');
       })
@@ -204,7 +232,7 @@ app.controller('SignUpController', function($scope, $state, $rootScope, $cookies
 
 });
 
-app.controller('LoginController', function($scope, $state, MusicFactory) {
+app.controller('LoginController', function($scope, $state, $cookies, $rootScope, MusicFactory) {
 
   $scope.submitLogin = function() {
     var submitInfo = {
@@ -213,7 +241,14 @@ app.controller('LoginController', function($scope, $state, MusicFactory) {
     };
     MusicFactory.submitLoginInfo(submitInfo)
       .then(function(results) {
-        console.log('success submitting login info', results);
+        var userInfo = results.data.userInfo;
+        $rootScope.rootUsername = userInfo._id;
+        $rootScope.rootToken = userInfo.token.id;
+        $cookies.putObject('cookieData', userInfo);
+        $rootScope.factoryCookieData = userInfo;
+
+        console.log('success submitting login info', userInfo);
+        $state.go('home');
       })
       .catch(function(err) {
         console.log('experienced err submitting login info:', err.message);
@@ -222,7 +257,7 @@ app.controller('LoginController', function($scope, $state, MusicFactory) {
 
 });
 
-app.controller('SearchController', function($scope, $state, $sce, MusicFactory) {
+app.controller('SearchController', function($scope, $state, $rootScope, $sce, MusicFactory) {
   $scope.needsMelody = false;
   $scope.needsLyrics = false;
   $scope.needsVoice = false;
@@ -262,14 +297,14 @@ app.controller('SearchController', function($scope, $state, $sce, MusicFactory) 
     });
 });
 
-app.controller('ProjectsController', function($scope, $state) {
+app.controller('ProjectsController', function($scope, $rootScope, $state) {
 
   console.log('hellow inside the projects');
 
 
 });
 
-app.controller('NewProjectsController', function($scope, MusicFactory) {
+app.controller('NewProjectsController', function($scope, $rootScope, MusicFactory) {
   $scope.hasMelody  = false;
   $scope.hasLyrics = false;
   $scope.hasVoice = false;
@@ -282,6 +317,7 @@ app.controller('NewProjectsController', function($scope, MusicFactory) {
   $scope.createProject = function() {
     var newProject = {
       name: $scope.projectName,
+      owner: $rootScope.rootUsername,
       description: $scope.description,
       has: {
         melody: $scope.hasMelody,
@@ -298,7 +334,7 @@ app.controller('NewProjectsController', function($scope, MusicFactory) {
     };
     MusicFactory.addNewProject(newProject)
       .then(function(results) {
-        console.log('resuls from adding new project:', results);
+        console.log('results from adding new project:', results);
       })
       .catch(function(err) {
         console.log('encountered error adding new project::', err.message);
@@ -307,7 +343,7 @@ app.controller('NewProjectsController', function($scope, MusicFactory) {
 
 });
 
-app.controller('MyProjectsController', function($scope, $stateParams, MusicFactory) {
+app.controller('MyProjectsController', function($scope, $stateParams, $rootScope, MusicFactory) {
   $scope.projectId = $stateParams.project_id;
   $scope.melody = false;
   $scope.lyrics = false;
@@ -328,7 +364,7 @@ app.controller('MyProjectsController', function($scope, $stateParams, MusicFacto
     });
 
     // for now, hard code sender until we have a $rootScope username
-    $scope.username = "Lulu";
+    // $scope.username = "Lulu";
 
     $scope.requestContribute = function() {
 
@@ -336,7 +372,7 @@ app.controller('MyProjectsController', function($scope, $stateParams, MusicFacto
 
       console.log('requestedTypes', $scope.requestedTypes);
       var requestTypes = {
-        sender: $scope.username,
+        sender: $rootScope.rootUsername,
         owner: $scope.owner,
         description: $scope.description,
         request: $scope.requestedTypes

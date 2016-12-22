@@ -50,8 +50,8 @@ const User = mongoose.model( 'User', {
   joined: Date,
   bio: String,
   musicanType: [String], // Melody, Lyrics, Voice, Production
-  projects: [ObjectId], // Project Id
-  token: String // token
+  projects: [ ObjectId ], // Project Id
+  token: { id: String, expires: Date } // token
 });
 
 const Project = mongoose.model('Project', {
@@ -95,10 +95,10 @@ const File = mongoose.model('File', {
   path: String
 });
 
-const AuthToken = mongoose.model('AuthToken', {
-  _id: { type: String, required: true, unique: true },
-  expires: { type: Date, required: true }
-});
+// const AuthToken = mongoose.model('AuthToken', {
+//   _id: { type: String, required: true, unique: true },
+//   expires: { type: Date, required: true }
+// });
 
 // require('./experiment/file.js')(app);
 
@@ -130,32 +130,6 @@ app.post('/api/search/projects', function(request, response) {
   var needsInfo = request.body.needsInfo;
 
   var needsArr = getTypes([needsInfo]);
-  //
-  console.log(needsInfo);
-  console.log('Needs Arr:', needsArr);
-
-  // seekingTypes: {
-  //   melody: Boolean,
-  //   lyrics: Boolean,
-  //   voice: Boolean,
-  //   production: Boolean
-  // }, // Melody, Lyrics, Voice, Production
-
-  // Project.find({
-  //   $or: [
-  //     { seekingTypes.melody: needsInfo.melody }
-  //   ]
-  //     seekingTypes.melody: {
-  //       $in: [needsArr]
-  //     }
-  //   })
-  //   .then(function(results) {
-  //     console.log('projects results:', results);
-  //     return response.json(results);
-  //   })
-  //   .catch(function(err) {
-  //     console.log('error querying for projects:', err.message);
-  //   });
 
   var conditions = [];
 
@@ -166,10 +140,7 @@ app.post('/api/search/projects', function(request, response) {
       cond[seek] = needsInfo[key];
       conditions.push(cond);
     }
-  }
-
-  console.log('the CONDITIONS:', conditions);
-  // { 'seekingType.voice': true }
+  };
 
   Project.find({
       $or: conditions
@@ -197,54 +168,6 @@ app.post('/api/signup', function(request, response) {
   var email = data.email;
   var password = data.password;
 
-  // // generate a new salt
-  // bluebird.all([ bcrypt.genSalt(saltRounds)])
-  //   .then(function(salt) {
-  //     // return an encrypted password
-  //     return bcrypt.hash(password, salt);
-  //   })
-  //   .then(function(hash) {
-  //
-  //     // generate a random token
-  //     var randomToken = uuid();
-  //     // create a date for when the token expires
-  //     // 30 days form now
-  //     var expiresDate = new Date();
-  //     expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
-  //
-  //     var newToken = new AuthToken({
-  //       _id: randomToken,
-  //       expires: expiresDate
-  //     });
-  //
-  //     // create a new instance of user
-  //     var newUser = new User({
-  //       _id: username,
-  //       firstName: firstName,
-  //       lastName: lastName,
-  //       email: email,
-  //       password: hash,
-  //       joined: new Date(),
-  //       bio: "",
-  //       musicanType: [],
-  //       projects: [],
-  //       token: randomToken
-  //     });
-  //
-  //     // newToken.save();
-  //     // newUser.save();
-  //     newToken.save();
-  //
-  //     return newUser.save();
-  //   })
-  //   .then(function(newUserInfo) {
-  //     console.log('check me here:', newUserInfo);
-  //     return response.json({
-  //       userInfo: newUserInfo
-  //     });
-
-
-
   // generate a new salt
   bluebird.all([ bcrypt.genSalt(saltRounds) ])
     .spread(function(salt) {
@@ -260,10 +183,10 @@ app.post('/api/signup', function(request, response) {
       var expiresDate = new Date();
       expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
 
-      var newToken = new AuthToken({
-        _id: randomToken,
-        expires: expiresDate
-      });
+      // var newToken = new AuthToken({
+      //   _id: randomToken,
+      //   expires: expiresDate
+      // });
 
       // create a new instance of user
       var newUser = new User({
@@ -276,18 +199,16 @@ app.post('/api/signup', function(request, response) {
         bio: "",
         musicanType: [],
         projects: [],
-        token: randomToken
+        token: { id: randomToken, expires: expiresDate}
       });
 
-      return [ newToken.save(), newUser.save() ];
+      return newUser.save();
     })
-    .spread(function(newToken, newUser) {
-      console.log('check token here:', newToken);
+    .then(function(newUser) {
       console.log('check user here:', newUser);
 
       return response.json({
-        userInfo: newUser,
-        tokenInfo: newToken
+        userInfo: newUser
       });
     })
     .catch(function(err) {
@@ -299,21 +220,19 @@ app.post('/api/signup', function(request, response) {
 // ********************************
 //          LOGOUT
 // *******************************
-app.delete('/api/logout/:tokenid', function(request, response) {
+app.put('/api/logout', function(request, response) {
 
   console.log('deleting this token from the db', request.params.tokenid);
 
-  var tokenId = request.params.tokenId;
+  var username = request.body.username;
+  var tokenId = request.body.token;
 
-  AuthToken.remove({ _id: tokenId})
-    .then(function() {
-      return User.update({
-        token: tokenId
-      }, {
-        $set: {
-          token: ''
-        }
-      })
+  User.update({
+      _id: username
+    }, {
+      $set: {
+        token: {}
+      }
     })
     .then(function(loggedOut) {
       response.json({
@@ -325,6 +244,10 @@ app.delete('/api/logout/:tokenid', function(request, response) {
     });
 });
 
+
+// ********************************
+//          PROJECT DETAIL PAGE
+// *******************************
 app.get('/api/project/:projectid', function(request, response) {
 
   var projectId = request.params.projectid;
@@ -339,9 +262,9 @@ app.get('/api/project/:projectid', function(request, response) {
 
 });
 
-app.post('/upload', upload.single('file'), function(req, res) {
+app.post('/upload/:username', upload.single('file'), function(req, res) {
 
-  console.log('reached this API');
+  console.log('reached this API', req.params);
 
   // hard-coded for now
   var username = 'Lulu';
@@ -391,11 +314,10 @@ app.post('/upload', upload.single('file'), function(req, res) {
 });
 
 // ********************************
-//          LOGOUT
+//              LOGIN
 // *******************************
 app.post('/api/login', function(request, response) {
   var data = request.body;
-  console.log('data', data.password);
   var username = data.username;
   var password = data.password;
 
@@ -422,34 +344,23 @@ app.post('/api/login', function(request, response) {
         var expiresDate = new Date();
         expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
 
-        var newToken = new AuthToken({
-          _id: randomToken,
-          expires: expiresDate
-        });
-
-        return [ newToken.save(),
-          User.update({
+        return [ User.update({
             _id: username
           }, {
             $set: {
-              token: randomToken
+              token: {
+                id: randomToken, expires: expiresDate
+              }
             }
-          })
-        ];
+          }), User.findOne({ _id: username }) ];
       } else {
         return response.json({
           message: 'Passwords do not match!'
         })
       }
     })
-    .spread(function(tokenInfo, userInfo) {
-      console.log('token info:', tokenInfo);
-      console.log('user info:', tokenInfo);
-      return [ tokenInfo, User.findOne({ _id: username })];
-    })
-    .spread(function(tokenInfo, userInfo) {
+    .spread(function(updated, userInfo) {
       return response.json({
-        tokenInfo: tokenInfo,
         userInfo: userInfo
       });
     })
@@ -483,14 +394,52 @@ app.post('/api/request', function(request, response) {
 
 });
 
+// ********************************
+//          USER PROFILE
+// *******************************
+app.get('/api/profile/:username', function(request, response) {
+
+  var username = request.params.username;
+
+  User.findOne({ _id: username })
+    .then(function(userInfo) {
+
+      // an array of project ids
+      var allProjects = userInfo.projects;
+      console.log('user projects:', allProjects);
+
+      return [ userInfo, Project.find({
+        _id: {
+          $in: allProjects
+        }
+      })];
+
+    })
+    .spread(function(userInfo, allProjects) {
+      console.log('all user projects:', allProjects);
+      return response.json({
+        userInfo: userInfo,
+        allProjects: allProjects
+      })
+    })
+    .catch(function(err) {
+      console.log('encountered errors retrieving profile data:', err.message);
+    });
+
+});
+
+// ********************************
+//          CREATE NEW PROJECT
+// *******************************
 app.post('/api/new/project', function(request, response) {
 
   console.log(request.body);
 
   //  hard code for now until we have sign up/login functionality set up
-  var owner = 'sunny';
+  // var owner = results.owner;
 
   var results = request.body;
+  var owner = results.owner;
   var projectHas = results.has;
   var projectNeeds = results.needs;
 
@@ -504,9 +453,29 @@ app.post('/api/new/project', function(request, response) {
     owner: owner
   });
 
-  newProject.save();
+  bluebird.all([ newProject.save(), User.findOne({ _id: owner }) ])
+    .spread(function(savedProject, userInfo) {
 
-  return 'Created new project!';
+      var projectId = savedProject._id;
+      var userProjects = userInfo.projects;
+      var updatedUserProjects = userProjects.concat([projectId]);
+
+      return User.update({
+          _id: owner
+        }, {
+          $set: {
+            projects: updatedUserProjects
+          }
+        });
+    })
+    .then(function(updatedUserProjects) {
+      return response.json({
+        message: "Added new project to user!"
+      });
+    })
+    .catch(function(err) {
+      console.log('encountered error adding new project:', err.message);
+    });
 
 });
 
