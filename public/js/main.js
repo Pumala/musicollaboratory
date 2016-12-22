@@ -145,6 +145,15 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
     });
   };
 
+  service.submitLoginInfo = function(loginInfo) {
+    var url = '/api/login';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: loginInfo
+    });
+  }
+
   return service;
 
 });
@@ -195,7 +204,21 @@ app.controller('SignUpController', function($scope, $state, $rootScope, $cookies
 
 });
 
-app.controller('LoginController', function($scope, $state) {
+app.controller('LoginController', function($scope, $state, MusicFactory) {
+
+  $scope.submitLogin = function() {
+    var submitInfo = {
+      username: $scope.username,
+      password: $scope.password
+    };
+    MusicFactory.submitLoginInfo(submitInfo)
+      .then(function(results) {
+        console.log('success submitting login info', results);
+      })
+      .catch(function(err) {
+        console.log('experienced err submitting login info:', err.message);
+      });
+  }
 
 });
 

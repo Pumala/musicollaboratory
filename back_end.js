@@ -390,6 +390,75 @@ app.post('/upload', upload.single('file'), function(req, res) {
   console.log('HOLA!!');
 });
 
+// ********************************
+//          LOGOUT
+// *******************************
+app.post('/api/login', function(request, response) {
+  var data = request.body;
+  console.log('data', data.password);
+  var username = data.username;
+  var password = data.password;
+
+  User.findOne({ _id: username })
+    .then(function(userInfo) {
+      if (userInfo === null) {
+        return response.json({
+          message: 'User does not exist!'
+        });
+      }
+      console.log('user info??', userInfo);
+      var hash = userInfo.password;
+
+      // compare the passwords to see if they match
+      return bcrypt.compare(password, hash);
+    })
+    .then(function(comparePasswords) {
+      if (comparePasswords) {
+        // generate a random token
+        var randomToken = uuid();
+
+        // create a date for when the token expires
+        // 30 days form now
+        var expiresDate = new Date();
+        expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
+
+        var newToken = new AuthToken({
+          _id: randomToken,
+          expires: expiresDate
+        });
+
+        return [ newToken.save(),
+          User.update({
+            _id: username
+          }, {
+            $set: {
+              token: randomToken
+            }
+          })
+        ];
+      } else {
+        return response.json({
+          message: 'Passwords do not match!'
+        })
+      }
+    })
+    .spread(function(tokenInfo, userInfo) {
+      console.log('token info:', tokenInfo);
+      console.log('user info:', tokenInfo);
+      return [ tokenInfo, User.findOne({ _id: username })];
+    })
+    .spread(function(tokenInfo, userInfo) {
+      return response.json({
+        tokenInfo: tokenInfo,
+        userInfo: userInfo
+      });
+    })
+    .catch(function(err) {
+      console.log('encountered error logging in!', err.message)
+    });
+
+});
+
 // Send request to project owner
 app.post('/api/request', function(request, response) {
   // const Request = mongoose.model('Request', {
