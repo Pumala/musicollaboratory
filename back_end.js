@@ -54,6 +54,14 @@ const User = mongoose.model( 'User', {
   token: { id: String, expires: Date } // token
 });
 
+const File = mongoose.model('File', {
+  _id: { type: String, required: true, unique: true }, // file hash name
+  originalName: { type: String, required: true },
+  owner: String, // username
+  path: String,
+  project: ObjectId
+});
+
 const Project = mongoose.model('Project', {
   name: { type: String, required: true },
   description: String,
@@ -75,24 +83,12 @@ const Project = mongoose.model('Project', {
 });
 
 const Request = mongoose.model('Request', {
-    senderName: { type: String, required: true },
-    projectOwner: { type: String, required: true },
-    requestTypes: {
-      melody: Boolean,
-      lyrics: Boolean,
-      voice: Boolean,
-      production: Boolean
-    }, // Melody, Lyrics, Voice, Production
     projectId: ObjectId,
+    projectOwner: { type: String, required: true },
+    senderName: { type: String, required: true },
+    requestTypes: [String], // Melody, Lyrics, Voice, Production
     description: String,
     date: Date
-});
-
-const File = mongoose.model('File', {
-  _id: { type: String, required: true, unique: true }, // file hash name
-  originalName: { type: String, required: true },
-  owner: String, // username
-  path: String
 });
 
 // const AuthToken = mongoose.model('AuthToken', {
@@ -113,6 +109,9 @@ function getTypes(typesArr) {
   return arr;
 };
 
+// ********************************
+//          LIST ALL PROJECTS
+// *******************************
 app.get('/api/search/allprojects', function(request, response) {
 
   Project.find().limit(20)
@@ -125,6 +124,9 @@ app.get('/api/search/allprojects', function(request, response) {
     });
 });
 
+// ********************************
+//          SEARCH FOR PROJECTS
+// *******************************
 app.post('/api/search/projects', function(request, response) {
 
   var needsInfo = request.body.needsInfo;
@@ -182,11 +184,6 @@ app.post('/api/signup', function(request, response) {
       // 30 days form now
       var expiresDate = new Date();
       expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
-
-      // var newToken = new AuthToken({
-      //   _id: randomToken,
-      //   expires: expiresDate
-      // });
 
       // create a new instance of user
       var newUser = new User({
@@ -262,12 +259,20 @@ app.get('/api/project/:projectid', function(request, response) {
 
 });
 
-app.post('/upload/:username', upload.single('file'), function(req, res) {
+// ********************************
+//          CREATE NEW PROJECT
+// *******************************
+
+// ********************************
+//         CREATE/UPLOAD NEW FILE
+// *******************************
+app.post('/api/upload/:username/:projectid', upload.single('file'), function(req, res) {
 
   console.log('reached this API', req.params);
 
   // hard-coded for now
-  var username = 'Lulu';
+  var username = req.params.username;
+  var projectId = req.params.projectid;
 
   var myFile = req.file;
   console.log('this is the file:', myFile);
@@ -286,8 +291,6 @@ app.post('/upload/:username', upload.single('file'), function(req, res) {
   });
 
   newFile.save();
-
-  var projectId = "5859c2268dc69cbea0550bd2";
 
   // make a query to find the project for which the file belongs to
   // then update its files array
@@ -310,7 +313,6 @@ app.post('/upload/:username', upload.single('file'), function(req, res) {
       console.log('encountered error saving file to user info:', err.message);
     })
 
-  console.log('HOLA!!');
 });
 
 // ********************************
@@ -370,27 +372,58 @@ app.post('/api/login', function(request, response) {
 
 });
 
-// Send request to project owner
-app.post('/api/request', function(request, response) {
-  // const Request = mongoose.model('Request', {
-  //     senderName: { type: String, required: true },
-  //     projectOwner: String,
-  //     requestTypes: String, // Melody, Lyrics, Voice, Production
-  //     projectId: ObjectId,
-  //     description: String,
-  //     date: Date
-  // });
+// ********************************************
+//          CREATE A CONTRIBUTION REQUEST
+// *******************************************
+app.post('/api/request/new', function(request, response) {
+
   console.log('request.body is:', request.body);
-  var projectOwner = request.body.owner;
+  var data = request.body;
 
-  var requestTypes = request.body.request;
+  var sender = data.sender;
+  var projectOwner = data.owner;
+  var requestTypes = data.request;
+  var projectId = data.projectId;
+  var description = data.description;
 
-  var requestTypes = getTypes(requestTypes);
+  var requestTypes = getTypes([requestTypes]);
 
-  // var newRequest = new Request ({
-  //   senderName:
-  // })
-  console.log(requestTypes);
+  console.log('requesting these types....', typeof projectId);
+  console.log(projectOwner);
+  console.log(sender);
+  console.log(description);
+
+  var newRequest = new Request({
+    projectId: projectId,
+    projectOwner: projectOwner,
+    senderName: sender,
+    requestTypes: requestTypes,
+    description: description,
+    date: new Date()
+  });
+
+  newRequest.save();
+
+  return "request was added to db....."
+
+});
+
+// ********************************************
+//          RETRIEVE ALL USER REQUESTS
+// *******************************************
+app.get('/api/requests/:username', function(request, response) {
+
+  var username = request.params.username;
+
+  Request.find()
+    .then(function(allRequests) {
+      return response.json({
+        allRequests: allRequests
+      });
+    })
+    .catch(function(err) {
+      console.log('error retrieving all the requests:', err.message);
+    });
 
 });
 
@@ -431,7 +464,7 @@ app.get('/api/profile/:username', function(request, response) {
 // ********************************
 //          CREATE NEW PROJECT
 // *******************************
-app.post('/api/new/project', function(request, response) {
+app.post('/api/new/project', upload.single('file'), function(request, response) {
 
   console.log(request.body);
 
@@ -460,17 +493,18 @@ app.post('/api/new/project', function(request, response) {
       var userProjects = userInfo.projects;
       var updatedUserProjects = userProjects.concat([projectId]);
 
-      return User.update({
+      return [ User.update({
           _id: owner
         }, {
           $set: {
             projects: updatedUserProjects
           }
-        });
+        }), projectId
+      ];
     })
-    .then(function(updatedUserProjects) {
+    .spread(function(updatedUserProjects, projectId) {
       return response.json({
-        message: "Added new project to user!"
+        projectId: projectId
       });
     })
     .catch(function(err) {
@@ -479,6 +513,22 @@ app.post('/api/new/project', function(request, response) {
 
 });
 
+app.get('/api/project/upload/:projectId', function(request, response) {
+
+  var projectId = request.params.projectId;
+
+  Project.findOne({ _id: projectId })
+    .then(function(projInfo) {
+      return response.json({
+        projInfo: projInfo
+      });
+      // console.log(projInfo);
+    })
+    .catch(function(err) {
+      console.log('encountered errors retrieving project data form upload:', err.message);
+    });
+
+});
 
 app.listen(3000, function() {
   console.log('The server has started to listen........');

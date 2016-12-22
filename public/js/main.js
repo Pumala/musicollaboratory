@@ -42,10 +42,23 @@ app.config(function($stateProvider, $urlRouterProvider) {
     controller: 'NewProjectsController'
   })
   .state({
+    name: 'requests',
+    url: '/profile/{username}/requests',
+    templateUrl: 'templates/requests.html',
+    controller: 'RequestsController'
+  })
+  .state({
     name: "myproject",
     url: "/myproject/{project_id}",
     templateUrl: "templates/myproject.html",
     controller: "MyProjectsController"
+  })
+  .state({
+    name: "myprojectuploader",
+    url: "/myproject/{projectInfo}/upload",
+    params: { projectInfo : null},
+    templateUrl: "templates/new_project_file.html",
+    controller: "ProjectFileController"
   })
   .state({
     name: "profile",
@@ -57,7 +70,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise('/');
 });
 
-app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
+app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $cookies) {
   var service = {};
 
   $rootScope.factoryCookieData = $cookies.getObject('cookieData') ? $cookies.getObject('cookieData') : null;
@@ -132,7 +145,8 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
   };
 
   service.sendRequest = function(requestInfo) {
-    var url = '/api/request';
+    console.log('hello want to send request:', requestInfo);
+    var url = '/api/request/new';
     return $http({
       method: 'POST',
       url: url,
@@ -166,6 +180,22 @@ app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
     });
   };
 
+  service.FileUploadService = function(projectId) {
+    var url = "/api/project/upload/" + projectId;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
+
+  service.getRequests = function() {
+    var url = '/api/requests/' + $rootScope.rootUsername;
+    return $http({
+      method: 'GET',
+      url: url
+    });
+  };
+
   return service;
 
 });
@@ -174,29 +204,64 @@ app.controller('FileController', function($scope, $rootScope, FileUploader) {
   // var uploader = $scope.uploader = new FileUploader({
   //   url: '/upload'
   // });
+
   var uploader = $scope.uploader = new FileUploader({
-    url: '/upload/' + $rootScope.rootUsername
+    url: '/api/upload/' + $rootScope.rootUsername + '/' + $scope.projectId
   });
 
   uploader.onCompleteAll = function() {
+    console.log('proj id?:', $scope.projectId);
     console.info('onCompleteAll');
   };
+});
+
+app.controller('ProjectFileController', function($scope, MusicFactory, $state, $stateParams, $rootScope) {
+  console.log($stateParams);
+  $scope.projectId = $stateParams.projectInfo;
+  MusicFactory.FileUploadService($scope.projectId)
+  .then(function(projectInfo) {
+    console.log('sucess sending project info!', projectInfo.data.projInfo);
+    $scope.projectInfo = projectInfo.data.projInfo;
+  })
+  .catch(function(err) {
+    console.log('err in ProjectFileController', err.stack);
+  })
 });
 
 app.controller('HomeController', function($scope, $state) {
 
 });
 
-app.controller('UserController', function($scope, $state, MusicFactory) {
+app.controller('RequestsController', function($scope, $stateParams, MusicFactory, $state) {
+  $scope.username = $stateParams.username;
+
+  MusicFactory.getRequests()
+    .then(function(results) {
+      $scope.allRequests = results.data.allRequests;
+      console.log('all requests:', $scope.allRequests);
+    })
+    .catch(function(err) {
+      console.log('err getting requests:', err.message);
+    });
+
+});
+
+app.controller('UserController', function($scope, $sce, $state, MusicFactory) {
 
   // makes a service call to pass data to the backend to render the user profile page
   MusicFactory.getUserProfile()
     .then(function(results) {
       console.log('user profile results:', results);
+      $scope.allProjects = results.data.allProjects;
+      $scope.userInfo = results.data.userInfo;
     })
     .catch(function(err) {
       console.log('encountered errors retrieving user profile data', err.message);
     });
+
+    $scope.getAudioUrl = function(fileHash) {
+      return $sce.trustAsResourceUrl('/upload/' + fileHash);
+    };
 
 });
 
@@ -304,7 +369,7 @@ app.controller('ProjectsController', function($scope, $rootScope, $state) {
 
 });
 
-app.controller('NewProjectsController', function($scope, $rootScope, MusicFactory) {
+app.controller('NewProjectsController', function($scope, $stateParams, $state, FileUploader, $rootScope, MusicFactory) {
   $scope.hasMelody  = false;
   $scope.hasLyrics = false;
   $scope.hasVoice = false;
@@ -335,6 +400,7 @@ app.controller('NewProjectsController', function($scope, $rootScope, MusicFactor
     MusicFactory.addNewProject(newProject)
       .then(function(results) {
         console.log('results from adding new project:', results);
+        $state.go('myprojectuploader', { projectInfo : results.data.projectId });
       })
       .catch(function(err) {
         console.log('encountered error adding new project::', err.message);
@@ -375,17 +441,18 @@ app.controller('MyProjectsController', function($scope, $stateParams, $rootScope
         sender: $rootScope.rootUsername,
         owner: $scope.owner,
         description: $scope.description,
-        request: $scope.requestedTypes
+        request: $scope.requestedTypes,
+        projectId: $scope.projectId
       };
       console.log('here are the request types::', requestTypes);
 
-      // MusicFactory.sendRequest(requestTypes)
-      //   .then(function(results) {
-      //     console.log('here are the request results:', results);
-      //   })
-      //   .catch(function(err) {
-      //     console.log('error processing request to project owner:', err.message);
-      //   });
+      MusicFactory.sendRequest(requestTypes)
+        .then(function(results) {
+          console.log('here are the request results:', results);
+        })
+        .catch(function(err) {
+          console.log('error processing request to project owner:', err.message);
+        });
     }
 
 });
