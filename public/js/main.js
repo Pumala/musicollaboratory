@@ -60,6 +60,37 @@ app.config(function($stateProvider, $urlRouterProvider) {
 app.factory('MusicFactory', function($http, $rootScope, $state, $cookies) {
   var service = {};
 
+  $rootScope.factoryCookieData = $cookies.getObject('cookieData') ? $cookies.getObject('cookieData') : null;
+  console.log('factory cookies?:', $cookies.getObject('cookieData'));
+  if ($rootScope.factoryCookieData) {
+    $rootScope.rootUsername = $cookies.getObject('cookieData').userInfo._id;
+    $rootScope.rootToken = $cookies.getObject('cookieData').tokenInfo._id;
+
+    console.log('root token???', $cookies.getObject('cookieData').tokenInfo._id);
+  }
+
+  $rootScope.rootLogout = function() {
+    var url = '/api/logout/' + $rootScope.rootToken;
+    return $http({
+      method: 'DELETE',
+      url: url
+    })
+    .then(function(results) {
+      console.log(results);
+      // reset $rootScope variables
+      $rootScope.factoryCookieData = null;
+      $rootScope.rootUsername = null;
+      $rootScope.rootToken = null;
+      // remove the cookie
+      $cookies.remove('cookieData');
+      $state.go('home');
+
+    })
+    .catch(function(err) {
+      console.log('err logging out:', eerr.message);
+    })
+  }
+
   service.addNewProject = function(newProjectInfo) {
     var url = '/api/new/project';
     return $http({
@@ -132,7 +163,7 @@ app.controller('HomeController', function($scope, $state) {
 
 });
 
-app.controller('SignUpController', function($scope, $state, MusicFactory) {
+app.controller('SignUpController', function($scope, $state, $rootScope, $cookies, MusicFactory) {
 
   $scope.submitSignUp = function() {
     if ($scope.password === $scope.confirm_password) {
@@ -148,7 +179,14 @@ app.controller('SignUpController', function($scope, $state, MusicFactory) {
     }
     MusicFactory.submitNewUser(signUpInfo)
       .then(function(results) {
-        console.log('results submitting new user info:', results)
+        // console.log('results submitting new user info:', results.data)
+        $rootScope.rootUsername = results.data.userInfo._id;
+        $rootScope.rootToken = results.data.tokenInfo._id;
+
+        $cookies.putObject('cookieData', results.data);
+        $rootScope.factoryCookieData = $cookies.putObject('cookieData', results.data);
+
+        $state.go('home');
       })
       .catch(function(err) {
         console.log('error submitting new user info:', err.message);

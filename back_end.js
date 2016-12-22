@@ -184,9 +184,12 @@ app.post('/api/search/projects', function(request, response) {
 
 });
 
+// ********************************
+//          USER SIGNUP
+// *******************************
 app.post('/api/signup', function(request, response) {
   console.log('SIGNUP INFO:', request.body);
-  var data = request.data;
+  var data = request.body;
 
   var firstName = data.firstName;
   var lastName = data.lastName;
@@ -194,33 +197,132 @@ app.post('/api/signup', function(request, response) {
   var email = data.email;
   var password = data.password;
 
-  var newUser = {
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    password: password,
-    joined: new Date(),
-    bio: "",
-    musicanType: [],
-    projects: [],
-    token: ""
-  }
+  // // generate a new salt
+  // bluebird.all([ bcrypt.genSalt(saltRounds)])
+  //   .then(function(salt) {
+  //     // return an encrypted password
+  //     return bcrypt.hash(password, salt);
+  //   })
+  //   .then(function(hash) {
+  //
+  //     // generate a random token
+  //     var randomToken = uuid();
+  //     // create a date for when the token expires
+  //     // 30 days form now
+  //     var expiresDate = new Date();
+  //     expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
+  //
+  //     var newToken = new AuthToken({
+  //       _id: randomToken,
+  //       expires: expiresDate
+  //     });
+  //
+  //     // create a new instance of user
+  //     var newUser = new User({
+  //       _id: username,
+  //       firstName: firstName,
+  //       lastName: lastName,
+  //       email: email,
+  //       password: hash,
+  //       joined: new Date(),
+  //       bio: "",
+  //       musicanType: [],
+  //       projects: [],
+  //       token: randomToken
+  //     });
+  //
+  //     // newToken.save();
+  //     // newUser.save();
+  //     newToken.save();
+  //
+  //     return newUser.save();
+  //   })
+  //   .then(function(newUserInfo) {
+  //     console.log('check me here:', newUserInfo);
+  //     return response.json({
+  //       userInfo: newUserInfo
+  //     });
 
-  newUser.save();
 
-  // const User = mongoose.model( 'User', {
-  //   _id: { type: String, required: true, unique: true }, // username
-  //   firstName: { type: String, required: true },
-  //   lastName: { type: String, required: true },
-  //   email: { type: String, required: true },
-  //   password: { type: String },
-  //   joined: Date,
-  //   bio: String,
-  //   musicanType: [String], // Melody, Lyrics, Voice, Production
-  //   projects: [ObjectId], // Project Id
-  //   token: String // token
-  // });
 
+  // generate a new salt
+  bluebird.all([ bcrypt.genSalt(saltRounds) ])
+    .spread(function(salt) {
+      // return an encrypted password
+      return bcrypt.hash(password, salt);
+    })
+    .then(function(hash) {
+
+      // generate a random token
+      var randomToken = uuid();
+      // create a date for when the token expires
+      // 30 days form now
+      var expiresDate = new Date();
+      expiresDate = expiresDate.setDate(expiresDate.getDate() + 30);
+
+      var newToken = new AuthToken({
+        _id: randomToken,
+        expires: expiresDate
+      });
+
+      // create a new instance of user
+      var newUser = new User({
+        _id: username,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: hash,
+        joined: new Date(),
+        bio: "",
+        musicanType: [],
+        projects: [],
+        token: randomToken
+      });
+
+      return [ newToken.save(), newUser.save() ];
+    })
+    .spread(function(newToken, newUser) {
+      console.log('check token here:', newToken);
+      console.log('check user here:', newUser);
+
+      return response.json({
+        userInfo: newUser,
+        tokenInfo: newToken
+      });
+    })
+    .catch(function(err) {
+      console.log('error saving new user to db!!!', err.message);
+    });
+
+});
+
+// ********************************
+//          LOGOUT
+// *******************************
+app.delete('/api/logout/:tokenid', function(request, response) {
+
+  console.log('deleting this token from the db', request.params.tokenid);
+
+  var tokenId = request.params.tokenId;
+
+  AuthToken.remove({ _id: tokenId})
+    .then(function() {
+      return User.update({
+        token: tokenId
+      }, {
+        $set: {
+          token: ''
+        }
+      })
+    })
+    .then(function(loggedOut) {
+      response.json({
+        message: 'deleted token'
+      });
+    })
+    .catch(function(err) {
+      console.log("error deleting token", err.stack);
+    });
 });
 
 app.get('/api/project/:projectid', function(request, response) {
