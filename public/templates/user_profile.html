@@ -12,13 +12,22 @@
 
   <div class="well">
     <h2>Completed Projects</h2>
+    <ul  ng-repeat="(key, value) in project.existingTypes" >
+        <li ng-show="value">{{key}}</li>
+    </ul>
   </div>
+
+<!-- project.seekingTypes[value] -->
 
   <div class="" ng-repeat="project in allProjects">
     <div class="well">
       <h4>{{project.name}}</h4>
       <p>{{project.description}}</p>
-      <div ng-show="project.files.length > 0">
+      <ul  ng-repeat="(key, value) in project.existingTypes" >
+          <li ng-show="value">{{key}}</li>
+      </ul>
+
+      <div >
         <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
       </div>
 
