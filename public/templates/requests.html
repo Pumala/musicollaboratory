@@ -2,6 +2,16 @@
 
 <div ng-repeat="request in allRequests">
   <div class="well">
-    <h2>{{request.senderName}}</h2>
+    <h2><a ui-sref="profile({ username: request.senderName })"><strong>{{request.senderName}}</strong></a></h2>
+    <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
+    <h4>Interested in contributing:</h4>
+    <form ng-repeat="type in request.requestTypes">
+      <label for="">{{type}}</label>
+      <input type="checkbox" ng-model="typeRequest[type]" name="" value="">
+    </form>
+    <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
+    <p>{{request.description}}</p>
+    <button class="btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.senderName)">Accept</button>
+    <a class="btn btn-danger" ng-click="declineRequest(request._id)">Decline</a>
   </div>
 </div>

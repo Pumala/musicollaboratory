@@ -79,7 +79,8 @@ const Project = mongoose.model('Project', {
   }, // Melody, Lyrics, Voice, Production
   files: [String], // uploading files ( mp3, lyrics ), // file hash name
   members: [String],
-  owner: String
+  owner: String,
+  completed: Boolean
 });
 
 const Request = mongoose.model('Request', {
@@ -512,6 +513,124 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
     });
 
 });
+
+app.delete('/api/request/delete/:requestid', function(request, response) {
+
+  console.log(request.params.requestid);
+  var requestId = request.params.requestid;
+
+  Request.remove({ _id: requestId })
+    .then(function(deleteRequest) {
+      return response.json({
+        message: "hello we deleted the request from the db"
+      });
+    })
+    .catch(function(err) {
+      console.log('error attempting to delete request from db:', err.message);
+    });
+});
+
+app.put('/api/request/accept', function(request, response) {
+  console.log(request.body.requestInfo);
+  var data = request.body.requestInfo;
+
+  var requestId = data.requestId;
+  var typeRequest = data.typeRequest;
+  var projectId = data.projectId;
+  var username = data.username;
+
+
+//delete request
+  bluebird.all([
+    Request.remove({ _id: requestId }),
+    Project.findOne( { _id: projectId}),
+    User.findOne( { _id: username} )
+   ])
+    .spread(function(acceptRequest, acceptProject, acceptUser) {
+      console.log('project info:', acceptProject);
+      console.log('USER INFO', acceptUser.projects);
+
+      var projectMembers = acceptProject.members;
+      projectMembers.push(username);
+
+      console.log('updated members:', projectMembers);
+
+      var projectSeekingObj = acceptProject.seekingTypes;
+      var projectExistingObj = acceptProject.existingTypes;
+
+      console.log('current seeking types:', projectSeekingObj);
+
+      // updates what the project is seeeking
+      for (key in projectSeekingObj) {
+        for (type in typeRequest) {
+          if (key === type) {
+            projectSeekingObj[key] = false;
+          }
+        }
+      }
+
+      // update what types exist in the project
+      for (key in projectExistingObj) {
+        for (type in typeRequest) {
+          if (key === type) {
+            projectExistingObj[key] = true;
+          }
+        }
+      }
+
+      console.log('updated project seeking obj:', projectSeekingObj);
+      console.log('updated project existing obj:', projectExistingObj);
+
+      // for (key in projectSeekingObj) {
+      //   console.log('key:', key);
+      // }
+
+
+      var projectsArr = acceptUser.projects;
+      projectsArr.push(projectId);
+
+      // Project.update({
+      //   _id: projectId
+      // }, {
+      //   $set: {
+      //     seekingTypes: projectSeekingObj,
+      //     existingTypes: projectExistingObj,
+      //     members: projectMembers
+      //   }
+      // })
+
+      return [ User.update({
+        _id: username
+        }, {
+          $set: {
+            projects: projectsArr
+          }
+        }),
+        Project.update({
+          _id: projectId
+        }, {
+          $set: {
+            seekingTypes: projectSeekingObj,
+            existingTypes: projectExistingObj,
+            members: projectMembers
+          }
+        })
+      ];
+    })
+    .spread(function(updatedUser, updatedProject) {
+      console.log('updated user:', updatedUser);
+      console.log('updated project:', updatedProject);
+
+      // return response.json({
+      //   message: "in accept, accepted the request from the db"
+      // });
+    })
+    .catch(function(err) {
+      console.log('error attempting to delete request from db:', err.message);
+    });
+
+
+})
 
 app.get('/api/project/upload/:projectId', function(request, response) {
 

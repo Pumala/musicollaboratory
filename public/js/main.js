@@ -196,6 +196,24 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
+  service.deleteRequest = function(requestId) {
+    var url = '/api/request/delete/' + requestId;
+    return $http({
+      method: 'DELETE',
+      url: url
+    });
+  };
+
+  service.serviceAcceptRequest = function(requestInfo) {
+    var url = '/api/request/accept';
+    return $http({
+      method: 'PUT',
+      url: url,
+      data: {
+        requestInfo: requestInfo
+      }
+    })
+  };
   return service;
 
 });
@@ -234,6 +252,7 @@ app.controller('HomeController', function($scope, $state) {
 
 app.controller('RequestsController', function($scope, $stateParams, MusicFactory, $state) {
   $scope.username = $stateParams.username;
+  $scope.typeRequest = {};
 
   MusicFactory.getRequests()
     .then(function(results) {
@@ -244,9 +263,49 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
       console.log('err getting requests:', err.message);
     });
 
+    $scope.declineRequest = function(requestId) {
+      MusicFactory.deleteRequest(requestId)
+        .then(function(results) {
+          console.log('success deleting request::', results);
+          $state.reload();
+        })
+        .catch(function(err) {
+          console.log('error deleting request::', err.message);
+        });
+    }
+    $scope.acceptRequest = function(requestId, projectId, username) {
+      console.log('type request obj::', $scope.typeRequest);
+      var requestObj = {
+        requestId: requestId,
+        typeRequest: $scope.typeRequest,
+        projectId: projectId,
+        username: username
+      };
+      MusicFactory.serviceAcceptRequest(requestObj)
+        .then(function(results) {
+          console.log('success accepting request::', results);
+        })
+        .catch(function(err) {
+          console.log('error accepting request::', err.message);
+        });
+    }
+
 });
 
 app.controller('UserController', function($scope, $sce, $state, MusicFactory) {
+
+  $scope.checkCompletedProjects = function(typesObj) {
+    console.log('types obj:', typesObj);
+    // loop through the seeking types Object
+    for (key in typesObj) {
+      // typesObj['lyrics'] === true
+      // if any type
+      if (typesObj[key]) {
+        return false;
+      }
+    };
+    return true;
+  };
 
   // makes a service call to pass data to the backend to render the user profile page
   MusicFactory.getUserProfile()

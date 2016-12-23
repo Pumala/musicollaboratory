@@ -8,30 +8,27 @@
 
   <div class="well">
     <h2>Current Projects</h2>
+    <div ng-repeat="project in allProjects">
+      <div ng-hide="checkCompletedProjects(project.seekingTypes)" class="well">
+        <h4>{{project.name}}</h4>
+        <p>{{project.description}}</p>
+        <div >
+          <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="well">
     <h2>Completed Projects</h2>
-    <ul  ng-repeat="(key, value) in project.existingTypes" >
-        <li ng-show="value">{{key}}</li>
-    </ul>
-  </div>
-
-<!-- project.seekingTypes[value] -->
-
-  <div class="" ng-repeat="project in allProjects">
-    <div class="well">
-      <h4>{{project.name}}</h4>
-      <p>{{project.description}}</p>
-      <!-- <ul  ng-repeat="(key, value) in project.existingTypes" >
-          <li ng-show="value">{{key}}</li>
-      </ul> -->
-
-      <div >
-        <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
-      </div>
-
+    <div ng-repeat="(key, value) in allProjects" >
+        <div class="well" ng-show="checkCompletedProjects(value.seekingTypes)">
+          <h3>{{value.name}}</h3>
+          <p>{{value.description}}</p>
+          <div >
+            <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio>
+          </div>
+        </div>
     </div>
   </div>
-
 </div>
