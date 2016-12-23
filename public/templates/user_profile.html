@@ -23,9 +23,9 @@
     <div class="well">
       <h4>{{project.name}}</h4>
       <p>{{project.description}}</p>
-      <ul  ng-repeat="(key, value) in project.existingTypes" >
+      <!-- <ul  ng-repeat="(key, value) in project.existingTypes" >
           <li ng-show="value">{{key}}</li>
-      </ul>
+      </ul> -->
 
       <div >
         <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
