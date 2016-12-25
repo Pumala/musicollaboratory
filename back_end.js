@@ -51,6 +51,7 @@ const User = mongoose.model( 'User', {
   bio: String,
   musicanType: [String], // Melody, Lyrics, Voice, Production
   projects: [ ObjectId ], // Project Id
+  requests: [ ObjectId ], // Request Id
   token: { id: String, expires: Date } // token
 });
 
@@ -91,6 +92,10 @@ const Request = mongoose.model('Request', {
     description: String,
     date: Date
 });
+
+// TO DO !!!!!!!!!!!!!!!!
+// update project detail page => edit project page
+// update request center page !!!!
 
 // const AuthToken = mongoose.model('AuthToken', {
 //   _id: { type: String, required: true, unique: true },
@@ -159,6 +164,86 @@ app.post('/api/search/projects', function(request, response) {
 });
 
 // ********************************
+//          DELETE PROJECT
+// *******************************
+app.delete('/api/remove/project/:projectid', function(request, response) {
+  console.log('PARAMS?',request.params);
+  var projectId = request.params.projectid;
+
+  Project.remove({ _id: projectId })
+    .then(function(removedProject) {
+      return response.json({
+        message: 'removed project from db'
+      })
+    })
+    .catch(function(err) {
+      console.log('encountered err removing project from db', err.message);
+    })
+
+});
+
+// *****************+++++++****************************
+//          MARK PROJECT AS COMPLETE or UNCOMPLETE
+// *****************+++++++***************************
+app.put('/api/complete/project', function(request, response) {
+
+  console.log('params?', request.body);
+  var projectId = request.body.projectId;
+  var isCompleted = request.body.isCompleted;
+
+  Project.update({
+      _id: projectId
+    }, {
+      $set: {
+        completed: isCompleted
+      }
+    })
+    .then(function(completedProject) {
+      console.log('updated as complete?', completedProject);
+      return response.json({
+        message: 'mark project as complete in db'
+      })
+    })
+    .catch(function(err) {
+      console.log('encountered err marking project complete in db', err.message);
+    });
+
+});
+
+// *****************+++++++****************************
+//                    EDIT PROJECT
+// *****************+++++++***************************
+app.put('/api/edit/project', function(request, response) {
+
+  console.log(request.body);
+
+  var projectId = request.body.projectId;
+  var description = request.body.projectInfo.description;
+  var hasTypes = request.body.projectInfo.has;
+  var needsTypes = request.body.projectInfo.needs;
+
+  Project.update({
+      _id: projectId
+    }, {
+      $set: {
+        description: description,
+        existingTypes: hasTypes,
+        seekingTypes: needsTypes
+      }
+    })
+    .then(function(updatedProjectInfo) {
+      console.log('results updating', updatedProjectInfo);
+      return response.json({
+        message: 'sucess updating project info!'
+      });
+    })
+    .catch(function(err) {
+      console.log('encountered errors updating project info:', err.message);
+    })
+
+});
+
+// ********************************
 //          USER SIGNUP
 // *******************************
 app.post('/api/signup', function(request, response) {
@@ -197,6 +282,7 @@ app.post('/api/signup', function(request, response) {
         bio: "",
         musicanType: [],
         projects: [],
+        requests: [],
         token: { id: randomToken, expires: expiresDate}
       });
 
@@ -246,17 +332,81 @@ app.put('/api/logout', function(request, response) {
 // ********************************
 //          PROJECT DETAIL PAGE
 // *******************************
-app.get('/api/project/:projectid', function(request, response) {
+app.get('/api/project/:projectid/:username', function(request, response) {
 
   var projectId = request.params.projectid;
+  var username = request.params.username;
 
-  Project.findOne({ _id: projectId })
-    .then(function(projectInfo) {
-      return response.json(projectInfo);
+  console.log('PARAMS?', request.params);
+
+  // make a query to check if user has already requested to contribute
+  User.findOne({ _id: username })
+    .then(function(userInfo) {
+      var userRequests = userInfo.requests;
+      console.log('what am i doing',userInfo);
+
+      return Request.find({
+        _id: {
+          $in: userRequests
+        }
+      });
+    })
+    .then(function(userRequestInfo) {
+      // console.log('INFO INFO INFO:', userRequestInfo);
+      var alreadyRequested = false;
+
+      userRequestInfo.forEach(function(request) {
+        if (String(request.projectId) === String(projectId)) {
+          console.log('YES YES YES YES');
+          alreadyRequested = true;
+        }
+      });
+
+      return [ Project.findOne({ _id: projectId }), alreadyRequested]
+    })
+    .spread(function(projectInfo, alreadyRequested) {
+      return response.json({
+        projectInfo: projectInfo,
+        alreadyRequested: alreadyRequested
+      });
     })
     .catch(function(err) {
-      console.log('encountered errors retrieving project info from db:', err.message);
-    });
+      console.log(err.message);
+    })
+
+  // bluebird.all([ User.findOne({ _id: username }),
+  //   Project.findOne({ _id: projectId })
+  // ])
+  //   .spread(function(userInfo, projectInfo) {
+  //     var userRequests = userInfo.requests;
+  //
+  //     // loop through each request to see if any of them were requests
+  //     // to this particular project
+  //     // use the request id to compare
+  //     userRequests.forEach(function(request) {
+  //   })
+
+
+
+  // Request.findOne({
+  //   $and: [
+  //     {
+  //       projectId: projectId
+  //     },
+  //     {
+  //       senderName: username
+  //     }
+  //   ]
+  // });
+
+  //
+  // Project.findOne({ _id: projectId })
+  //   .then(function(projectInfo) {
+  //     return response.json(projectInfo);
+  //   })
+  //   .catch(function(err) {
+  //     console.log('encountered errors retrieving project info from db:', err.message);
+  //   });
 
 });
 
@@ -403,9 +553,33 @@ app.post('/api/request/new', function(request, response) {
     date: new Date()
   });
 
-  newRequest.save();
+  bluebird.all([ User.findOne({ _id: sender }), newRequest.save() ])
+    .spread(function(userInfo, newRequest) {
+      var requestId = newRequest._id;
+      var userRequests = userInfo.requests;
 
-  return "request was added to db....."
+      userRequests.push(requestId);
+      console.log(userRequests);
+      return User.update({
+        _id: sender
+      }, {
+        $set: {
+          requests: userRequests
+        }
+      });
+    })
+    .then(function(updatedUser) {
+      return response.json({
+        message: 'success adding new request!'
+      })
+    })
+    .catch(function(err) {
+      console.log('error saving new request...', err.message);
+    });
+
+
+
+  // return "request was added to db....."
 
 });
 
@@ -416,15 +590,47 @@ app.get('/api/requests/:username', function(request, response) {
 
   var username = request.params.username;
 
-  Request.find()
-    .then(function(allRequests) {
-      return response.json({
-        allRequests: allRequests
+  bluebird.all([
+    Request.find({ senderName: username}),
+    Request.find({ projectOwner: username })
+  ])
+    .spread(function(sendRequests, receiveRequests) {
+
+      var sendProjectsArr = [];
+
+      sendRequests.forEach(function(request) {
+        sendProjectsArr.push(request.projectId);
       });
+
+      var receiveProjectsArr = [];
+
+      receiveRequests.forEach(function(request) {
+        receiveProjectsArr.push(request.projectId);
+      });
+
+      return [ Project.find({
+        _id: {
+          $in: receiveProjectsArr
+        }
+      }), Project.find({
+        _id: {
+          $in: sendProjectsArr
+        }
+      }), receiveRequests, sendRequests ];
+
     })
-    .catch(function(err) {
+    .spread(function(receiveProjects, sendProjects, receiveRequests, sendRequests) {
+
+        return response.json({
+          receiveProjects: receiveProjects,
+          sendProjects: sendProjects,
+          receiveRequests: receiveRequests,
+          sendRequests: sendRequests
+        });
+      })
+      .catch(function(err) {
       console.log('error retrieving all the requests:', err.message);
-    });
+      });
 
 });
 
@@ -484,7 +690,8 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
     seekingTypes: projectNeeds,
     files: [],
     members: [owner],
-    owner: owner
+    owner: owner,
+    completed: false
   });
 
   bluebird.all([ newProject.save(), User.findOne({ _id: owner }) ])
@@ -632,21 +839,93 @@ app.put('/api/request/accept', function(request, response) {
 
 })
 
-app.get('/api/project/upload/:projectId', function(request, response) {
-
+app.get('/api/project/file/upload/:projectId', function(request, response) {
+  console.log('.........YUP......', request.params);
   var projectId = request.params.projectId;
 
   Project.findOne({ _id: projectId })
     .then(function(projInfo) {
+      var projFiles = projInfo.files;
+
+      console.log('..........files..........', projFiles);
+      return [ File.find({
+          _id: {
+            $in: projFiles
+          }
+        }), projInfo
+      ];
+
+    })
+    .spread(function(fileInfo, projInfo) {
       return response.json({
+        allFiles: fileInfo,
         projInfo: projInfo
       });
-      // console.log(projInfo);
     })
     .catch(function(err) {
       console.log('encountered errors retrieving project data form upload:', err.message);
     });
 
+  // Project.findOne({ _id: projectId })
+  //   .then(function(projInfo) {
+  //     return response.json({
+  //       projInfo: projInfo
+  //     });
+  //     // console.log(projInfo);
+  //   })
+  //   .catch(function(err) {
+  //     console.log('encountered errors retrieving project data form upload:', err.message);
+  //   });
+
+});
+
+
+app.delete('/api/:projectid/file/remove/:fileid', function(request, response) {
+
+  console.log(request.params);
+
+  var projectId = request.params.projectid;
+  var fileId = request.params.fileid;
+
+  bluebird.all([
+      File.remove({ _id: fileId }),
+      Project.findOne({ _id: projectId })
+    ])
+    .spread(function(removedFile, projectInfo) {
+      var projectFiles = projectInfo.files;
+      console.log('before', projectFiles);
+
+      var removeIndex = projectFiles.indexOf(fileId);
+      projectFiles.splice(removeIndex, 1);
+
+      return Project.update({
+        _id: projectId
+      }, {
+        $set: {
+          files: projectFiles
+        }
+      });
+
+    })
+    .then(function(updatedProject) {
+      return response.json({
+        message: 'success deleting file!'
+      });
+    })
+    .catch(function(err) {
+      console.log('error deleting file...', err.message);
+    });
+  // File.remove({ _id: fileId })
+  //   .then(function(removedFile) {
+  //     return response.json({
+  //       message: 'success deleting file!'
+  //     });
+  //   })
+  //   .catch(function(err) {
+  //     console.log('error removing file....', err.message);
+  //   });
+
+  // console.log('file ID:', fileId);
 });
 
 app.listen(3000, function() {

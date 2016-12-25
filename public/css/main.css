@@ -56,5 +56,13 @@ body {
   margin: 70px auto;
 }
 /********************************************
-                  PROJECTS PAGE
+            PROJECTS DETAIL PAGE
 ********************************************/
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
