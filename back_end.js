@@ -328,7 +328,6 @@ app.put('/api/logout', function(request, response) {
     });
 });
 
-
 // ********************************
 //          PROJECT DETAIL PAGE
 // *******************************
@@ -372,47 +371,9 @@ app.get('/api/project/:projectid/:username', function(request, response) {
     })
     .catch(function(err) {
       console.log(err.message);
-    })
-
-  // bluebird.all([ User.findOne({ _id: username }),
-  //   Project.findOne({ _id: projectId })
-  // ])
-  //   .spread(function(userInfo, projectInfo) {
-  //     var userRequests = userInfo.requests;
-  //
-  //     // loop through each request to see if any of them were requests
-  //     // to this particular project
-  //     // use the request id to compare
-  //     userRequests.forEach(function(request) {
-  //   })
-
-
-
-  // Request.findOne({
-  //   $and: [
-  //     {
-  //       projectId: projectId
-  //     },
-  //     {
-  //       senderName: username
-  //     }
-  //   ]
-  // });
-
-  //
-  // Project.findOne({ _id: projectId })
-  //   .then(function(projectInfo) {
-  //     return response.json(projectInfo);
-  //   })
-  //   .catch(function(err) {
-  //     console.log('encountered errors retrieving project info from db:', err.message);
-  //   });
+    });
 
 });
-
-// ********************************
-//          CREATE NEW PROJECT
-// *******************************
 
 // ********************************
 //         CREATE/UPLOAD NEW FILE
@@ -721,6 +682,10 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
 
 });
 
+
+// ********************************
+//          DELETE REQUEST
+// *******************************
 app.delete('/api/request/delete/:requestid', function(request, response) {
 
   console.log(request.params.requestid);
@@ -737,6 +702,9 @@ app.delete('/api/request/delete/:requestid', function(request, response) {
     });
 });
 
+// ****************************************************
+//          ACCEPT REQUEST TO JOIN PROJECT
+// ***************************************************
 app.put('/api/request/accept', function(request, response) {
   console.log(request.body.requestInfo);
   var data = request.body.requestInfo;
@@ -839,6 +807,9 @@ app.put('/api/request/accept', function(request, response) {
 
 })
 
+// ***********************************************************************
+//          GET PROJECT INFO AND FILES BELONGING TO THAT PROJECT
+// **********************************************************************
 app.get('/api/project/file/upload/:projectId', function(request, response) {
   console.log('.........YUP......', request.params);
   var projectId = request.params.projectId;
@@ -879,7 +850,9 @@ app.get('/api/project/file/upload/:projectId', function(request, response) {
 
 });
 
-
+// *****************************************
+//          DELETE FILE FROM PROJECT
+// ****************************************
 app.delete('/api/:projectid/file/remove/:fileid', function(request, response) {
 
   console.log(request.params);
