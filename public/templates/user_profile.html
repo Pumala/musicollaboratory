@@ -4,7 +4,9 @@
   <h2>{{userInfo._id}}</h2>
   <p>Joined {{ userInfo.joined | date : 'MMM yyyy'}}</p>
 
-  <a ui-sref="requests({ username: rootUsername })" class="btn btn-success">My Requests</a>
+  <div ng-show="rootUsername === currUser">
+    <a ui-sref="requests({ username: rootUsername })" class="btn btn-success">My Requests</a>
+  </div>
 
   <div class="well">
     <h2>Current Projects</h2>

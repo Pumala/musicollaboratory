@@ -173,8 +173,8 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
-  service.getUserProfile = function() {
-    var url = "/api/profile/" + $rootScope.rootUsername;
+  service.getUserProfile = function(username) {
+    var url = "/api/profile/" + username;
     return $http({
       method: 'GET',
       url: url
@@ -381,7 +381,8 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
 
 });
 
-app.controller('UserController', function($scope, $sce, $state, MusicFactory) {
+app.controller('UserController', function($scope, $sce, $state, $stateParams, MusicFactory) {
+  $scope.currUser = $stateParams.username;
 
   $scope.checkCompletedProjects = function(typesObj) {
     console.log('types obj:', typesObj);
@@ -397,7 +398,7 @@ app.controller('UserController', function($scope, $sce, $state, MusicFactory) {
   };
 
   // makes a service call to pass data to the backend to render the user profile page
-  MusicFactory.getUserProfile()
+  MusicFactory.getUserProfile($scope.currUser)
     .then(function(results) {
       console.log('user profile results:', results);
       $scope.allProjects = results.data.allProjects;
