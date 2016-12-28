@@ -1,11 +1,11 @@
 <h1>Requests Center</h1>
 
-<div ng-repeat="request in receiveRequests" class="well">
+<div class="well">
   <h2>Inbound</h2>
-  <div class="well">
+  <div ng-repeat="request in receiveRequests" class="well">
     <h2>From: <a ui-sref="profile({ username: request.senderName })"><strong>{{request.senderName}}</strong></a></h2>
     <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-    <h4>Interested in contributing to {{request.projectName}}:</h4>
+    <h4>Interested in contributing to <a ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
     <form ng-repeat="type in request.requestTypes">
       <label for="">{{type}}</label>
       <input type="checkbox" ng-model="typeRequest[type]" name="" value="">
@@ -17,9 +17,9 @@
   </div>
 </div>
 
-<div ng-repeat="request in sendRequests" class="well">
+<div class="well">
   <h2>Outbound: My Pending Requests</h2>
-  <div class="well">
+  <div ng-repeat="request in sendRequests" class="well">
     <h2>To: <a ui-sref="profile({ username: request.projectOwner })"><strong>{{request.projectOwner}}</strong></a></h2>
     <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
     <h4>Interested in contributing to {{request.projectName}}:</h4>

@@ -344,7 +344,7 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
         request.projectName = $scope.projectNames2[index];
       });
 
-      console.log('NAMES@!', $scope.projectNames);
+      console.log('send@!', $scope.receiveRequests);
       console.log('all the requests and names:', $scope.allRequests);
     })
     .catch(function(err) {

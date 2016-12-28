@@ -8,6 +8,10 @@ html {
 }
 body {
   height: 100%;
+  font-family: 'Quicksand', sans-serif;
+}
+p {
+  font-size: 1.15em;
 }
 .banner {
   background-image: url('../images/purple.jpg');
@@ -34,7 +38,40 @@ body {
                   HOME PAGE
 ********************************************/
 .banner h1 {
-  margin: 0;
+  padding: 2em 0;
+  margin: 0 1.25em;
+  font-size: 2.25em;
+}
+.banner a {
+  font-weight: bold;
+  font-size: 1.25em;
+  display: block;
+  width: 200px;
+  border-radius: 6px;
+  margin: 20px auto;
+}
+.banner a:first-child,
+.banner a:last-child:hover {
+  color: #fff;
+  background-color: #673AB7;
+  border: 4px solid #673AB7;
+  transition: .3s;
+}
+.banner a:last-child,
+.banner a:first-child:hover {
+  color: #673AB7;
+  background-color: transparent;
+  border: 4px solid #673AB7;
+  transition: .3s;
+}
+#home section {
+  margin: 3em 0 5em 0;
+}
+#home p {
+  margin-top: 2.25em;
+}
+#getStarted {
+
 }
 /********************************************
               LOGIN / SIGN UP PAGE
@@ -65,4 +102,15 @@ body {
 
 .show {
   display: block;
+}
+/********************************************
+                  SEARCH PAGE
+********************************************/
+.searchType {
+  float: left;
+  width: 50%;
+}
+.searchType input {
+  float: left;
+  margin-right: 5px;
 }
