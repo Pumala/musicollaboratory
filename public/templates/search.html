@@ -1,4 +1,4 @@
-<div class="container">
+<div id="search" class="container">
 
   <!-- <h1>Search for a project</h1> -->
   <h2>What would you like to contribute in a project?</h2>
@@ -29,7 +29,7 @@
         <label for="production">Production</label>
         <input ng-model="needsProduction" type="checkbox" name="production" value="production">
       </div>
-      <button ng-click="searchProjects()" type="submit" name="button">Search</button>
+      <a ng-click="searchProjects()" class="btn btn-default">Search</a>
       <a ng-click="reloadSearch()" class='btn btn-primary'>view all projects</a>
 
     </div>
@@ -59,8 +59,8 @@
     </div>
   </form> -->
 
-  <div class="row" ng-show="allProjects.length > 0" ng-repeat="project in allProjects">
-    <div class="col-sm-4">
+  <div class="row" ng-show="allProjects.length > 0">
+    <div ng-repeat="project in allProjects" class="col-sm-4">
       <div class="well">
         <h3><a ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
         <p>Created by: {{project.owner}}</p>
