@@ -1,15 +1,17 @@
-<div class="container">
+<div id="profile" class="container">
 
-  <h1>User Profile</h1>
-  <h2>{{userInfo._id}}</h2>
+  <h2>{{userInfo._id}}'s Profile</h2>
   <p>Joined {{ userInfo.joined | date : 'MMM yyyy'}}</p>
 
   <div ng-show="rootUsername === currUser">
-    <a ui-sref="requests({ username: rootUsername })" class="btn btn-success">My Requests</a>
+    <a ui-sref="requests({ username: rootUsername })" class="btn btn-default">My Requests</a>
   </div>
 
-  <div class="well">
+  <div class="currentProjects">
     <h2>Current Projects</h2>
+    <div ng-show="allProjects.length === 0">
+      <p>None at this time...</p>
+    </div>
     <div ng-repeat="project in allProjects">
       <div ng-hide="checkCompletedProjects(project.seekingTypes)" class="well">
         <h4><a ui-sref="myproject({ project_id: project._id})">{{project.name}}</a></h4>
@@ -21,8 +23,11 @@
     </div>
   </div>
 
-  <div class="well">
+  <div class="completedProjects">
     <h2>Completed Projects</h2>
+    <div ng-show="allProjects.length === 0">
+      <p>None at this time...</p>
+    </div>
     <div ng-repeat="(key, value) in allProjects" >
         <div class="well" ng-show="checkCompletedProjects(value.seekingTypes)">
           <h3>{{value.name}}</h3>

@@ -1,6 +1,6 @@
-<div class="container">
+<div id="newProject" class="container">
 
-  <h1>Create New Project</h1>
+  <h1 class="text-center">Create New Project</h1>
 
   <form ng-submit="createProject()">
     <div class="form-group">
@@ -9,11 +9,12 @@
     </div>
     <div class="form-group">
       <label for="description">Description: </label><br>
-      <textarea ng-model="description" rows="8" cols="80"></textarea>
+      <!-- <textarea ng-model="description" rows="8" cols="80"></textarea> -->
+      <textarea ng-model="description" rows="8"></textarea>
     </div>
     <div class="row">
       <div class="col-sm-6">
-        <div class="well">
+        <div class="types well">
           <h2>Has:</h2>
           <div class="">
             <label for="melody">Melody: </label>
@@ -34,7 +35,7 @@
         </div>
       </div>
       <div class="col-sm-6">
-        <div class="well">
+        <div class="types well">
           <h2>Needs:</h2>
           <div class="">
             <label for="melody">Melody: </label>

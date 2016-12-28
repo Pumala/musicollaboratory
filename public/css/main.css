@@ -14,13 +14,28 @@ p {
   font-size: 1.15em;
 }
 .banner {
-  background-image: url('../images/purple.jpg');
+  background-image: url('../images/red.jpg');
   height: 100%;
   width: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   color: #fff;
+}
+a {
+  color: #222;
+}
+.red {
+  color: #FF5722;
+}
+a.btn.btn-default,
+button.btn.btn-default {
+  background-color: #FF5722;
+}
+a.btn.btn-primary,
+button.btn.btn-primary {
+  background-color: #343434;
+  border-color: #343434;
 }
 /********************************************
                   NAVBAR
@@ -29,11 +44,16 @@ p {
   border-radius: 0;
   margin-bottom: 0;
 }
+.navbar-inverse {
+  background: #343434;
+}
 .navbar-inverse .navbar-toggle {
   color: #fff;
   border-color: #fff;
 }
-
+.logo-words {
+  color: #FF5722;
+}
 /********************************************
                   HOME PAGE
 ********************************************/
@@ -53,6 +73,20 @@ p {
 .banner a:first-child,
 .banner a:last-child:hover {
   color: #fff;
+  background-color: #343434;
+  border: 4px solid #343434;
+  transition: .3s;
+}
+.banner a:last-child,
+.banner a:first-child:hover {
+  color: #343434;
+  background-color: transparent;
+  border: 4px solid #343434;
+  transition: .3s;
+}
+/*.banner a:first-child,
+.banner a:last-child:hover {
+  color: #fff;
   background-color: #673AB7;
   border: 4px solid #673AB7;
   transition: .3s;
@@ -63,7 +97,7 @@ p {
   background-color: transparent;
   border: 4px solid #673AB7;
   transition: .3s;
-}
+}*/
 #home section {
   margin: 3em 0 5em 0;
 }
@@ -93,9 +127,31 @@ p {
   margin: 70px auto;
 }
 /********************************************
+                  SEARCH PAGE
+********************************************/
+#newProject {
+  margin: 1.75em auto;
+}
+#newProject h1 {
+  margin-bottom: 1.25em;
+}
+#newProject form {
+  max-width: 550px;
+  margin: auto;
+}
+#newProject textarea {
+  width: 100%;
+}
+#newProject .types input {
+  float: left;
+  margin-right: 5px;
+}
+/********************************************
             PROJECTS DETAIL PAGE
 ********************************************/
+#projectDetails {
 
+}
 .hide {
   display: none;
 }
@@ -106,6 +162,15 @@ p {
 /********************************************
                   SEARCH PAGE
 ********************************************/
+#search {
+  margin: 3em auto;
+}
+#search h2 {
+  margin-bottom: 2em;
+}
+#search audio {
+  width: 100%;
+}
 .searchType {
   float: left;
   width: 50%;
@@ -113,4 +178,27 @@ p {
 .searchType input {
   float: left;
   margin-right: 5px;
+}
+/********************************************
+                  PROFILE
+********************************************/
+#profile {
+  margin: 2em auto;
+}
+#profile audio {
+  width: 100%;
+}
+#profile .currentProjects,
+#profile .completedProjects {
+  margin: 2em auto 3em auto;
+}
+/********************************************
+                  REQUESTS
+********************************************/
+#requests {
+  margin: 2em auto;
+}
+#requests .inbound,
+#requests .outbound {
+  margin: 2em auto 2.5em auto;
 }

@@ -1,4 +1,4 @@
-<div class="container">
+<div id="projectDetails" class="container">
 
   <h1>{{project.name}}</h1>
   <h3>Project Owner: <a ui-sref="profile({ username: project.owner })">{{project.owner}}</a></h3>
@@ -84,7 +84,7 @@
     </div>
   </form>
 
-  <div ng-show="rootUsername === project.owner">
+  <div ng-hide="rootUsername !== project.owner">
     <button ng-class="{ hide: edit, show: !edit }" ng-click="editProject()" class="btn btn-primary">Edit Project</button>
     <button ng-class="{ hide: !edit, show: edit}" ng-click="cancelEdit()" class="btn btn-primary" name="button">Cancel</button>
     <button ng-class="{ hide: !edit, show: edit}" ng-click="saveEdits(project._id)" class="btn btn-primary" name="button">Save</button>
