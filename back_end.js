@@ -49,6 +49,7 @@ const User = mongoose.model( 'User', {
   password: { type: String },
   joined: Date,
   bio: String,
+  avatar: String,
   musicanType: [String], // Melody, Lyrics, Voice, Production
   projects: [ ObjectId ], // Project Id
   requests: [ ObjectId ], // Request Id
@@ -66,6 +67,7 @@ const File = mongoose.model('File', {
 const Project = mongoose.model('Project', {
   name: { type: String, required: true },
   description: String,
+  avatar: String,
   existingTypes: {
     melody: Boolean,
     lyrics: Boolean,
@@ -151,15 +153,32 @@ app.post('/api/search/projects', function(request, response) {
   };
 
   Project.find({
-      $or: conditions
+      $or: conditions,
+      $and: [
+        {
+        completed: false
+      }
+      ]
     })
     .then(function(results) {
-      console.log('projects results:', results);
+      console.log('HELLO!!!!');
+      // console.log('projects results:', results);
       return response.json(results);
     })
     .catch(function(err) {
       console.log('error querying for projects:', err.message);
     });
+
+  // Project.find({
+  //     $or: conditions
+  //   })
+  //   .then(function(results) {
+  //     console.log('projects results:', results);
+  //     return response.json(results);
+  //   })
+  //   .catch(function(err) {
+  //     console.log('error querying for projects:', err.message);
+  //   });
 
 });
 
@@ -242,6 +261,32 @@ app.put('/api/edit/project', function(request, response) {
     })
 
 });
+// ********************************
+//          EDIT USER BIO
+// *******************************
+app.put('/api/edit/user/bio', function(request, response) {
+  console.log('update bio params:', request.body);
+
+  var bio = request.body.bio;
+  var username = request.body.username;
+
+  User.update({
+      _id: username
+    }, {
+      $set: {
+        bio: bio
+      }
+    })
+    .then(function(updatedBio) {
+      return response.json({
+        message: 'sucess updating user bio'
+      })
+    })
+    .catch(function(err) {
+      console.log('experienced error updating user bio', err.message);
+    });
+
+});
 
 // ********************************
 //          USER SIGNUP
@@ -280,6 +325,7 @@ app.post('/api/signup', function(request, response) {
         password: hash,
         joined: new Date(),
         bio: "",
+        avatar: "user_avatar.png",
         musicanType: [],
         projects: [],
         requests: [],
@@ -306,7 +352,7 @@ app.post('/api/signup', function(request, response) {
 // *******************************
 app.put('/api/logout', function(request, response) {
 
-  console.log('deleting this token from the db', request.params.tokenid);
+  console.log('deleting this token from the db', request.body);
 
   var username = request.body.username;
   var tokenId = request.body.token;
@@ -315,7 +361,7 @@ app.put('/api/logout', function(request, response) {
       _id: username
     }, {
       $set: {
-        token: {}
+        token: { id: "", expires: null }
       }
     })
     .then(function(loggedOut) {
@@ -331,10 +377,13 @@ app.put('/api/logout', function(request, response) {
 // ********************************
 //          PROJECT DETAIL PAGE
 // *******************************
-app.get('/api/project/:projectid/:username', function(request, response) {
+app.get('/api/project/:projectid/:username/:editmode', function(request, response) {
+
+  console.log('getting project details::', request.params);
 
   var projectId = request.params.projectid;
   var username = request.params.username;
+  var editMode = request.params.editmode;
 
   console.log('PARAMS?', request.params);
 
@@ -364,9 +413,21 @@ app.get('/api/project/:projectid/:username', function(request, response) {
       return [ Project.findOne({ _id: projectId }), alreadyRequested]
     })
     .spread(function(projectInfo, alreadyRequested) {
+      console.log('projectInfo::', projectInfo.files);
+      var projectFiles = projectInfo.files;
+      return [projectInfo, alreadyRequested, File.find({
+        _id: {
+          $in: projectFiles
+        }
+      }) ]
+    })
+    .spread(function(projectInfo, alreadyRequested, allFiles) {
+      console.log('all the files::', allFiles);
       return response.json({
+        allFiles: allFiles,
         projectInfo: projectInfo,
-        alreadyRequested: alreadyRequested
+        alreadyRequested: alreadyRequested,
+        editMode: editMode
       });
     })
     .catch(function(err) {
@@ -474,6 +535,8 @@ app.post('/api/login', function(request, response) {
       }
     })
     .spread(function(updated, userInfo) {
+      console.log('updated??', userInfo);
+
       return response.json({
         userInfo: userInfo
       });
@@ -647,6 +710,7 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
   var newProject = new Project({
     name: results.name,
     description: results.description,
+    avatar: 'note.png',
     existingTypes: projectHas,
     seekingTypes: projectNeeds,
     files: [],
@@ -796,9 +860,9 @@ app.put('/api/request/accept', function(request, response) {
       console.log('updated user:', updatedUser);
       console.log('updated project:', updatedProject);
 
-      // return response.json({
-      //   message: "in accept, accepted the request from the db"
-      // });
+      return response.json({
+        message: "in accept, accepted the request from the db"
+      });
     })
     .catch(function(err) {
       console.log('error attempting to delete request from db:', err.message);

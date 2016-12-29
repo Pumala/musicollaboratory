@@ -1,22 +1,24 @@
-<h1>Project File Uploader</h1>
+<div class="container">
+  <h1>Project File Uploader</h1>
 
-<h2>{{projectInfo.name}}</h2>
+  <h2>{{projectInfo.name}}</h2>
 
-<form ng-controller="FileController">
-  <h3>Upload files</h3>
-  <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
-  <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
-  <input type="file" nv-file-select="" uploader="uploader" />
-  <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-      Upload
-  </button>
-</form>
+  <form ng-controller="FileController">
+    <h3>Upload files</h3>
+    <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
+    <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
+    <input type="file" nv-file-select="" uploader="uploader" />
+    <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+        Upload
+    </button>
+  </form>
 
-<div class="well">
-  <div ng-repeat="file in allFiles">
-    <p>{{file.originalName}}</p>
-    <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>
+  <div class="well">
+    <div ng-repeat="file in allFiles">
+      <p>{{file.originalName}}</p>
+      <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>
+    </div>
   </div>
-</div>
 
-<a ui-sref="profile({ username: rootUsername })" class="btn btn-primary">Done</a>
+  <a ui-sref="profile({ username: rootUsername })" class="btn btn-primary">Done</a>
+</div>

@@ -63,6 +63,7 @@
     <div ng-repeat="project in allProjects" class="col-sm-4">
       <div class="well">
         <h3><a ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
+        <img ng-src="/images/{{project.avatar}}" alt="">
         <p>Created by: {{project.owner}}</p>
         <p>Seeking:</p>
         <div ng-repeat="(key, val) in project.seekingTypes">

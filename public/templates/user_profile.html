@@ -1,7 +1,19 @@
 <div id="profile" class="container">
 
-  <h2>{{userInfo._id}}'s Profile</h2>
-  <p>Joined {{ userInfo.joined | date : 'MMM yyyy'}}</p>
+  <div class="userInfo">
+    <h2>{{userInfo._id}}'s Profile</h2>
+    <img class="avatar" ng-src="/images/{{userInfo.avatar}}" alt="">
+    <p>Joined {{ userInfo.joined | date : 'MMM yyyy'}}</p>
+
+    <textarea ng-show="edit" ng-model="description" rows="8" placeholder="Add a bio..."></textarea>
+    <p ng-show="!edit">{{description}}</p>
+    <div ng-show="rootUsername === currUser">
+      <button ng-click="saveBio()" ng-show="edit" type="button" name="button">Save</button>
+      <button ng-click="editBio()" ng-show="!edit" type="button" name="button">Edit</button>
+      <button ng-click="cancelEditBio()" ng-show="edit" type="button" name="button">Cancel</button>
+    </div>
+
+  </div>
 
   <div ng-show="rootUsername === currUser">
     <a ui-sref="requests({ username: rootUsername })" class="btn btn-default">My Requests</a>
@@ -12,9 +24,10 @@
     <div ng-show="allProjects.length === 0">
       <p>None at this time...</p>
     </div>
-    <div ng-repeat="project in allProjects">
-      <div ng-hide="checkCompletedProjects(project.seekingTypes)" class="well">
+    <div>
+      <div ng-repeat="project in allProjects" ng-show="!project.completed" class="well">
         <h4><a ui-sref="myproject({ project_id: project._id})">{{project.name}}</a></h4>
+        <img ng-src="/images/{{project.avatar}}" alt="">
         <p>{{project.description}}</p>
         <div >
           <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
@@ -28,14 +41,14 @@
     <div ng-show="allProjects.length === 0">
       <p>None at this time...</p>
     </div>
-    <div ng-repeat="(key, value) in allProjects" >
-        <div class="well" ng-show="checkCompletedProjects(value.seekingTypes)">
-          <h3>{{value.name}}</h3>
-          <p>{{value.description}}</p>
-          <div >
-            <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio>
-          </div>
+    <div>
+      <div ng-repeat="(key, value) in allProjects" class="well" ng-show="value.completed">
+        <h3><a ui-sref="myproject({ project_id: value._id })">{{value.name}}</a></h3>
+        <p>{{value.description}}</p>
+        <div >
+          <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio>
         </div>
+      </div>
     </div>
   </div>
 </div>

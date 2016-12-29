@@ -13,6 +13,13 @@ body {
 p {
   font-size: 1.15em;
 }
+.clear:before, .clear:after {
+  display: table;
+  content: ""
+}
+.clear:after {
+  clear: both;
+}
 .banner {
   background-image: url('../images/red.jpg');
   height: 100%;
@@ -24,6 +31,9 @@ p {
 }
 a {
   color: #222;
+}
+.muted {
+  color: #7e7474;
 }
 .red {
   color: #FF5722;
@@ -150,14 +160,80 @@ button.btn.btn-primary {
             PROJECTS DETAIL PAGE
 ********************************************/
 #projectDetails {
-
+  margin: 2em auto;
+}
+#projectDetails .projectInfo {
+  max-width: 300px;
+  margin: auto;
+}
+#projectDetails .projectInfo h1 {
+  font-size: 2em;
+}
+#projectDetails .projectInfo h3 {
+  font-size: 1em;
+  font-weight: 400;
+  text-align: left;
+  line-height: 1.2em;
+}
+#projectDetails .completedProjects {
+  margin-bottom: 2em;
+}
+#projectDetails .completedProjects h2 {
+  font-size: 1.2em;
+}
+#projectDetails audio {
+  width: 100%;
+}
+#projectDetails .editButtons {
+  margin: 0 auto 2em auto;;
+}
+#projectDetails .editButtons button {
+  display: inline-block;
+}
+#projectDetails .members {
+  margin: 2em auto 1em auto;
+}
+#projectDetails .members ul {
+  margin: 1em auto 2em auto;;
+  list-style-type: decimal;
+}
+#projectDetails .projectTypes h2 {
+  font-size: 1.2em;
+}
+#projectDetails .projectTypes ul {
+  list-style-type: none;
+}
+#projectDetails .members li,
+#projectDetails .projectTypes li {
+  text-align: left;
+}
+#projectDetails .photo {
+  text-align: center;
+}
+#projectDetails .avatar {
+  max-width: 175px;
 }
 .hide {
   display: none;
 }
-
-.show {
+.showBtn {
   display: block;
+}
+#projectDetails .requests input {
+  float: left;
+  margin-right: 5px;
+}
+#projectDetails .requests h2 {
+  font-size: 1.2em;
+}
+#projectDetails .requests textarea {
+  width: 100%;
+}
+#projectDetails .requests .select {
+  margin: 1em auto;
+}
+#projectDetails .requests label {
+  font-weight: 400;
 }
 /********************************************
                   SEARCH PAGE
@@ -168,7 +244,8 @@ button.btn.btn-primary {
 #search h2 {
   margin-bottom: 2em;
 }
-#search audio {
+#search audio,
+#search img {
   width: 100%;
 }
 .searchType {
@@ -192,6 +269,17 @@ button.btn.btn-primary {
 #profile .completedProjects {
   margin: 2em auto 3em auto;
 }
+#profile .avatar {
+  max-width: 150px;
+  margin: 1em auto;
+}
+#profile textarea {
+  width: 100%;
+  margin: 1em auto;
+}
+#profile .userInfo {
+  text-align: center;
+}
 /********************************************
                   REQUESTS
 ********************************************/
@@ -201,4 +289,25 @@ button.btn.btn-primary {
 #requests .inbound,
 #requests .outbound {
   margin: 2em auto 2.5em auto;
+}
+#requests h2 {
+  font-size: 1.5em;
+}
+/********************************************
+                  MEDIA QUERIES
+********************************************/
+@media screen and (min-width: 525px) {
+  #projectDetails .projectTypes .well {
+    padding-top: 0;
+  }
+  #projectDetails .projectTypes li {
+    float: left;
+    width: 25%;
+  }
+}
+@media screen and (min-width: 992px) {
+  #projectDetails {
+    width: 750px;
+    margin: auto;
+  }
 }

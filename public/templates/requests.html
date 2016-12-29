@@ -7,7 +7,7 @@
       <p>None at this time...</p>
     </div>
     <div ng-repeat="request in receiveRequests" class="well">
-      <h2>From: <a ui-sref="profile({ username: request.senderName })"><strong>{{request.senderName}}</strong></a></h2>
+      <h3>From: <a ui-sref="profile({ username: request.senderName })"><strong>{{request.senderName}}</strong></a></h3>
       <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
       <h4>Interested in contributing to <a ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
       <form ng-repeat="type in request.requestTypes">
@@ -27,7 +27,7 @@
       <p>None at this time...</p>
     </div>
     <div ng-repeat="request in sendRequests" class="well">
-      <h2>To: <a ui-sref="profile({ username: request.projectOwner })"><strong>{{request.projectOwner}}</strong></a></h2>
+      <h3>To: <a ui-sref="profile({ username: request.projectOwner })"><strong>{{request.projectOwner}}</strong></a></h3>
       <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
       <h4>Interested in contributing to {{request.projectName}}:</h4>
       <ul ng-repeat="type in request.requestTypes">
