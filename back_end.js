@@ -202,7 +202,7 @@ app.delete('/api/remove/project/:projectid', function(request, response) {
 });
 
 // *****************+++++++****************************
-//          MARK PROJECT AS COMPLETE or UNCOMPLETE
+//          MARK PROJECT AS COMPLETE or INCOMPLETE
 // *****************+++++++***************************
 app.put('/api/complete/project', function(request, response) {
 

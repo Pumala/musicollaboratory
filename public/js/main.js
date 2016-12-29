@@ -503,9 +503,13 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
         $rootScope.rootToken = $scope.userInfo.token.id;
         $cookies.putObject('cookieData', $scope.userInfo);
         $rootScope.factoryCookieData = $scope.userInfo;
-
-        console.log('success submitting login info', $scope.userInfo);
-        $state.go('profile', { username: $rootScope.rootUsername });
+        // var userInfo = results.data.userInfo;
+        // $rootScope.rootUsername = userInfo._id;
+        // $rootScope.rootToken = userInfo.token.id;
+        // $cookies.putObject('cookieData', userInfo);
+        // $rootScope.factoryCookieData = userInfo;
+        // console.log('success submitting login info', userInfo);
+        // $state.go('profile', {username: $rootScope.rootUsername});
       })
       .catch(function(err) {
         console.log('experienced err submitting login info:', err.message);
