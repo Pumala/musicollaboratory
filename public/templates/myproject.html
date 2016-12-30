@@ -1,12 +1,14 @@
 <div id="projectDetails" class="container">
 
-  <div class="editButtons text-center" ng-hide="rootUsername !== project.owner">
+  <div class="editButtons text-center" ng-show="project.members.indexOf(rootUsername) > -1">
     <button ng-class="{ hide: edit, showBtn: !edit }" ng-click="editProject()" class="btn btn-primary">Edit Project</button>
     <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="cancelEdit()" class="btn btn-primary" name="button">Cancel</button>
     <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="saveEdits(project._id)" class="btn btn-primary" name="button">Save</button>
-    <button ng-click="deleteProject(project._id)" class="btn btn-danger">Delete Project</button>
-    <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-success">Mark as Completed</button>
-    <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-success">Unmark as Completed</button>
+    <div ng-hide="rootUsername !== project.owner">
+      <button ng-click="deleteProject(project._id)" class="btn btn-danger">Delete Project</button>
+      <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-success">Mark as Completed</button>
+      <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-success">Unmark as Completed</button>
+    </div>
   </div>
 
 
@@ -39,6 +41,7 @@
       <ul>
         <li ng-repeat="(type, checked) in project.existingTypes" ng-show="project.existingTypes[type]">{{type}}</li>
       </ul>
+      <!-- <p>None at this time...</p> -->
     </div>
 
     <div class="well clear">
@@ -48,8 +51,9 @@
       </div> -->
       <!-- <p ng-show="project.seekingTypes.length === 0">None at this time...</p> -->
       <ul ng-repeat="(type, checked) in project.seekingTypes">
-        <li ng-show="project.seekingTypes[type]">{{type}}</li>
+        <li ng-model="something" ng-show="project.seekingTypes[type]">{{type}}</li>
       </ul>
+      <!-- <p ng-show="!something">None at this time...</p> -->
     </div>
 
     <div>
@@ -144,7 +148,7 @@
     <p>Thanks. Your request was successfully sent.</p>
   </div>
 <!--  -->
-  <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner)" ng-submit="requestContribute()">
+  <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0)" ng-submit="requestContribute()">
     <div class="well">
       <h2>Request to contribute</h2>
       <div class="select">

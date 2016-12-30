@@ -212,7 +212,8 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
       method: 'PUT',
       url: url,
       data: {
-        requestInfo: requestInfo
+        requestInfo: requestInfo,
+        projectOwner: $rootScope.rootUsername
       }
     });
   };
@@ -329,6 +330,9 @@ app.controller('HomeController', function($scope, $state) {
 
 });
 
+// ********************************
+//          REQUEST CONTROLLER
+// *******************************
 app.controller('RequestsController', function($scope, $stateParams, MusicFactory, $state) {
   $scope.username = $stateParams.username;
   $scope.typeRequest = {};
@@ -341,26 +345,26 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
       $scope.sendRequests = results.data.sendRequests;
       $scope.sendProjects = results.data.sendProjects;
 
-      $scope.projectNames1 = [];
-      $scope.receiveProjects.forEach(function(project) {
-        $scope.projectNames1.push(project.name);
-      });
-
       $scope.receiveRequests.forEach(function(request, index) {
-        request.projectName = $scope.projectNames1[index];
-      });
-
-      $scope.projectNames2 = [];
-      $scope.sendProjects.forEach(function(project) {
-        $scope.projectNames2.push(project.name);
+        $scope.receiveProjects.forEach(function(project) {
+          if (String(request.projectId) === String(project._id)) {
+            request.projectName = project.name;
+          } else {
+            console.log('NOPEE');
+          }
+        });
       });
 
       $scope.sendRequests.forEach(function(request, index) {
-        request.projectName = $scope.projectNames2[index];
+        $scope.sendProjects.forEach(function(project) {
+          if (String(request.projectId) === String(project._id)) {
+            request.projectName = project.name;
+          } else {
+            console.log('NOPEE');
+          }
+        });
       });
 
-      console.log('send@!', $scope.receiveRequests);
-      console.log('all the requests and names:', $scope.allRequests);
     })
     .catch(function(err) {
       console.log('err getting requests:', err.message);
@@ -377,13 +381,14 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
           console.log('error deleting request::', err.message);
         });
     }
-    $scope.acceptRequest = function(requestId, projectId, username) {
+    $scope.acceptRequest = function(requestId, projectId, username, projectName) {
       console.log('type request obj::', $scope.typeRequest);
       var requestObj = {
         requestId: requestId,
         typeRequest: $scope.typeRequest,
         projectId: projectId,
-        username: username
+        username: username,
+        projectName: projectName
       };
       console.log('new reqest obj::', requestObj);
 
@@ -399,6 +404,9 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
 
 });
 
+// ********************************
+//          USER CONTROLLER
+// *******************************
 app.controller('UserController', function($scope, $sce, $state, $stateParams, MusicFactory) {
   $scope.currUser = $stateParams.username;
   $scope.edit = false;
@@ -464,6 +472,9 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
 
 });
 
+// ********************************
+//          SIGN UP CONTROLLER
+// *******************************
 app.controller('SignUpController', function($scope, $state, $rootScope, $cookies, MusicFactory) {
 
   $scope.submitSignUp = function() {
@@ -518,7 +529,7 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
         // $cookies.putObject('cookieData', userInfo);
         // $rootScope.factoryCookieData = userInfo;
         // console.log('success submitting login info', userInfo);
-        // $state.go('profile', {username: $rootScope.rootUsername});
+        $state.go('profile', {username: $rootScope.rootUsername});
       })
       .catch(function(err) {
         console.log('experienced err submitting login info:', err.message);
@@ -527,6 +538,9 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
 
 });
 
+// ********************************
+//          SEARCH CONTROLLER
+// *******************************
 app.controller('SearchController', function($scope, $state, $rootScope, $sce, MusicFactory) {
   $scope.needsMelody = false;
   $scope.needsLyrics = false;

@@ -1,13 +1,13 @@
 <div id="requests" class="container">
-  <h1 class="text-center">Requests Center</h1>
+  <h1 class="text-center">Messages Center</h1>
 
   <div class="inbound">
-    <h2 class="thick red">Inbound</h2>
+    <h2 class="thick red">Inbox</h2>
     <div class="noRequests" ng-show="receiveRequests.length === 0">
       <p>None at this time...</p>
     </div>
     <div ng-repeat="request in receiveRequests" class="well">
-      <h3>From: <a ui-sref="profile({ username: request.senderName })"><strong>{{request.senderName}}</strong></a></h3>
+      <h3>From: <a ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
       <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
       <h4>Interested in contributing to <a ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
       <form ng-repeat="type in request.requestTypes">
@@ -16,18 +16,18 @@
       </form>
       <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
       <p>{{request.description}}</p>
-      <button class="btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.senderName)">Accept</button>
+      <button class="btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.from, request.projectName)">Accept</button>
       <a class="btn btn-danger" ng-click="declineRequest(request._id)">Decline</a>
     </div>
   </div>
 
   <div class="outbound">
-    <h2 class="thick red">Outbound</h2>
+    <h2 class="thick red">Outbox</h2>
     <div class="noRequests" ng-show="sendRequests.length === 0">
       <p>None at this time...</p>
     </div>
     <div ng-repeat="request in sendRequests" class="well">
-      <h3>To: <a ui-sref="profile({ username: request.projectOwner })"><strong>{{request.projectOwner}}</strong></a></h3>
+      <h3>To: <a ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
       <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
       <h4>Interested in contributing to {{request.projectName}}:</h4>
       <ul ng-repeat="type in request.requestTypes">
@@ -35,6 +35,7 @@
       </ul>
       <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
       <p>{{request.description}}</p>
+      <a class="btn btn-danger" ng-click="declineRequest(request._id)">Delete</a>
     </div>
   </div>
 

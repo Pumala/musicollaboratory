@@ -87,14 +87,24 @@ const Project = mongoose.model('Project', {
   completed: Boolean
 });
 
-const Request = mongoose.model('Request', {
+const Message = mongoose.model('Message', {
     projectId: ObjectId,
-    projectOwner: { type: String, required: true },
-    senderName: { type: String, required: true },
+    to: { type: String, required: true },
+    from: { type: String, required: true },
     requestTypes: [String], // Melody, Lyrics, Voice, Production
     description: String,
-    date: Date
+    date: Date,
+    request: Boolean
 });
+
+// const Message = mongoose.model('Message', {
+//     projectId: ObjectId,
+//     to: { type: String, required: true },
+//     from: { type: String, required: true },
+//     requestTypes: Object, // Melody, Lyrics, Voice, Production
+//     description: String,
+//     date: Date
+// });
 
 // TO DO !!!!!!!!!!!!!!!!
 // update project detail page => edit project page
@@ -394,7 +404,7 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
       var userRequests = userInfo.requests;
       console.log('what am i doing',userInfo);
 
-      return Request.find({
+      return Message.find({
         _id: {
           $in: userRequests
         }
@@ -511,6 +521,7 @@ app.post('/api/login', function(request, response) {
       return bcrypt.compare(password, hash);
     })
     .then(function(comparePasswords) {
+      console.log('do they match???', comparePasswords);
       if (comparePasswords) {
         // generate a random token
         var randomToken = uuid();
@@ -567,18 +578,19 @@ app.post('/api/request/new', function(request, response) {
   console.log('requesting these types....', typeof projectId);
   console.log(projectOwner);
   console.log(sender);
-  console.log(description);
+  console.log('types: ', requestTypes);
 
-  var newRequest = new Request({
+  var newMessage = new Message({
     projectId: projectId,
-    projectOwner: projectOwner,
-    senderName: sender,
+    to: projectOwner,
+    from: sender,
     requestTypes: requestTypes,
     description: description,
-    date: new Date()
+    date: new Date(),
+    request: true
   });
 
-  bluebird.all([ User.findOne({ _id: sender }), newRequest.save() ])
+  bluebird.all([ User.findOne({ _id: sender }), newMessage.save() ])
     .spread(function(userInfo, newRequest) {
       var requestId = newRequest._id;
       var userRequests = userInfo.requests;
@@ -616,8 +628,8 @@ app.get('/api/requests/:username', function(request, response) {
   var username = request.params.username;
 
   bluebird.all([
-    Request.find({ senderName: username}),
-    Request.find({ projectOwner: username })
+    Message.find({ from: username}),
+    Message.find({ to: username })
   ])
     .spread(function(sendRequests, receiveRequests) {
 
@@ -646,16 +658,16 @@ app.get('/api/requests/:username', function(request, response) {
     })
     .spread(function(receiveProjects, sendProjects, receiveRequests, sendRequests) {
 
-        return response.json({
-          receiveProjects: receiveProjects,
-          sendProjects: sendProjects,
-          receiveRequests: receiveRequests,
-          sendRequests: sendRequests
-        });
-      })
-      .catch(function(err) {
-      console.log('error retrieving all the requests:', err.message);
+      return response.json({
+        receiveProjects: receiveProjects,
+        sendProjects: sendProjects,
+        receiveRequests: receiveRequests,
+        sendRequests: sendRequests
       });
+    })
+    .catch(function(err) {
+    console.log('error retrieving all the requests:', err.message);
+    });
 
 });
 
@@ -757,7 +769,7 @@ app.delete('/api/request/delete/:requestid', function(request, response) {
   console.log(request.params.requestid);
   var requestId = request.params.requestid;
 
-  Request.remove({ _id: requestId })
+  Message.remove({ _id: requestId })
     .then(function(deleteRequest) {
       return response.json({
         message: "hello we deleted the request from the db"
@@ -779,11 +791,54 @@ app.put('/api/request/accept', function(request, response) {
   var typeRequest = data.typeRequest;
   var projectId = data.projectId;
   var username = data.username;
+  var projectName = data.projectName;
 
+  var projectOwner = request.body.projectOwner;
 
-//delete request
+  var acceptedTypes = [];
+
+  for (type in typeRequest) {
+    if (typeRequest[type]) {
+      acceptedTypes.push(type);
+    }
+  };
+
+  var acceptedTypes2 = "";
+
+  if (acceptedTypes.length === 2) {
+    acceptedTypes2 = acceptedTypes[0] + " and " + acceptedTypes[1];
+  } else if (acceptedTypes.length > 2) {
+    var lastIndex = acceptedTypes.length - 1;
+    acceptedTypes.forEach(function(type, index) {
+      if (index !== lastIndex) {
+        acceptedTypes2 += type + ", ";
+      } else {
+        acceptedTypes2 += "and " + type;
+      }
+    });
+  } else {
+    acceptedTypes2 = acceptedTypes;
+  }
+
+  // console.log('accepted types here::', acceptedTypes2);
+
+  var note = "Your request for contributing " + acceptedTypes2 + " for " + projectName + " has been approved.";
+
+  var newMessage = new Message({
+      projectId: projectId,
+      to: username,
+      from: projectOwner,
+      requestTypes: acceptedTypes2, // Melody, Lyrics, Voice, Production
+      description: note,
+      date: new Date(),
+      request: false
+  });
+
+  newMessage.save();
+
+// delete request
   bluebird.all([
-    Request.remove({ _id: requestId }),
+    Message.remove({ _id: requestId }),
     Project.findOne( { _id: projectId}),
     User.findOne( { _id: username} )
    ])
@@ -822,23 +877,8 @@ app.put('/api/request/accept', function(request, response) {
       console.log('updated project seeking obj:', projectSeekingObj);
       console.log('updated project existing obj:', projectExistingObj);
 
-      // for (key in projectSeekingObj) {
-      //   console.log('key:', key);
-      // }
-
-
       var projectsArr = acceptUser.projects;
       projectsArr.push(projectId);
-
-      // Project.update({
-      //   _id: projectId
-      // }, {
-      //   $set: {
-      //     seekingTypes: projectSeekingObj,
-      //     existingTypes: projectExistingObj,
-      //     members: projectMembers
-      //   }
-      // })
 
       return [ User.update({
         _id: username
@@ -869,7 +909,6 @@ app.put('/api/request/accept', function(request, response) {
     .catch(function(err) {
       console.log('error attempting to delete request from db:', err.message);
     });
-
 
 })
 
