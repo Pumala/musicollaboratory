@@ -2,8 +2,8 @@
   <h1 class="text-center">Requests Center</h1>
 
   <div class="inbound">
-    <h2>Inbound</h2>
-    <div ng-show="receiveRequests.length === 0">
+    <h2 class="thick red">Inbound</h2>
+    <div class="noRequests" ng-show="receiveRequests.length === 0">
       <p>None at this time...</p>
     </div>
     <div ng-repeat="request in receiveRequests" class="well">
@@ -22,8 +22,8 @@
   </div>
 
   <div class="outbound">
-    <h2>Outbound: My Pending Requests</h2>
-    <div ng-show="sendRequests.length === 0">
+    <h2 class="thick red">Outbound</h2>
+    <div class="noRequests" ng-show="sendRequests.length === 0">
       <p>None at this time...</p>
     </div>
     <div ng-repeat="request in sendRequests" class="well">

@@ -66,6 +66,7 @@ const File = mongoose.model('File', {
 
 const Project = mongoose.model('Project', {
   name: { type: String, required: true },
+  created: Date,
   description: String,
   avatar: String,
   existingTypes: {
@@ -709,6 +710,7 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
 
   var newProject = new Project({
     name: results.name,
+    created: new Date(),
     description: results.description,
     avatar: 'note.png',
     existingTypes: projectHas,

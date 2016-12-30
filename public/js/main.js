@@ -424,17 +424,26 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
 
   }
 
-  $scope.checkCompletedProjects = function(typesObj) {
-    console.log('types obj:', typesObj);
-    // loop through the seeking types Object
-    for (key in typesObj) {
-      // typesObj['lyrics'] === true
-      // if any type
-      if (typesObj[key]) {
-        return false;
-      }
-    };
-    return true;
+  $scope.checkCurrentProjects = function() {
+    var completedArr = $scope.allProjects.filter(function(project) {
+      return project.completed === true;
+    });
+    if (completedArr.length === 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  $scope.checkCompletedProjects = function() {
+    var completedArr = $scope.allProjects.filter(function(project) {
+      return project.completed === true;
+    });
+    if (completedArr.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   // makes a service call to pass data to the backend to render the user profile page

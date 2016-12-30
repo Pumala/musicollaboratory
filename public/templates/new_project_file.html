@@ -1,24 +1,29 @@
-<div class="container">
-  <h1>Project File Uploader</h1>
+<div id="newProjectFiles" class="container">
+  <h1>Upload samples of your project</h1>
 
   <h2>{{projectInfo.name}}</h2>
 
   <form ng-controller="FileController">
-    <h3>Upload files</h3>
-    <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
-    <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
-    <input type="file" nv-file-select="" uploader="uploader" />
-    <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-        Upload
-    </button>
+    <h3 class="muted">Samples can be lyrics, melodies, and song tracks. You'll have a chance to add more files later if you're not ready.</h3>
+    <div class="fileDiv">
+      <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
+      <input type="file" nv-file-select="" uploader="uploader" />
+      <button type="button" class="upload btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+          Upload
+      </button>
+    </div>
   </form>
 
-  <div class="well">
+  <div ng-show="allFiles.length > 0" class="well">
     <div ng-repeat="file in allFiles">
       <p>{{file.originalName}}</p>
       <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>
     </div>
   </div>
 
-  <a ui-sref="profile({ username: rootUsername })" class="btn btn-primary">Done</a>
+  <div class="doneBtn">
+    <p>All set? Click done when you're ready.</p>
+    <a ui-sref="profile({ username: rootUsername })" class="btn btn-default">Done</a>
+  </div>
+
 </div>

@@ -31,7 +31,7 @@
   </div>
 
   <div ng-show="!edit" class="projectTypes">
-    <p><strong>Description</strong>: {{project.description}}</p>
+    <p class="description"><strong>Description</strong>: {{project.description}}</p>
 
     <div class="well clear">
       <!-- <h2 ng-hide="((project.existingTypes.lyrics === false) && (project.existingTypes.production === false) && (project.existingTypes.melody === false) && (project.existingTypes.voice === false))">Already has:</h2> -->
@@ -79,7 +79,6 @@
     </form>
 
     <div class="">
-      <h1>Files</h1>
       <div ng-repeat="file in allFiles">
         <div class="well">
           <p>{{file.originalName}}</p>
@@ -142,7 +141,7 @@
   </div>
 
   <div ng-show="alreadyRequested" class="well">
-    <p>Request Already Submitted</p>
+    <p>Thanks. Your request was successfully sent.</p>
   </div>
 <!--  -->
   <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner)" ng-submit="requestContribute()">

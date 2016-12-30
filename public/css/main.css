@@ -38,9 +38,18 @@ a {
 .red {
   color: #FF5722;
 }
+.thick {
+  font-weight: 700;
+}
+a.btn.btn-purple,
+button.btn.btn-purple {
+  background-color: #6922ff;
+  color: #fff;
+}
 a.btn.btn-default,
 button.btn.btn-default {
   background-color: #FF5722;
+  color: #fff;
 }
 a.btn.btn-primary,
 button.btn.btn-primary {
@@ -130,20 +139,38 @@ button.btn.btn-primary {
   color: #fff;
 }
 .login h1, .signup h1 {
+  font-size: 2em;
+}
+.userForm {
+  max-width: 450px;
+  margin: 1em auto;
+}
+/*.login h1, .signup h1 {
   padding-top: 35px;
 }
 .userForm {
   max-width: 450px;
   margin: 70px auto;
-}
+}*/
 /********************************************
-                  SEARCH PAGE
+              CREATE NEW PROJECT
 ********************************************/
 #newProject {
-  margin: 1.75em auto;
+  margin: 0 auto 2em auto;
+}
+#newProject .well {
+  padding-top: .5em;
 }
 #newProject h1 {
-  margin-bottom: 1.25em;
+  margin: 1em auto;
+  font-size: 2em;
+}
+#newProject .types h2 {
+  font-size: 1.5em;
+}
+#newProject .hasTypes,
+#newProject .needsTypes {
+  margin: 1em 0 0 35%;
 }
 #newProject form {
   max-width: 550px;
@@ -151,10 +178,38 @@ button.btn.btn-primary {
 }
 #newProject textarea {
   width: 100%;
+  border: 1px solid #000;
 }
 #newProject .types input {
   float: left;
   margin-right: 5px;
+}
+/********************************************
+      CREATE NEW PROJECT - FILES UPLOADER
+********************************************/
+#newProjectFiles {
+  margin: 1em auto;
+}
+#newProjectFiles h1 {
+  font-size: 2em;
+}
+#newProjectFiles .doneBtn {
+  text-align: center;
+  margin: 5em auto;
+}
+#newProjectFiles form h3 {
+  font-size: 1.15em;
+  line-height: 1.2em;
+  font-weight: 300;
+}
+#newProjectFiles form input[type="file"] {
+  color: #FF5722;
+}
+#newProjectFiles form .upload {
+  margin: .5em 0 0 .5em;
+}
+#newProjectFiles form .fileDiv {
+  margin: 3.5em auto;
 }
 /********************************************
             PROJECTS DETAIL PAGE
@@ -165,6 +220,9 @@ button.btn.btn-primary {
 #projectDetails .projectInfo {
   max-width: 300px;
   margin: auto;
+}
+#projectDetails .description {
+  margin-bottom: 2em;
 }
 #projectDetails .projectInfo h1 {
   font-size: 2em;
@@ -189,6 +247,7 @@ button.btn.btn-primary {
 }
 #projectDetails .editButtons button {
   display: inline-block;
+  margin: .25em .1em;
 }
 #projectDetails .members {
   margin: 2em auto 1em auto;
@@ -201,7 +260,7 @@ button.btn.btn-primary {
   font-size: 1.2em;
 }
 #projectDetails .projectTypes ul {
-  list-style-type: none;
+  list-style-type: circle;
 }
 #projectDetails .members li,
 #projectDetails .projectTypes li {
@@ -228,6 +287,7 @@ button.btn.btn-primary {
 }
 #projectDetails .requests textarea {
   width: 100%;
+  margin: .5em auto 1em auto;
 }
 #projectDetails .requests .select {
   margin: 1em auto;
@@ -239,14 +299,22 @@ button.btn.btn-primary {
                   SEARCH PAGE
 ********************************************/
 #search {
-  margin: 3em auto;
+  margin: 1em auto;
 }
-#search h2 {
-  margin-bottom: 2em;
+#search .noResults h2 {
+  font-size: 1.5em;
+  margin: 2em auto;
+}
+#search h1 {
+  margin-bottom: 1.5em;
+  font-size: 2em;
 }
 #search audio,
 #search img {
   width: 100%;
+}
+#search .well img {
+  margin: 1em auto;
 }
 .searchType {
   float: left;
@@ -256,18 +324,54 @@ button.btn.btn-primary {
   float: left;
   margin-right: 5px;
 }
+#search .searchBtn a {
+  display: block;
+  margin: 1em auto;
+  width: 150px;
+}
 /********************************************
                   PROFILE
 ********************************************/
 #profile {
   margin: 2em auto;
 }
-#profile audio {
+#profile h1 {
+  font-size: 2em;
+}
+#profile .currentProjects h2,
+#profile .completedProjects h2 {
+  font-size: 1.75em;
+}
+#profile audio,
+#profile img {
   width: 100%;
+}
+#profile .requestBtn {
+  margin: 1em auto 4em auto;
+  text-align: center;
 }
 #profile .currentProjects,
 #profile .completedProjects {
   margin: 2em auto 3em auto;
+}
+#profile .currentProjects .well,
+#profile .completedProjects  .well {
+  max-width: 250px;
+  margin: auto;
+}
+#profile .currentProjects .listProjects,
+#profile .completedProjects .listProjects {
+  margin-top: 2em;
+}
+#profile .currentProjects .listProjects p,
+#profile .completedProjects .listProjects p {
+  margin: 1em auto;
+}
+#profile .bio {
+  margin: 3em auto;
+}
+#profile .noProjects {
+  margin-top: 3em;
 }
 #profile .avatar {
   max-width: 150px;
@@ -276,6 +380,8 @@ button.btn.btn-primary {
 #profile textarea {
   width: 100%;
   margin: 1em auto;
+  border: 2px solid #000;
+  padding: .5em;
 }
 #profile .userInfo {
   text-align: center;
@@ -284,14 +390,23 @@ button.btn.btn-primary {
                   REQUESTS
 ********************************************/
 #requests {
-  margin: 2em auto;
+  margin: 1em auto;
+}
+#requests h1 {
+  margin: 1em auto 1.5em auto;
 }
 #requests .inbound,
 #requests .outbound {
   margin: 2em auto 2.5em auto;
 }
+#requests .noRequests {
+  margin-top: 3em;
+}
 #requests h2 {
   font-size: 1.5em;
+  border-top: 2px dotted #000;
+  border-bottom: 2px dotted #000;
+  padding: .5em 0;
 }
 /********************************************
                   MEDIA QUERIES
@@ -308,6 +423,6 @@ button.btn.btn-primary {
 @media screen and (min-width: 992px) {
   #projectDetails {
     width: 750px;
-    margin: auto;
+    margin: 1em auto;
   }
 }
