@@ -176,11 +176,11 @@
         <p ng-show="!editComment">{{comment.date | date : "MMM dd, yyyy"}}</p>
         <p ng-show="!editComment">Written by {{comment.author}}</p>
         <div ng-show="rootUsername === comment.author" class="">
-          <button ng-show="!editComment" ng-click="editProjectComment()" type="button" name="button">Edit</button>
+          <button ng-show="!editComment" ng-click="editComment = true" type="button" name="button">Edit</button>
 
           <button ng-click="saveProjectComment(comment._id, comment.content)" ng-show="editComment" type="button" name="button">Save</button>
 
-          <button ng-click="cancelProjectComment()" ng-show="editComment" type="button" name="button">Cancel</button>
+          <button ng-click="editComment = false" ng-show="editComment" type="button" name="button">Cancel</button>
           <button ng-click="deleteComment(comment._id)">Delete</button>
         </div>
       </div>

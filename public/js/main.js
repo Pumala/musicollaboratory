@@ -689,15 +689,6 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
       });
   };
 
-  $scope.cancelProjectComment = function() {
-    console.log('CANCELING.........');
-    $scope.editComment = false;
-  };
-
-  $scope.editProjectComment = function() {
-    $scope.editComment = true;
-  };
-
   $scope.saveProjectComment = function(commentId, content) {
     console.log('ID:', commentId);
     console.log('content:', content);
