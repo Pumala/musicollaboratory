@@ -2,8 +2,8 @@
 
   <div class="editButtons text-center" ng-show="project.members.indexOf(rootUsername) > -1">
     <button ng-class="{ hide: edit, showBtn: !edit }" ng-click="editProject()" class="btn btn-primary">Edit Project</button>
-    <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="cancelEdit()" class="btn btn-primary" name="button">Cancel</button>
-    <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="saveEdits(project._id)" class="btn btn-primary" name="button">Save</button>
+    <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="cancelProjectEdit()" class="btn btn-primary" name="button">Cancel</button>
+    <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="saveProjectEdits(project._id)" class="btn btn-primary" name="button">Save</button>
     <div ng-hide="rootUsername !== project.owner">
       <button ng-click="deleteProject(project._id)" class="btn btn-danger">Delete Project</button>
       <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-success">Mark as Completed</button>
@@ -51,7 +51,7 @@
       </div> -->
       <!-- <p ng-show="project.seekingTypes.length === 0">None at this time...</p> -->
       <ul ng-repeat="(type, checked) in project.seekingTypes">
-        <li ng-model="something" ng-show="project.seekingTypes[type]">{{type}}</li>
+        <li ng-show="project.seekingTypes[type]">{{type}}</li>
       </ul>
       <!-- <p ng-show="!something">None at this time...</p> -->
     </div>
@@ -162,5 +162,29 @@
       <button type="submit" class="btn btn-default">Submit</button>
     </div>
   </form>
+
+  <div ng-show="project.members.indexOf(rootUsername) > -1">
+    <h2>Project Comments</h2>
+    <form>
+      <textarea ng-model="content" name="name" rows="8" cols="80"></textarea>
+      <button ng-click="addComment(content)" class="btn btn-default">Add</button>
+    </form>
+    <div class="comments">
+      <div class="" ng-repeat="comment in allComments">
+        <textarea ng-model="comment.content" ng-show="editComment" name="name" rows="8" cols="80"></textarea>
+        <p ng-show="!editComment">{{comment.content}}</p>
+        <p ng-show="!editComment">{{comment.date | date : "MMM dd, yyyy"}}</p>
+        <p ng-show="!editComment">Written by {{comment.author}}</p>
+        <div ng-show="rootUsername === comment.author" class="">
+          <button ng-show="!editComment" ng-click="editProjectComment()" type="button" name="button">Edit</button>
+
+          <button ng-click="saveProjectComment(comment._id, comment.content)" ng-show="editComment" type="button" name="button">Save</button>
+
+          <button ng-click="cancelProjectComment()" ng-show="editComment" type="button" name="button">Cancel</button>
+          <button ng-click="deleteComment(comment._id)">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>

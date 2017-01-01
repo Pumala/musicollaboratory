@@ -84,7 +84,16 @@ const Project = mongoose.model('Project', {
   files: [String], // uploading files ( mp3, lyrics ), // file hash name
   members: [String],
   owner: String,
-  completed: Boolean
+  completed: Boolean,
+  comments: [ObjectId]
+});
+
+comments: [12313132131312313]
+
+const Comment = mongoose.model('Comment', {
+  content: String,
+  date: Date,
+  author: String
 });
 
 const Message = mongoose.model('Message', {
@@ -127,6 +136,76 @@ function getTypes(typesArr) {
   }
   return arr;
 };
+
+// *******************************************
+//          ADD NEW COMMENT TO PROJECT
+// ******************************************
+app.post('/api/comment/new', function(request, response) {
+  // const Comment = mongoose.model('Comment', {
+  //   content: String,
+  //   date: Date,
+  //   author: String
+  // });
+
+  var author = request.body.author;
+  var content = request.body.content;
+  var projectId = request.body.projectId;
+
+  var newComment = new Comment({
+    content: content,
+    date: new Date(),
+    author: author
+  });
+
+  // save new comment to the db
+  bluebird.all([ newComment.save(), Project.findOne({ _id: projectId }) ])
+    .spread(function(comment, project) {
+      // assign comment id to a variable
+      var commentId = comment._id;
+
+      // assign project comments to a variable
+      var projectComments = project.comments;
+      // add the comment id to the project comments array
+      projectComments.push(commentId);
+
+      // update the projects comments in the db
+      return Project.update({
+          _id: projectId
+        }, {
+          $set: {
+            comments: projectComments
+          }
+        })
+    })
+    .then(function(updatedProject) {
+      return response.json({
+        message: 'The comment was successfully added to the db!'
+      });
+    })
+    .catch(function(err) {
+      console.log('encountered err adding the comment to the db: ', err.message);
+    });
+
+});
+
+// ****************************************
+//         DELETE COMMENT FROM DB
+// ***************************************
+app.delete('/api/comment/delete/:commentid', function(request, response) {
+
+  var commentId = request.params.commentid;
+
+  Comment.remove({ _id: commentId })
+    .then(function(results) {
+      return response.json({
+        message: 'successfully deleted comment from db'
+      });
+    })
+    .catch(function(err) {
+      console.log('experienced err deleting comment from db', err.message);
+    });
+
+});
 
 // ********************************
 //          LIST ALL PROJECTS
@@ -211,13 +290,32 @@ app.delete('/api/remove/project/:projectid', function(request, response) {
     })
 
 });
+// *****************+++++++****************************
+//          SAVE COMMENT
+// *****************+++++++***************************
+app.put('/api/comment/save', function(request, response) {
+  console.log('saving comment::', request.body);
+  Comment.update({
+      _id: request.body.commentId
+    }, {
+      $set: {
+        content: request.body.content
+      }
+    })
+    .then(function(updatedComment) {
+      response.json({
+        message: 'success updating comment in db'
+      });
+    })
+    .catch(function(err) {
+      console.log('experiences err updating comment', err.message);
+    });
+});
 
 // *****************+++++++****************************
 //          MARK PROJECT AS COMPLETE or INCOMPLETE
 // *****************+++++++***************************
 app.put('/api/complete/project', function(request, response) {
-
-  console.log('params?', request.body);
   var projectId = request.body.projectId;
   var isCompleted = request.body.isCompleted;
 
@@ -426,16 +524,22 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
     .spread(function(projectInfo, alreadyRequested) {
       console.log('projectInfo::', projectInfo.files);
       var projectFiles = projectInfo.files;
+      var projectComments = projectInfo.comments;
       return [projectInfo, alreadyRequested, File.find({
         _id: {
           $in: projectFiles
         }
-      }) ]
+      }), Comment.find({
+        _id: {
+          $in: projectComments
+        }
+      }) ];
     })
-    .spread(function(projectInfo, alreadyRequested, allFiles) {
+    .spread(function(projectInfo, alreadyRequested, allFiles, allComments) {
       console.log('all the files::', allFiles);
       return response.json({
         allFiles: allFiles,
+        allComments: allComments,
         projectInfo: projectInfo,
         alreadyRequested: alreadyRequested,
         editMode: editMode

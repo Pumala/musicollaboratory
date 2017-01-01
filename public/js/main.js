@@ -270,6 +270,35 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
+  service.addNewComment = function(commentObj) {
+    var url = '/api/comment/new';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: commentObj
+    });
+  };
+
+  service.removeComment = function(commentId) {
+    var url = '/api/comment/delete/' + commentId;
+    return $http({
+      method: 'DELETE',
+      url: url
+    });
+  };
+
+  service.saveProjectComment = function(commentId, content) {
+    var url = '/api/comment/save';
+    return $http({
+      method: 'PUT',
+      url: url,
+      data: {
+        commentId: commentId,
+        content: content
+      }
+    })
+  }
+
   return service;
 
 });
@@ -634,6 +663,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   $scope.lyrics = false;
   $scope.voice = false;
   $scope.production = false;
+  $scope.editComment = false;
   // $scope.edit = false;
 
   console.log('ID......', $scope.projectId);
@@ -642,6 +672,57 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   $scope.getAudioUrl = function(fileHash) {
     return $sce.trustAsResourceUrl('/upload/' + fileHash);
   };
+
+  $scope.addComment = function(content) {
+    var commentObj = {
+      content: content,
+      projectId: $scope.projectId,
+      author: $rootScope.rootUsername
+    };
+    MusicFactory.addNewComment(commentObj)
+      .then(function(results) {
+        $state.reload();
+        console.log('successfully added comment to db');
+      })
+      .catch(function(err) {
+        console.log('experienced err add new comment to db:', err.message);
+      });
+  };
+
+  $scope.cancelProjectComment = function() {
+    console.log('CANCELING.........');
+    $scope.editComment = false;
+  };
+
+  $scope.editProjectComment = function() {
+    $scope.editComment = true;
+  };
+
+  $scope.saveProjectComment = function(commentId, content) {
+    console.log('ID:', commentId);
+    console.log('content:', content);
+    MusicFactory.saveProjectComment(commentId, content)
+      .then(function(results) {
+        console.log('results updating comment from backend:', results);
+        $state.reload();
+        console.log('successfully saved comment');
+      })
+      .catch(function(err) {
+        console.log('err save project comment', err.stack);
+      })
+    };
+
+  $scope.deleteComment = function(commentId) {
+    MusicFactory.removeComment(commentId)
+      .then(function(results) {
+        console.log('successfully deleted comment from db');
+        $state.reload();
+      })
+      .catch(function(err) {
+        console.log('experienced err deleting comment to db:', err.message);
+      });
+  }
+
 
   $scope.deleteFile = function(fileId) {
     MusicFactory.removeFile(fileId, $scope.projectId)
@@ -657,39 +738,26 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   }
   console.log('edit status here', $scope.edit);
 
-
-
   MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
     .then(function(results) {
-      console.log('NEW NEW NEW', results);
+      console.log('updated PROJECT DETAIL info', results);
       $scope.edit = results.data.editMode;
       if ($scope.edit === "true") {
         $scope.edit = true;
       } else {
         $scope.edit = false;
       }
+      console.log('comment is a what......', $scope.editComment);
       console.log('loading edit', $scope.edit);
       $scope.allFiles = results.data.allFiles;
-      // console.log('here are the project details::', results.data);
+      $scope.allComments = results.data.allComments;
+
       $scope.alreadyRequested = results.data.alreadyRequested;
       $scope.project = results.data.projectInfo;
       $scope.projectId = results.data.projectInfo._id;
       $scope.owner = results.data.projectInfo.owner;
       $scope.requestedTypes = {};
       $scope.isCompleted = $scope.project.completed;
-
-      // var seeking = results.data.projectInfo.seekingTypes;
-      // var counter = 0;
-      // for (type in seeking) {
-      //   if () {
-      //
-      //   }
-      // };
-      //
-      // if (counter === 0) {
-      //   isSeeking = true
-      // }
-
     })
     .catch(function(err) {
       console.log('encountered errors loading my projects detail page', err.message);
@@ -707,12 +775,12 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
       $scope.edit = true;
     };
 
-    $scope.cancelEdit = function() {
+    $scope.cancelProjectEdit = function() {
       $scope.edit = false;
       $state.reload();
     };
 
-    $scope.saveEdits = function(projectId) {
+    $scope.saveProjectEdits = function(projectId) {
       console.log('DESCRIPT???', $scope.project.description);
       var updatedProjectObj = {
         description: $scope.project.description,
@@ -769,7 +837,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
 
     $scope.requestContribute = function() {
 
-      console.log('TYPE????:', $scope.checked)
+      // console.log('TYPE????:', $scope.checked)
 
       console.log('requestedTypes', $scope.requestedTypes);
       var requestTypes = {
