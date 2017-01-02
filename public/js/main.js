@@ -720,14 +720,14 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
       .then(function() {
         $state.reload();
         $scope.edit = true;
-        console.log('editing is....', $scope.edit);
+        // console.log('editing is....', $scope.edit);
         console.log('success deleting file!');
       })
       .catch(function(err) {
         console.log('error removing file:', err.message);
       });
   }
-  console.log('edit status here', $scope.edit);
+  // console.log('edit status here', $scope.edit);
 
   MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
     .then(function(results) {

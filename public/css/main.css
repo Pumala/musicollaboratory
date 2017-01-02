@@ -32,6 +32,9 @@ p {
 a {
   color: #222;
 }
+.tinyP {
+  font-size: .9em;
+}
 .muted {
   color: #7e7474;
 }
@@ -165,7 +168,7 @@ button.btn.btn-primary {
               CREATE NEW PROJECT
 ********************************************/
 #newProject {
-  margin: 0 auto 2em auto;
+  margin: 0 auto 5em auto;
 }
 #newProject .well {
   padding-top: .5em;
@@ -187,6 +190,7 @@ button.btn.btn-primary {
 }
 #newProject textarea {
   width: 100%;
+  padding: .5em;
   border: 1px solid #000;
 }
 #newProject .types input {
@@ -297,6 +301,7 @@ button.btn.btn-primary {
 #projectDetails .requests textarea {
   width: 100%;
   margin: .5em auto 1em auto;
+  padding: .5em;
 }
 #projectDetails .requests .select {
   margin: 1em auto;
@@ -308,22 +313,52 @@ button.btn.btn-primary {
                   SEARCH PAGE
 ********************************************/
 #search {
-  margin: 1em auto;
+  /*margin: 1em auto;*/
+  background-color: whitesmoke;
 }
 #search .noResults h2 {
   font-size: 1.5em;
   margin: 2em auto;
 }
+#search .background {
+  background-color: #FF5722;
+}
 #search h1 {
+  margin-top: 0;
   margin-bottom: 1.5em;
   font-size: 1.5em;
+  color: #fff;
 }
-#search audio,
+/*#search audio,
 #search img {
   width: 100%;
+}*/
+#search .projects .top {
+  /*background-color: #FF5722;*/
 }
 #search .projects h3 {
   font-size: 1.35em;
+  margin: 0 0 .5em 0;
+}
+#search audio,
+#search img {
+  width: 110px;
+}
+#search .info {
+  margin-left: 2em;
+}
+#search .projects {
+  border-top: 2px dotted #000;
+  padding: 1em 0;
+  /*border-bottom: 2px dotted #000;*/
+  /*max-width: 250px;*/
+  /*width: 100%;
+  float: left;*/
+  /*margin: 0 5%;*/
+}
+#search .projects .well {
+  padding-top: 1em;
+  height: 450px;
 }
 #search .well img {
   margin: 1em auto;
@@ -331,13 +366,14 @@ button.btn.btn-primary {
 .searchType {
   float: left;
   width: 50%;
+  color: #fff;
 }
 .searchType input {
   float: left;
   margin-right: 5px;
 }
 #search .searchBtn a {
-  display: block;
+  display: inline-block;
   margin: 1em auto;
   width: 150px;
 }
@@ -353,13 +389,31 @@ button.btn.btn-primary {
 #profile .currentProjects h2,
 #profile .completedProjects h2 {
   font-size: 1.75em;
+  color: #fff;
+  background-color: #6922ff;
+  display: inline-block;
+  padding: .5em 5em;
 }
-#profile audio,
+#profile .project {
+  border-top: 2px dotted #000;
+  margin-bottom: 1em;
+  padding: .5em;
+}
+#profile .project .content {
+  width: 120px;
+  margin-top: 3em;
+  margin-left: -1.5em;
+}
+/*#profile audio,
 #profile img {
   width: 100%;
+}*/
+#profile audio,
+#profile img {
+  width: 100px;
 }
 #profile .requestBtn {
-  margin: -10px;
+  margin-top: -10px;
   /*margin: 1em auto 4em auto;
   text-align: center;*/
 }
@@ -392,7 +446,7 @@ button.btn.btn-primary {
 }
 #profile .dotted {
   border-top: 2px dotted #000;
-  padding: .25em 0;
+  padding: .5em;
   border-bottom: 2px dotted #000;
 }
 #profile textarea {
@@ -426,7 +480,10 @@ button.btn.btn-primary {
   font-size: 1.25em;
   border-top: 2px dotted #000;
   border-bottom: 2px dotted #000;
-  padding: .5em 0;
+  padding: .5em 4em;
+  color: #fff;
+  display: inline-block;
+  background-color: #6922ff;
 }
 /********************************************
                   MEDIA QUERIES
@@ -439,10 +496,71 @@ button.btn.btn-primary {
     float: left;
     width: 25%;
   }
+  #search {
+    min-height: 800px;
+  }
+  #search .allProjects {
+    width: 92%;
+    margin: auto;
+  }
+  #search form {
+    padding: 1em 0;
+    width: 92%;
+    margin: auto;
+  }
+  #profile .project {
+    width: 50%;
+    float: left;
+    border: 2px dotted #000;
+  }
+  #search .projects {
+    width: 50%;
+    float: left;
+    background-color: #fff;
+    border: 2px dotted #000;
+    padding: .8em;
+    /*width: 234px;*/
+  }
+  #search .background {
+    padding: 1em;
+  }
+  #search .projects .well {
+    height: 550px;
+  }
+  #search .info {
+    margin-left: .5em;
+  }
+  #search .projects .well:last-child {
+    margin: 0 0 0 .5em;
+  }
+  #search .projects .well:first-child {
+    margin: 0 .5em 0 0;
+  }
+  .login h1, .signup h1 {
+    font-size: 2.25em;
+  }
+  .userForm {
+    max-width: 450px;
+    margin: 4.5em auto;
+  }
+}
+@media screen and (min-width: 800px) {
+  #profile .project {
+    width: 33.333333%;
+  }
+  #search .projects {
+    width: 33.333333%;
+    float: left;
+    background-color: #fff;
+    border: 2px dotted #000;
+    padding: .8em;
+    /*width: 234px;*/
+  }
 }
 @media screen and (min-width: 992px) {
   #projectDetails {
     width: 750px;
     margin: 1em auto;
   }
+
 }

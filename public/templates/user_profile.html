@@ -13,7 +13,7 @@
     <p class="bio"ng-show="!edit">{{description}}</p>
     <div ng-show="rootUsername === currUser">
       <button ng-click="saveBio()" ng-show="edit" type="button" class="btn btn-success">Save</button>
-      <button ng-click="editBio()" ng-show="!edit" type="button" class="btn btn-purple">Edit</button>
+      <button ng-click="editBio()" ng-show="!edit" type="button" class="btn btn-default">Edit</button>
       <button ng-click="cancelEditBio()" ng-show="edit" type="button" class="btn btn-primary">Cancel</button>
     </div>
 
@@ -24,17 +24,19 @@
     <div class="noProjects" ng-show="checkCurrentProjects() === true">
       <p>None at this time...</p>
     </div>
-    <div class="listProjects">
-      <div ng-repeat="project in allProjects" ng-show="!project.completed" class="well">
-        <div class="text-center">
+    <div class="clear listProjects">
+      <div ng-repeat="project in allProjects" ng-show="!project.completed" class="clear project">
+        <div class="pull-left clear">
           <h4><a class="red" ui-sref="myproject({ project_id: project._id})">{{project.name}}</a></h4>
           <p class="muted">{{project.created | date : "MMM dd, yyyy"}}</p>
-          <img ng-src="/images/{{project.avatar}}" alt="">
+          <img class="" ng-src="/images/{{project.avatar}}" alt="">
         </div>
-        <p>{{project.description | limitTo : 100 : 0 }}...</p>
+        <div class="content pull-left">
+          <p>{{project.description | limitTo : 80 : 0 }}...</p>
 
-        <div ng-show="project.files.length > 0">
-          <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
+          <div ng-show="project.files.length > 0">
+            <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
+          </div>
         </div>
       </div>
     </div>
@@ -45,16 +47,18 @@
     <div class="noProjects" ng-show="checkCompletedProjects() === false">
       <p>None at this time...</p>
     </div>
-    <div class="listProjects">
-      <div ng-model="anyCompleted" ng-repeat="project in allProjects" class="well" ng-show="project.completed">
-        <div class="text-center">
+    <div class="clear listProjects">
+      <div ng-model="anyCompleted" ng-repeat="project in allProjects" class="project clear" ng-show="project.completed">
+        <div class="pull-left clear">
           <h3><a class="red" ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
           <p class="muted">{{project.created | date : "MMM dd, yyyy"}}</p>
           <img ng-src="/images/{{project.avatar}}" alt="">
-          <p>{{project.description | limitTo : 100 : 0 }}...</p>
         </div>
-        <div ng-show="project.files.length > 0">
-          <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio>
+        <div class="content pull-left">
+          <p>{{project.description | limitTo : 80 : 0 }}...</p>
+          <div ng-show="project.files.length > 0">
+            <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio>
+          </div>
         </div>
       </div>
     </div>

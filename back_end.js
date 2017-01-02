@@ -494,7 +494,28 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
   var username = request.params.username;
   var editMode = request.params.editmode;
 
-  console.log('PARAMS?', request.params);
+  // console.log('PARAMS?', request.params);
+
+  if (username === 'undefined') {
+    Project.findOne({ _id: projectId })
+      .then(function(projectInfo) {
+        var projectFiles = projectInfo.files;
+        return [ File.find({
+          _id: {
+            $in: projectFiles
+          }
+        }), projectInfo ];
+      })
+      .spread(function(allFiles, projectInfo) {
+        return response.json({
+          allFiles: allFiles,
+          projectInfo: projectInfo
+        });
+      })
+      .catch(function(err) {
+        console.log('encountered err retrieving project details:', err.message);
+      })
+  }
 
   // make a query to check if user has already requested to contribute
   User.findOne({ _id: username })

@@ -1,17 +1,10 @@
-<div id="search" class="container">
-
-  <!-- <h1>Search for a project</h1> -->
-  <h1>What would you like to contribute in a project?</h1>
-  <!-- <form>
-    <div class="form-group">
-      <input type="text" name="search" value="">
-    </div>
-    <button class="btn btn-primary" name="button">Search</button>
-  </form> -->
+<div id="search" class="">
 
   <form>
-    <div class="well">
+    <div class="background">
       <div class="clear">
+
+        <h1>What would you like to contribute in a project?</h1>
 
         <div class="searchType">
           <label for="melody">Melody</label>
@@ -32,7 +25,7 @@
       </div>
       <div class="searchBtn">
         <a ng-click="searchProjects()" class="btn btn-default">Search</a>
-        <a ng-click="reloadSearch()" class='btn btn-primary'>view all projects</a>
+        <a ng-click="reloadSearch()" class='btn btn-purple'>view all projects</a>
       </div>
 
     </div>
@@ -62,20 +55,31 @@
     </div>
   </form> -->
 
-  <div class="projects row" ng-show="allProjects.length > 0">
-    <div ng-repeat="project in allProjects" class="col-sm-4">
-      <div class="well">
-        <h3><a class="red" ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
-        <img ng-src="/images/{{project.avatar}}" alt="">
-        <p>Created by: <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a></p>
-        <p>Seeking:</p>
-        <div ng-repeat="(key, val) in project.seekingTypes">
-          <li ng-if="val">{{key}}</li>
+  <div class="clear allProjects" ng-show="allProjects.length > 0">
+    <div class="clear projects" ng-repeat="project in allProjects">
+
+      <div class="">
+
+        <div class="top">
+          <h3><a class="red" ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
+          <p class="tinyP muted">Created by: <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a></p>
         </div>
+        <img class="pull-left" ng-src="/images/{{project.avatar}}" alt="">
+
+        <div class="pull-left info">
+          <!-- <p>Created by: <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a></p> -->
+          <p>Seeking:</p>
+          <div ng-repeat="(key, val) in project.seekingTypes">
+            <li ng-if="val">{{key}}</li>
+          </div>
+        </div>
+
         <div ng-if="project.files[0]">
           <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
         </div>
+
       </div>
+
     </div>
   </div>
 
