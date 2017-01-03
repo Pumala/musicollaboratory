@@ -433,6 +433,10 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
 
 });
 
+// **************************************
+//          PLAY AUDIO CONTROLLER
+// *************************************
+// app.controller()
 // ********************************
 //          USER CONTROLLER
 // *******************************
@@ -575,9 +579,20 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
   $scope.needsLyrics = false;
   $scope.needsVoice = false;
   $scope.needsProduction = false;
-  $scope.getAudioUrl = function(fileHash) {
-    return $sce.trustAsResourceUrl('/upload/' + fileHash);
+  $scope.audioTrack = null;
+
+  $scope.getAudioUrl = function(fileHash, currProjectName) {
+    console.log(fileHash);
+    $scope.audioTrack = $sce.trustAsResourceUrl('/upload/' + fileHash);
+    $scope.currProjectName = currProjectName;
+    // console.log($scope.audioTrack);
+    // $scope.audioTrack = "/upload/" + fileHash;
+    // console.log($scope.audioTrack);
   };
+
+  // $scope.getAudioUrl = function(fileHash) {
+  //   return $sce.trustAsResourceUrl('/upload/' + fileHash);
+  // };
 
   $scope.searchProjects = function() {
     var needsInfo = {

@@ -58,8 +58,10 @@
   <div class="clear allProjects" ng-show="allProjects.length > 0">
     <div class="clear projects" ng-repeat="project in allProjects">
 
-      <div class="">
-
+      <div class="card clear">
+        <div class="pull-right" ng-if="project.files[0]">
+          <i ng-click="getAudioUrl(project.files[0], project.name)" class="fa fa-3x fa-play-circle" aria-hidden="true"></i>
+        </div>
         <div class="top">
           <h3><a class="red" ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
           <p class="tinyP muted">Created by: <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a></p>
@@ -74,10 +76,6 @@
           </div>
         </div>
 
-        <div ng-if="project.files[0]">
-          <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
-        </div>
-
       </div>
 
     </div>
@@ -87,6 +85,16 @@
     <h2>No results...</h2>
   </div>
 
+  <div ng-class="{show: audioTrack, hide: !audioTrack }" class="playTrack">
+    <p>File Sample from <span class="red">{{currProjectName}}</span></p>
+    <audio controls audioplayer ng-src="{{audioTrack}}"></audio>
+    <!-- <audio controls audioplayer ng-src="/upload/8e75f6e5-9662-4684-9656-2bd6eea3c75c.m4a"></audio> -->
+  </div>
+</div>
+
+  <!-- <img ng-click="getAudioUrl(project.files[0])" src="../images/guitar.jpg" alt=""> -->
+  <!-- <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio> -->
+  <!-- <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio> -->
 
   <!-- <div class="row" ng-repeat="project in allProjects">
     <div class="col-sm-4">
@@ -103,4 +111,8 @@
   </div> -->
 
 
-</div>
+<!-- <div ng-class="{show: audioTrack, hide: !audioTrack }" class="playTrack">
+  <p>File Sample from <span class="red">{{currProjectName}}</span></p>
+  <audio controls audioplayer ng-src="{{audioTrack}}"></audio>
+  <! <audio controls audioplayer ng-src="/upload/8e75f6e5-9662-4684-9656-2bd6eea3c75c.m4a"></audio> -->
+<!-- </div> -->

@@ -420,6 +420,19 @@ button.btn.btn-white {
 #search {
   /*margin: 1em auto;*/
   background-color: whitesmoke;
+  padding-bottom: 7em;
+}
+#search .playTrack {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #6922ff;
+  padding: 1em .5em 0 .5em;
+  color: #fff;
+}
+#search .playTrack span {
+  font-weight: 500;
 }
 #search .noResults h2 {
   font-size: 1.5em;
@@ -446,12 +459,15 @@ button.btn.btn-white {
   font-size: 1.35em;
   margin: 0 0 .5em 0;
 }
-#search audio,
+#search audio {
+  width: 100%;
+}
 #search img {
   width: 110px;
 }
 #search .info {
-  margin-left: 2em;
+  margin-left: 8%;
+  /*margin-left: 2em;*/
 }
 #search .projects {
   border-top: 2px dotted #000;
@@ -480,9 +496,17 @@ button.btn.btn-white {
   float: left;
   margin-right: 5px;
 }
+#search .allProjects .card {
+  width: 90%;
+  margin: auto;
+}
+#search .searchBtn {
+  text-align: center;
+  margin-top: 1em;
+}
 #search .searchBtn a {
   display: inline-block;
-  margin: 1em auto;
+  margin: .25em auto;
   width: 150px;
 }
 /********************************************
@@ -607,6 +631,9 @@ button.btn.btn-white {
                   MEDIA QUERIES
 ********************************************/
 @media screen and (min-width: 525px) {
+  #search .allProjects .card {
+    width: 100%;
+  }
   #projectDetails .projectTypes .well {
     padding: 1em;
   }
@@ -616,6 +643,7 @@ button.btn.btn-white {
   }
   #search {
     min-height: 800px;
+    position: relative;
   }
   #search .allProjects {
     width: 92%;
@@ -630,6 +658,12 @@ button.btn.btn-white {
     width: 50%;
     float: left;
     border: 2px dotted #000;
+  }
+  #search .playTrack {
+    text-align: center;
+  }
+  #search audio {
+    width: 500px;
   }
   #search .projects {
     width: 50%;
@@ -757,9 +791,12 @@ button.btn.btn-white {
 }
 
 @media screen and (min-width: 1050px) {
-  #projectDetails {
+  #projectDetails, #search, #profile {
     width: 1050px;
     margin: auto;
+  }
+  #search .info {
+    margin-left: 10%;
   }
   #projectDetails .allComments .left {
     width: 22%;
