@@ -1,187 +1,215 @@
-<div id="projectDetails" class="container">
+<div id="projectDetails" class="clear">
 
-  <div class="editButtons text-center" ng-show="project.members.indexOf(rootUsername) > -1">
-    <button ng-class="{ hide: edit, showBtn: !edit }" ng-click="editProject()" class="btn btn-primary">Edit Project</button>
-    <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="cancelProjectEdit()" class="btn btn-primary" name="button">Cancel</button>
-    <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="saveProjectEdits(project._id)" class="btn btn-primary" name="button">Save</button>
-    <div ng-hide="rootUsername !== project.owner">
-      <button ng-click="deleteProject(project._id)" class="btn btn-danger">Delete Project</button>
-      <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-success">Mark as Completed</button>
-      <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-success">Unmark as Completed</button>
-    </div>
-  </div>
-
-
-  <div class="projectInfo text-center">
-    <div class="completedProjects">
-      <h2 ng-show="project.completed">Project is closed.</h2>
-      <h2 ng-show="!project.completed">Project is open.</h2>
-    </div>
-    <div class="photo">
-      <img class="avatar" ng-src="/images/{{project.avatar}}" alt="">
-    </div>
-    <h1 class="text-center">{{project.name}}</h1>
-
-    <h3 class="muted"><em>Created by <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a>, © All rights reserved</em></h3>
-
-    <div class="members">
-      <h4>Current Members:</h4>
-      <ul>
-        <li ng-repeat="member in project.members"><a class="red" ui-sref="profile({ username: member })">{{member}}</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div ng-show="!edit" class="projectTypes">
-    <p class="description"><strong>Description</strong>: {{project.description}}</p>
-
-    <div class="well clear">
-      <!-- <h2 ng-hide="((project.existingTypes.lyrics === false) && (project.existingTypes.production === false) && (project.existingTypes.melody === false) && (project.existingTypes.voice === false))">Already has:</h2> -->
-      <h2>Already Has:</h2>
-      <ul>
-        <li ng-repeat="(type, checked) in project.existingTypes" ng-show="project.existingTypes[type]">{{type}}</li>
-      </ul>
-      <!-- <p>None at this time...</p> -->
+  <div ng-class="{ fullWidth: project.members.indexOf(rootUsername) < 0, left: project.members.indexOf(rootUsername) > -1 }">
+    <div class="editButtons" ng-show="project.members.indexOf(rootUsername) > -1">
+      <button ng-class="{ hide: edit, showBtn: !edit }" ng-click="editProject()" class="btn btn-primary">Edit Project</button>
+      <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="cancelProjectEdit()" class="btn btn-white" name="button">Cancel</button>
+      <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="saveProjectEdits(project._id)" class="btn btn-primary" name="button">Save</button>
+      <div class="showInline" ng-hide="rootUsername !== project.owner">
+        <button ng-click="deleteProject(project._id)" class="btn btn-default">Delete Project</button>
+        <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-purple">Mark as Completed</button>
+        <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-purple">Unmark as Completed</button>
+      </div>
     </div>
 
-    <div class="well clear">
-      <h2 ng-show="project.seekingTypes">Seeking:</h2>
-      <!-- <div ng-repeat="(type, checked) in project.seekingTypes">
-        <p ng-show="project.seekingTypes[type]">{{type}}</p>
-      </div> -->
-      <!-- <p ng-show="project.seekingTypes.length === 0">None at this time...</p> -->
-      <ul ng-repeat="(type, checked) in project.seekingTypes">
-        <li ng-show="project.seekingTypes[type]">{{type}}</li>
-      </ul>
-      <!-- <p ng-show="!something">None at this time...</p> -->
-    </div>
 
-    <div>
-      <h2>Project Samples:</h2>
-      <p ng-show="project.files.length < 1">None at this time.</p>
-      <div ng-repeat="file in project.files">
-        <div class="well">
-          <!-- Bring in over file Names -->
-          <!-- <p>{{file.name}}</p> -->
-          <audio controls audioplayer ng-src="{{getAudioUrl(file)}}"></audio>
+    <div class="projectInfo clear text-center">
+      <div class="completedProjects">
+        <h2 ng-show="project.completed">Project is closed.</h2>
+        <h2 ng-show="!project.completed">Project is open.</h2>
+      </div>
+      <div class="photo">
+        <img class="avatar" ng-src="/images/{{project.avatar}}" alt="">
+        <h3 class="muted"><em>Created by <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a>, © All rights reserved</em></h3>
+      </div>
+      <div class="centerCol">
+        <h1 class="purple">{{project.name}}</h1>
+        <div class="members">
+          <h4>Current Members:</h4>
+          <ul>
+            <li ng-repeat="member in project.members"><a class="red" ui-sref="profile({ username: member })">{{member}}</a></li>
+          </ul>
         </div>
       </div>
     </div>
 
-  </div>
+    <!-- <div ng-show="!edit">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>Description:</strong>
+        </div>
+        <div class="panel-body">{{project.description}}</p>
+        </div>
+      </div>
+    </div> -->
 
-  <div ng-show="edit">
+    <div ng-show="!edit" class="projectTypes">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>Description:</strong>
+        </div>
+        <div class="panel-body">{{project.description}}</p>
+        </div>
+      </div>
 
-    <form ng-controller="FileController">
-      <h3>Upload files</h3>
-      <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
-      <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
-      <input type="file" nv-file-select="" uploader="uploader" />
-      <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-          Upload
-      </button>
-    </form>
+      <div class="well clear">
+        <!-- <h2 ng-hide="((project.existingTypes.lyrics === false) && (project.existingTypes.production === false) && (project.existingTypes.melody === false) && (project.existingTypes.voice === false))">Already has:</h2> -->
+        <h2>Already Has:</h2>
+        <ul>
+          <li ng-repeat="(type, checked) in project.existingTypes" ng-show="project.existingTypes[type]">{{type}}</li>
+        </ul>
+        <!-- <p>None at this time...</p> -->
+      </div>
 
-    <div class="">
-      <div ng-repeat="file in allFiles">
-        <div class="well">
-          <p>{{file.originalName}}</p>
-          <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>
+      <div class="well clear">
+        <h2 ng-show="project.seekingTypes">Seeking:</h2>
+        <!-- <div ng-repeat="(type, checked) in project.seekingTypes">
+          <p ng-show="project.seekingTypes[type]">{{type}}</p>
+        </div> -->
+        <!-- <p ng-show="project.seekingTypes.length === 0">None at this time...</p> -->
+        <ul ng-repeat="(type, checked) in project.seekingTypes">
+          <li ng-show="project.seekingTypes[type]">{{type}}</li>
+        </ul>
+        <!-- <p ng-show="!something">None at this time...</p> -->
+      </div>
+
+      <div>
+        <h2>Project Samples:</h2>
+        <p ng-show="project.files.length < 1">None at this time.</p>
+        <div ng-repeat="file in allFiles">
+          <div class="well">
+            <p><strong>{{file.originalName}}</strong></p>
+            <p class="muted">Uploaded by <span class="red">{{file.owner}}</span></p>
+            <audio controls audioplayer ng-src="{{getAudioUrl(file._id)}}"></audio>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div ng-show="edit" class="editProjectInfo">
+
+      <form class="files" ng-controller="FileController">
+        <h3>Upload files</h3>
+        <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
+        <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
+        <input type="file" nv-file-select="" uploader="uploader" />
+        <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+            Upload
+        </button>
+      </form>
+
+      <div class="">
+        <div ng-repeat="file in allFiles">
+          <div class="well">
+            <p>{{file.originalName}}</p>
+            <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="well">
+            <h2>Description</h2>
+            <textarea ng-model="project.description" rows="8" cols="80"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="well">
+            <h2>Has:</h2>
+            <div class="">
+              <label for="melody">Melody</label>
+              <input ng-model="hasMelody" type="checkbox" name="melody" value="melody">
+            </div>
+            <div class="">
+              <label for="lyrics">Lyrics</label>
+              <input ng-model="hasLyrics" type="checkbox" name="lyrics" value="lyrics">
+            </div>
+            <div class="">
+              <label for="voice">Voice</label>
+              <input ng-model="hasVoice" type="checkbox" name="voice" value="voice">
+            </div>
+            <div class="">
+              <label for="production">Production</label>
+              <input ng-model="hasProduction" type="checkbox" name="production" value="production">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="well">
+            <h2>Needs:</h2>
+            <div class="">
+              <label for="melody">Melody</label>
+              <input ng-model="needsMelody" type="checkbox" name="melody" value="melody">
+            </div>
+            <div class="">
+              <label for="lyrics">Lyrics</label>
+              <input ng-model="needsLyrics" type="checkbox" name="lyrics" value="lyrics">
+            </div>
+            <div class="">
+              <label for="voice">Voice</label>
+              <input ng-model="needsVoice" type="checkbox" name="voice" value="voice">
+            </div>
+            <div class="">
+              <label for="production">Production</label>
+              <input ng-model="needsProduction" type="checkbox" name="production" value="production">
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
+    <div ng-show="alreadyRequested" class="well">
+      <p>Thanks. Your request was successfully sent.</p>
+    </div>
+
+    <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0)" ng-submit="requestContribute()">
       <div class="well">
-        <h2>Description</h2>
-        <textarea ng-model="project.description" rows="8" cols="80"></textarea>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-6">
-        <div class="well">
-          <h2>Has:</h2>
-          <div class="">
-            <label for="melody">Melody: </label>
-            <input ng-model="hasMelody" type="checkbox" name="melody" value="melody">
-          </div>
-          <div class="">
-            <label for="lyrics">Lyrics: </label>
-            <input ng-model="hasLyrics" type="checkbox" name="lyrics" value="lyrics">
-          </div>
-          <div class="">
-            <label for="voice">Voice: </label>
-            <input ng-model="hasVoice" type="checkbox" name="voice" value="voice">
-          </div>
-          <div class="">
-            <label for="production">Production: </label>
-            <input ng-model="hasProduction" type="checkbox" name="production" value="production">
+        <h2>Request to contribute</h2>
+        <div class="select">
+          <div ng-repeat="(type, checked) in project.seekingTypes" ng-show="project.seekingTypes[type]">
+            <label for="">{{type}}</label>
+            <input ng-model="requestedTypes[type]" type="checkbox">
           </div>
         </div>
+        <p>Let the project creator know why you'd be a good fit.</p>
+        <textarea ng-model="description" name="name" rows="4" cols="40"></textarea>
+        <button type="submit" class="btn btn-default">Submit</button>
       </div>
-      <div class="col-sm-6">
-        <div class="well">
-          <h2>Needs:</h2>
-          <div class="">
-            <label for="melody">Melody: </label>
-            <input ng-model="needsMelody" type="checkbox" name="melody" value="melody">
-          </div>
-          <div class="">
-            <label for="lyrics">Lyrics: </label>
-            <input ng-model="needsLyrics" type="checkbox" name="lyrics" value="lyrics">
-          </div>
-          <div class="">
-            <label for="voice">Voice: </label>
-            <input ng-model="needsVoice" type="checkbox" name="voice" value="voice">
-          </div>
-          <div class="">
-            <label for="production">Production: </label>
-            <input ng-model="needsProduction" type="checkbox" name="production" value="production">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div ng-show="alreadyRequested" class="well">
-    <p>Thanks. Your request was successfully sent.</p>
-  </div>
-<!--  -->
-  <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0)" ng-submit="requestContribute()">
-    <div class="well">
-      <h2>Request to contribute</h2>
-      <div class="select">
-        <div ng-repeat="(type, checked) in project.seekingTypes" ng-show="project.seekingTypes[type]">
-          <label for="">{{type}}</label>
-          <input ng-model="requestedTypes[type]" type="checkbox">
-        </div>
-      </div>
-      <p>Let the project creator know why you'd be a good fit.</p>
-      <textarea ng-model="description" name="name" rows="4" cols="40"></textarea>
-      <button type="submit" class="btn btn-default">Submit</button>
-    </div>
-  </form>
-
-  <div ng-show="project.members.indexOf(rootUsername) > -1">
-    <h2>Project Comments</h2>
-    <form>
-      <textarea ng-model="content" name="name" rows="8" cols="80"></textarea>
-      <button ng-click="addComment(content)" class="btn btn-default">Add</button>
     </form>
-    <div class="comments">
-      <div class="" ng-repeat="comment in allComments">
-        <textarea ng-model="comment.content" ng-show="editComment" name="name" rows="8" cols="80"></textarea>
-        <p ng-show="!editComment">{{comment.content}}</p>
-        <p ng-show="!editComment">{{comment.date | date : "MMM dd, yyyy"}}</p>
-        <p ng-show="!editComment">Written by {{comment.author}}</p>
-        <div ng-show="rootUsername === comment.author" class="">
-          <button ng-show="!editComment" ng-click="editComment = true" type="button" name="button">Edit</button>
+  </div>
 
-          <button ng-click="saveProjectComment(comment._id, comment.content)" ng-show="editComment" type="button" name="button">Save</button>
+  <div class="right">
+    <div class="comments" ng-show="project.members.indexOf(rootUsername) > -1">
+      <form class="post clear">
+        <h2>Project Comments</h2>
+        <textarea ng-model="content" rows="5" cols="80"></textarea>
+        <button ng-click="addComment(content)" class="btn btn-default pull-right">Post a Comment</button>
+      </form>
+      <div class="allComments clear">
+        <div class="pull-left editBackground" ng-repeat="comment in allComments">
+          <textarea ng-model="comment.content" ng-show="editComment" class="edit" rows="3" cols="80"></textarea>
+          <div class="clear">
+            <div class="pull-left left">
+              <p class="muted tinyP" ng-show="!editComment">{{comment.date | date : "MMM dd, yyyy"}}</p>
+              <p ng-show="!editComment">- <span><a class="red" ui-sref="profile({ username: comment.author })">{{comment.author}}</a></span></p>
+            </div>
+            <div class="pull-left right clear">
+              <p ng-show="!editComment">{{comment.content}}</p>
+              <div ng-show="rootUsername === comment.author" class="editButtons pull-right">
+                <button ng-show="!editComment" ng-click="editComment = true" class="btn btn-default">Edit</button>
 
-          <button ng-click="editComment = false" ng-show="editComment" type="button" name="button">Cancel</button>
-          <button ng-click="deleteComment(comment._id)">Delete</button>
+                <button ng-click="saveProjectComment(comment._id, comment.content)" ng-show="editComment" class="btn btn-purple">Save</button>
+
+                <button ng-click="editComment = false" ng-show="editComment" class="btn btn-default" name="button">Cancel</button>
+                <button ng-show="!editComment" class="btn btn-purple" ng-click="deleteComment(comment._id)">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
