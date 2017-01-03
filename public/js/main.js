@@ -444,6 +444,8 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
   $scope.currUser = $stateParams.username;
   $scope.edit = false;
 
+  console.log('hello');
+
   $scope.editBio = function() {
     $scope.edit = true;
   }
@@ -465,27 +467,34 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
 
   }
 
-  $scope.checkCurrentProjects = function() {
-    var completedArr = $scope.allProjects.filter(function(project) {
-      return project.completed === true;
-    });
-    if (completedArr.length === 0) {
-      return true;
-    } else {
-      return false;
-    }
+  $scope.getAudioUrl = function(fileHash, currProjectName, currProjectId) {
+    console.log(fileHash);
+    $scope.audioTrack = $sce.trustAsResourceUrl('/upload/' + fileHash);
+    $scope.currProjectName = currProjectName;
+    $scope.currProjectId = currProjectId;
   };
 
-  $scope.checkCompletedProjects = function() {
-    var completedArr = $scope.allProjects.filter(function(project) {
-      return project.completed === true;
-    });
-    if (completedArr.length === 0) {
-      return false;
-    } else {
-      return true;
-    }
-  };
+  // $scope.checkCurrentProjects = function() {
+  //   var completedArr = $scope.allProjects.filter(function(project) {
+  //     return project.completed === true;
+  //   });
+  //   if (completedArr.length === 0) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
+  //
+  // $scope.checkCompletedProjects = function() {
+  //   var completedArr = $scope.allProjects.filter(function(project) {
+  //     return project.completed === true;
+  //   });
+  //   if (completedArr.length === 0) {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // };
 
   // makes a service call to pass data to the backend to render the user profile page
   MusicFactory.getUserProfile($scope.currUser)
@@ -499,9 +508,9 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
       console.log('encountered errors retrieving user profile data', err.message);
     });
 
-    $scope.getAudioUrl = function(fileHash) {
-      return $sce.trustAsResourceUrl('/upload/' + fileHash);
-    };
+    // $scope.getAudioUrl = function(fileHash) {
+    //   return $sce.trustAsResourceUrl('/upload/' + fileHash);
+    // };
 
 });
 
@@ -571,6 +580,16 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
 
 });
 
+// PLAY AUDIO CONTROLLER
+// app.controller('PlayAudioController', function($scope, $sce) {
+//   $scope.getAudioUrl = function(fileHash, currProjectName, currProjectId) {
+//     console.log(fileHash);
+//     $scope.audioTrack = $sce.trustAsResourceUrl('/upload/' + fileHash);
+//     $scope.currProjectName = currProjectName;
+//     $scope.currProjectId = currProjectId;
+//   };
+// });
+
 // ********************************
 //          SEARCH CONTROLLER
 // *******************************
@@ -581,13 +600,11 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
   $scope.needsProduction = false;
   $scope.audioTrack = null;
 
-  $scope.getAudioUrl = function(fileHash, currProjectName) {
+  $scope.getAudioUrl = function(fileHash, currProjectName, currProjectId) {
     console.log(fileHash);
     $scope.audioTrack = $sce.trustAsResourceUrl('/upload/' + fileHash);
     $scope.currProjectName = currProjectName;
-    // console.log($scope.audioTrack);
-    // $scope.audioTrack = "/upload/" + fileHash;
-    // console.log($scope.audioTrack);
+    $scope.currProjectId = currProjectId;
   };
 
   // $scope.getAudioUrl = function(fileHash) {

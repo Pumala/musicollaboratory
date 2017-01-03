@@ -38,16 +38,15 @@
     <div class="clear listProjects">
       <div ng-repeat="project in allProjects" ng-show="!project.completed" class="clear project">
         <div class="clear">
+          <div class="pull-right" ng-show="project.files.length > 0">
+            <i ng-click="getAudioUrl(project.files[0], project.name, project._id)" class="fa fa-3x fa-play-circle" aria-hidden="true"></i>
+          </div>
           <h4><a class="red" ui-sref="myproject({ project_id: project._id})">{{project.name}}</a></h4>
           <p class="muted">{{project.created | date : "MMM dd, yyyy"}}</p>
         </div>
         <img class="pull-left clear" ng-src="/images/{{project.avatar}}" alt="">
         <div class="content pull-left">
           <p>{{project.description | limitTo : 80 : 0 }}...</p>
-
-          <div ng-show="project.files.length > 0">
-            <audio controls audioplayer ng-src="{{getAudioUrl(project.files[0])}}"></audio>
-          </div>
         </div>
       </div>
     </div>
@@ -68,10 +67,16 @@
         <div class="content pull-left">
           <p>{{project.description | limitTo : 80 : 0 }}...</p>
           <div ng-show="project.files.length > 0">
-            <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio>
+            <i ng-click="getAudioUrl(project.files[0], project.name, project._id)" class="fa fa-3x fa-play-circle" aria-hidden="true"></i>
+            <!-- <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio> -->
           </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div ng-class="{show: audioTrack, hide: !audioTrack }" id="playTrack">
+    <p>File Sample from <a class="red" ui-sref="myproject({ project_id: currProjectId })">{{currProjectName}}</a></p>
+    <audio controls audioplayer ng-src="{{audioTrack}}"></audio>
   </div>
 </div>

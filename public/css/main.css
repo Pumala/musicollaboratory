@@ -154,7 +154,7 @@ button.btn.btn-white {
               LOGIN / SIGN UP PAGE
 ********************************************/
 .login, .signup {
-  background-image: url('../images/red.jpg');
+  background-image: url('../images/purple.jpg');
   height: 100%;
   width: 100%;
   background-size: cover;
@@ -181,7 +181,25 @@ button.btn.btn-white {
               CREATE NEW PROJECT
 ********************************************/
 #newProject {
-  margin: 0 auto 5em auto;
+  background-image: url('../images/purple.jpg');
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+  padding-top: 1em;
+}
+#newProject {
+  margin: 0 auto;
+  /*margin: 0 auto 5em auto;*/
+}
+#newProject label {
+  color: #fff;
+}
+#newProject .types label,
+#newProject .types h2 {
+  color: #000;
 }
 #newProject .well {
   padding-top: .5em;
@@ -422,7 +440,7 @@ button.btn.btn-white {
   background-color: whitesmoke;
   padding-bottom: 7em;
 }
-#search .playTrack {
+#playTrack {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -431,7 +449,7 @@ button.btn.btn-white {
   padding: 1em .5em 0 .5em;
   color: #fff;
 }
-#search .playTrack span {
+#playTrack a {
   font-weight: 500;
 }
 #search .noResults h2 {
@@ -448,18 +466,11 @@ button.btn.btn-white {
   font-size: 1.5em;
   color: #fff;
 }
-/*#search audio,
-#search img {
-  width: 100%;
-}*/
-#search .projects .top {
-  /*background-color: #FF5722;*/
-}
 #search .projects h3 {
   font-size: 1.35em;
   margin: 0 0 .5em 0;
 }
-#search audio {
+#search audio, #profile audio {
   width: 100%;
 }
 #search img {
@@ -513,7 +524,7 @@ button.btn.btn-white {
                   PROFILE
 ********************************************/
 #profile {
-  margin: 2em auto;
+  margin: 2em auto 20em auto;
   width: 92%;
 }
 #profile h1 {
@@ -546,11 +557,6 @@ button.btn.btn-white {
   float: right;
   margin-top: -.5em
 }
-/*#profile audio,
-#profile img {
-  width: 100%;
-}*/
-#profile audio,
 #profile img {
   width: 100px;
 }
@@ -659,10 +665,11 @@ button.btn.btn-white {
     float: left;
     border: 2px dotted #000;
   }
-  #search .playTrack {
+  #playTrack {
     text-align: center;
   }
-  #search audio {
+  #search audio,
+  #profile audio {
     width: 500px;
   }
   #search .projects {
