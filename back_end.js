@@ -186,6 +186,10 @@ app.post('/api/comment/new', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered err adding the comment to the db: ', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -205,6 +209,10 @@ app.delete('/api/comment/delete/:commentid', function(request, response) {
     })
     .catch(function(err) {
       console.log('experienced err deleting comment from db', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -221,6 +229,10 @@ app.get('/api/search/allprojects', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered err finding all the projects:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 });
 
@@ -259,6 +271,10 @@ app.post('/api/search/projects', function(request, response) {
     })
     .catch(function(err) {
       console.log('error querying for projects:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
   // Project.find({
@@ -289,6 +305,10 @@ app.delete('/api/remove/project/:projectid', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered err removing project from db', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     })
 
 });
@@ -311,6 +331,10 @@ app.put('/api/comment/save', function(request, response) {
     })
     .catch(function(err) {
       console.log('experiences err updating comment', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 });
 
@@ -336,6 +360,10 @@ app.put('/api/complete/project', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered err marking project complete in db', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -369,6 +397,10 @@ app.put('/api/edit/project', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered errors updating project info:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     })
 
 });
@@ -395,6 +427,10 @@ app.put('/api/edit/user/bio', function(request, response) {
     })
     .catch(function(err) {
       console.log('experienced error updating user bio', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -454,6 +490,10 @@ app.post('/api/signup', function(request, response) {
     })
     .catch(function(err) {
       console.log('error saving new user to db!!!', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -482,6 +522,10 @@ app.put('/api/logout', function(request, response) {
     })
     .catch(function(err) {
       console.log("error deleting token", err.stack);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 });
 
@@ -516,6 +560,10 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
       })
       .catch(function(err) {
         console.log('encountered err retrieving project details:', err.message);
+        response.status(500);
+        response.json({
+          error: err.message
+        });
       })
   }
 
@@ -570,6 +618,10 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
     })
     .catch(function(err) {
       console.log(err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -639,6 +691,10 @@ app.post('/api/upload/avatar/user/:username', upload.single('file'), function(re
     })
     .catch(function(err) {
       console.log('encountered err saving image file to db...', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -712,6 +768,10 @@ app.post('/api/upload/avatar/project/:projectid/:username', upload.single('file'
     })
     .catch(function(err) {
       console.log('encountered err saving project avatar file to db...', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -854,6 +914,10 @@ app.post('/api/login', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered error logging in!', err.message)
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -911,6 +975,10 @@ app.post('/api/request/new', function(request, response) {
     })
     .catch(function(err) {
       console.log('error saving new request...', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 
@@ -966,6 +1034,10 @@ app.get('/api/requests/:username', function(request, response) {
     })
     .catch(function(err) {
     console.log('error retrieving all the requests:', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
     });
 
 });
@@ -1000,6 +1072,10 @@ app.get('/api/profile/:username', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered errors retrieving profile data:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -1055,6 +1131,10 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
     })
     .catch(function(err) {
       console.log('encountered error adding new project:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 });
@@ -1076,6 +1156,10 @@ app.delete('/api/request/delete/:requestid', function(request, response) {
     })
     .catch(function(err) {
       console.log('error attempting to delete request from db:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 });
 
@@ -1207,6 +1291,10 @@ app.put('/api/request/accept', function(request, response) {
     })
     .catch(function(err) {
       console.log('error attempting to delete request from db:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
 })
@@ -1240,6 +1328,10 @@ app.get('/api/project/file/upload/new/:projectId', function(request, response) {
     })
     .catch(function(err) {
       console.log('encountered errors retrieving project data form upload:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
 
   // Project.findOne({ _id: projectId })
@@ -1292,6 +1384,10 @@ app.delete('/api/:projectid/file/remove/:fileid', function(request, response) {
     })
     .catch(function(err) {
       console.log('error deleting file...', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
   // File.remove({ _id: fileId })
   //   .then(function(removedFile) {
