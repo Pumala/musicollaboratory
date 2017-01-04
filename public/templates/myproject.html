@@ -13,7 +13,6 @@
       </div>
     </div>
 
-
     <div class="projectInfo clear text-center">
       <div class="completedProjects">
         <h2 ng-show="project.completed">Project is closed.</h2>
@@ -22,7 +21,6 @@
       <div class="photo">
         <img class="avatar" ng-src="/upload/{{project.avatar}}" alt="">
         <h3 class="muted"><em>Started by <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a>, © All rights reserved </em><span>{{ project.created | date: "yyyy"}}</span></h3>
-        <!-- <p class="tinyP">{{ project.created | date: "yyyy"}}</p> -->
       </div>
       <div class="centerCol">
         <h1 class="purple">{{project.name}}</h1>
@@ -87,9 +85,6 @@
                 <button class="btn btn-primary" type="submit">Download!</button>
               </form>
             </div>
-            <!-- <a ui-sref="{{getAudioUrl(file._id)}}" download>Download</a> -->
-            <!-- <iframe ng-src="{{getAudioUrl(file._id)}}" width="" height=""></iframe> -->
-            <!-- <audio controls audioplayer ng-src="{{getAudioUrl(file._id)}}"></audio> -->
           </div>
         </div>
       </div>
@@ -194,6 +189,7 @@
         </div>
       </div>
     </div>
+  </div>
 
     <div ng-show="alreadyRequested" class="well">
       <p>Thanks. Your request was successfully sent.</p>
