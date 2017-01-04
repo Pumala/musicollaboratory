@@ -297,8 +297,24 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
         commentId: commentId,
         content: content
       }
-    })
-  }
+    });
+  };
+
+  service.deleteCurrUserAvatar = function(userAvatarId) {
+    var url = '/api/user/avatar/delete/' + userAvatarId + '/' + $rootScope.rootUsername;
+    return $http({
+      method: 'DELETE',
+      url: url
+    });
+  };
+
+  service.deleteCurrProjectAvatar = function(projectId, projectAvatarId) {
+    var url = '/api/avatar/delete/project/' + projectId + '/' + projectAvatarId;
+    return $http({
+      method: 'DELETE',
+      url: url,
+    });
+  };
 
   return service;
 
@@ -543,10 +559,23 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
       $scope.allProjects = results.data.allProjects;
       $scope.userInfo = results.data.userInfo;
       $scope.description = results.data.userInfo.bio.length === 0 ? "Add a bio..." : results.data.userInfo.bio;
+      $scope.avatarInfo = results.data.avatarInfo;
     })
     .catch(function(err) {
       console.log('encountered errors retrieving user profile data', err.message);
     });
+
+    $scope.deleteUserAvatar = function(avatarId) {
+      console.log('avatar id right....', avatarId);
+      MusicFactory.deleteCurrUserAvatar(avatarId)
+        .then(function(results) {
+          $state.reload();
+          console.log('success deleting user avatar');
+        })
+        .catch(function(err) {
+          console.log('experienced err deleting user avatar');
+        });
+    };
 
     // $scope.getAudioUrl = function(fileHash) {
     //   return $sce.trustAsResourceUrl('/upload/' + fileHash);
@@ -741,6 +770,9 @@ app.controller('NewProjectsController', function($scope, $stateParams, $state, F
 
 });
 
+// ***********************************************************************
+//                        USER PROJECTS CONTROLLER
+// **********************************************************************
 app.controller('UserProjectsController', function($scope, $sce, $state, $stateParams, $rootScope, MusicFactory) {
   $scope.projectId = $stateParams.project_id;
   $scope.melody = false;
@@ -799,6 +831,17 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   }
 
 
+  $scope.deleteProjectAvatar = function(projectAvatarId) {
+    MusicFactory.deleteCurrProjectAvatar($scope.projectId, projectAvatarId)
+      .then(function(results) {
+        console.log('success deleting the project avatar');
+        $state.reload();
+      })
+      .catch(function(err) {
+        console.log('error deleting the project avatar:', err.message);
+      });
+  };
+
   $scope.deleteFile = function(fileId) {
     MusicFactory.removeFile(fileId, $scope.projectId)
       .then(function() {
@@ -816,23 +859,24 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
     .then(function(results) {
       console.log('updated PROJECT DETAIL info', results);
-      $scope.edit = results.data.editMode;
-      if ($scope.edit === "true") {
-        $scope.edit = true;
-      } else {
-        $scope.edit = false;
-      }
-      console.log('comment is a what......', $scope.editComment);
-      console.log('loading edit', $scope.edit);
-      $scope.allFiles = results.data.allFiles;
-      $scope.allComments = results.data.allComments;
-
-      $scope.alreadyRequested = results.data.alreadyRequested;
-      $scope.project = results.data.projectInfo;
-      $scope.projectId = results.data.projectInfo._id;
-      $scope.owner = results.data.projectInfo.owner;
-      $scope.requestedTypes = {};
-      $scope.isCompleted = $scope.project.completed;
+      // $scope.edit = results.data.editMode;
+      // if ($scope.edit === "true") {
+      //   $scope.edit = true;
+      // } else {
+      //   $scope.edit = false;
+      // }
+      // console.log('comment is a what......', $scope.editComment);
+      // console.log('loading edit', $scope.edit);
+      // $scope.allFiles = results.data.allFiles;
+      // $scope.allComments = results.data.allComments;
+      // $scope.projectAvatar = results.data.projectAvatar;
+      //
+      // $scope.alreadyRequested = results.data.alreadyRequested;
+      // $scope.project = results.data.projectInfo;
+      // $scope.projectId = results.data.projectInfo._id;
+      // $scope.owner = results.data.projectInfo.owner;
+      // $scope.requestedTypes = {};
+      // $scope.isCompleted = $scope.project.completed;
     })
     .catch(function(err) {
       console.log('encountered errors loading my projects detail page', err.message);
