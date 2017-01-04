@@ -714,7 +714,7 @@ button.btn.btn-white {
   border-top: 2px dotted #000;
   max-width: 250px;
 }
-#requests form input {
+#requests .options input {
   float: left;
   margin-right: .5em;
 }

@@ -422,6 +422,7 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
         $scope.receiveProjects.forEach(function(project) {
           if (String(request.projectId) === String(project._id)) {
             request.projectName = project.name;
+            request.acceptedRequestTypes = {};
           } else {
             console.log('NOPEE');
           }
@@ -437,6 +438,9 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
           }
         });
       });
+
+      console.log('receiving:', $scope.receiveRequests);
+      console.log('sending:', $scope.sendRequests);
 
     })
     .catch(function(err) {
@@ -454,11 +458,14 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
           console.log('error deleting request::', err.message);
         });
     }
-    $scope.acceptRequest = function(requestId, projectId, username, projectName) {
-      console.log('type request obj::', $scope.typeRequest);
+    $scope.acceptRequest = function(requestId, projectId, username, projectName, acceptedRequestTypes) {
+      // console.log('hello: ', hello);
+      // console.log('type request obj::', $scope.typeRequest);
+      // console.log('RED type request obj::', $scope.request.acceptedRequestTypes);
+
       var requestObj = {
         requestId: requestId,
-        typeRequest: $scope.typeRequest,
+        typeRequest: acceptedRequestTypes,
         projectId: projectId,
         username: username,
         projectName: projectName
