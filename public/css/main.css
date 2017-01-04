@@ -13,6 +13,9 @@ body {
 p {
   font-size: 1em;
 }
+ul.panel-body {
+  margin: 0;
+}
 .clear:before, .clear:after {
   display: table;
   content: ""
@@ -439,7 +442,8 @@ button.btn.btn-white {
 #projectDetails .right .comments form {
   border-bottom: 1px solid #000;
 }
-#projectDetails .requests input {
+#projectDetails .requests input,
+#projectDetails .fileDiv input {
   float: left;
   margin-right: 5px;
 }
@@ -474,6 +478,12 @@ button.btn.btn-white {
   width: 100%;
   padding: .5em;
   border: 1px solid #000;
+}
+#projectDetails .sample .projectFile {
+  border-bottom: 1px solid #000;
+}
+#projectDetails .sample .projectFile:last-child {
+  border-bottom: 0;
 }
 #projectDetails .requests textarea {
   width: 100%;

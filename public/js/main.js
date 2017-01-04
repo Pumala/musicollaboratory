@@ -329,25 +329,15 @@ app.controller('FileController', function($timeout, $scope, $rootScope, $state, 
   var uploader = $scope.uploader = new FileUploader({
     url: '/api/upload/' + $rootScope.rootUsername + '/' + $scope.projectId
   });
-    // .then(function() {
-    //   console.log('wake up!');
-    // })
-    // .catch(function(err) {
-    //   console.log('NOOOOOO!');
-    // });
-  //
-  // uploader.uploadAll = function() {
-  //   $timeout(function () {
-  //     $state.reload();
-  //     // $state.go('myprojectuploader', { projectid: $scope.projectId });
-  //     console.log('proj iddd?:', $scope.projectId);
-  //     console.info('onCompleteAll');
-  //   }, 2000);
-  // };
-  console.log('setting up onCompleteAll')
+
+
+
+
+  // console.log('setting up onCompleteAll')
   uploader.onCompleteAll = function() {
     console.log('hello i am here');
-    $state.reload();
+    $rootScope.$emit('editMode', true);
+    // $state.reload();
   };
   uploader.onSuccessItem = function(fileItem, response, status, headers) {
 
@@ -787,7 +777,13 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   $scope.voice = false;
   $scope.production = false;
   $scope.editComment = false;
-  // $scope.edit = false;
+
+  console.log('setting up');
+  $scope.$on('editMode', function(value) {
+    console.log('emitting this value: ', value);
+  });
+
+
 
   console.log('ID......', $scope.projectId);
   // console.log('EDIT.........', $scope.edit);
@@ -890,14 +886,9 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
     });
 
     $scope.editProject = function() {
-      $scope.hasMelody  = $scope.project.existingTypes.melody;
-      $scope.hasLyrics = $scope.project.existingTypes.lyrics;
-      $scope.hasVoice = $scope.project.existingTypes.voice;
-      $scope.hasProduction = $scope.project.existingTypes.production;
-      $scope.needsMelody = $scope.project.seekingTypes.melody;
-      $scope.needsLyrics = $scope.project.seekingTypes.lyrics;
-      $scope.needsVoice = $scope.project.seekingTypes.voice;
-      $scope.needsProduction = $scope.project.seekingTypes.production;
+      $scope.allHasTypes  = $scope.project.existingTypes;
+      $scope.allNeedsTypes = $scope.project.seekingTypes;
+
       $scope.edit = true;
     };
 
@@ -907,21 +898,11 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
     };
 
     $scope.saveProjectEdits = function(projectId) {
-      console.log('DESCRIPT???', $scope.project.description);
+
       var updatedProjectObj = {
         description: $scope.project.description,
-        has: {
-          melody: $scope.hasMelody,
-          lyrics: $scope.hasLyrics,
-          voice: $scope.hasVoice,
-          production: $scope.hasProduction
-        },
-        needs: {
-          melody: $scope.needsMelody,
-          lyrics: $scope.needsLyrics,
-          voice: $scope.needsVoice,
-          production: $scope.needsProduction
-        }
+        has: $scope.allHasTypes,
+        needs: $scope.allNeedsTypes
       };
       console.log('updated project???', updatedProjectObj);
 
