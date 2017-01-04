@@ -19,8 +19,9 @@
         <h2 ng-show="!project.completed">Project is open.</h2>
       </div>
       <div class="photo">
-        <img class="avatar" ng-src="/images/{{project.avatar}}" alt="">
-        <h3 class="muted"><em>Created by <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a>, © All rights reserved</em></h3>
+        <img class="avatar" ng-src="/upload/{{project.avatar}}" alt="">
+        <h3 class="muted"><em>Started by <a class="red" ui-sref="profile({ username: project.owner })">{{project.owner}}</a>, © All rights reserved </em><span>{{ project.created | date: "yyyy"}}</span></h3>
+        <!-- <p class="tinyP">{{ project.created | date: "yyyy"}}</p> -->
       </div>
       <div class="centerCol">
         <h1 class="purple">{{project.name}}</h1>
@@ -79,8 +80,18 @@
         <div ng-repeat="file in allFiles">
           <div class="well">
             <p><strong>{{file.originalName}}</strong></p>
-            <p class="muted">Uploaded by <span class="red">{{file.owner}}</span></p>
-            <audio controls audioplayer ng-src="{{getAudioUrl(file._id)}}"></audio>
+            <p class="muted">Uploaded by <span><a class="red" ui-sref="profile({ username: file.owner })">{{file.owner}}</a></span> on {{ file.created | date : "MMM dd, yyyy"}}</p>
+            <div ng-if="file.type === 'audio'">
+              <audio controls audioplayer ng-src="{{getAudioUrl(file._id)}}"></audio>
+            </div>
+            <div ng-if="file.type === 'document'">
+              <form class="download" method="get" action="{{getAudioUrl(file._id)}}">
+                <button class="btn btn-primary" type="submit">Download!</button>
+              </form>
+            </div>
+            <!-- <a ui-sref="{{getAudioUrl(file._id)}}" download>Download</a> -->
+            <!-- <iframe ng-src="{{getAudioUrl(file._id)}}" width="" height=""></iframe> -->
+            <!-- <audio controls audioplayer ng-src="{{getAudioUrl(file._id)}}"></audio> -->
           </div>
         </div>
       </div>
@@ -89,13 +100,24 @@
 
     <div ng-show="edit" class="editProjectInfo">
 
+      <form ng-controller="ProjectAvatarController">
+        <h3 class="muted tinyP">Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tif.</h3>
+        <div class="fileDiv">
+          <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
+          <input type="file" nv-file-select="" uploader="uploader" />
+          <button type="button" class="upload btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+              Upload New Project Image
+          </button>
+        </div>
+      </form>
+
       <form class="files" ng-controller="FileController">
-        <h3>Upload files</h3>
+        <h3>Upload Project Samples</h3>
         <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
         <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
         <input type="file" nv-file-select="" uploader="uploader" />
         <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-            Upload
+            Upload Sample
         </button>
       </form>
 

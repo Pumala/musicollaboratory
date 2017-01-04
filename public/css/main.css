@@ -36,6 +36,15 @@ p {
 a {
   color: #222;
 }
+a:hover, a:focus {
+  color: #6922ff;
+}
+a.btn.btn-purple:hover, button.btn.btn-purple:hover,
+a.btn.btn-default:hover, button.btn.btn-default:hover,
+a.btn.btn-primary:hover, button.btn.btn-primary:hover {
+  transition: 0.3s;
+  background-color: #FFC107;
+}
 .tinyP {
   font-size: .9em;
 }
@@ -105,20 +114,31 @@ button.btn.btn-white {
   border-radius: 6px;
   margin: 20px auto;
 }
-.banner a:first-child,
-.banner a:last-child:hover {
+.banner a:last-child {
+  color: #fff;
+  background-color: transparent;
+  border: 4px solid #fff;
+  transition: .3s;
+}
+.banner a:first-child {
   color: #fff;
   background-color: #343434;
   border: 4px solid #343434;
   transition: .3s;
 }
-.banner a:last-child,
-.banner a:first-child:hover {
-  color: #343434;
-  background-color: transparent;
+.banner a:first-child:hover,
+.banner a:last-child:hover {
+  color: #000;
+  background-color: #fff;
   border: 4px solid #343434;
   transition: .3s;
 }
+/*.banner a:last-child, {
+  color: #fff;
+  background-color: transparent;
+  border: 4px solid #fff;
+  transition: .3s;
+}*/
 /*.banner a:first-child,
 .banner a:last-child:hover {
   color: #fff;
@@ -182,19 +202,18 @@ button.btn.btn-white {
 ********************************************/
 #newProject {
   background-image: url('../images/purple.jpg');
-  height: 100%;
+  /*height: 100%;*/
   width: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  color: #fff;
-  padding-top: 1em;
+  padding: 1em 1em 3em 1em;
 }
 #newProject {
   margin: 0 auto;
   /*margin: 0 auto 5em auto;*/
 }
-#newProject label {
+#newProject label, #newProject h1 {
   color: #fff;
 }
 #newProject .types label,
@@ -438,7 +457,7 @@ button.btn.btn-white {
 #search {
   /*margin: 1em auto;*/
   background-color: whitesmoke;
-  padding-bottom: 7em;
+  padding-bottom: 12em;
 }
 #playTrack {
   position: fixed;
@@ -452,9 +471,12 @@ button.btn.btn-white {
 #playTrack a {
   font-weight: 500;
 }
+#playTrack a:hover {
+  color: #FFC107;
+}
 #search .noResults h2 {
   font-size: 1.5em;
-  margin: 2em auto;
+  margin: 2em 1em;
 }
 #search .background {
   background-color: #FF5722;
@@ -594,8 +616,9 @@ button.btn.btn-white {
 }
 #profile .dotted {
   border-top: 2px dotted #000;
-  padding: .5em;
-  /*border-bottom: 2px dotted #000;*/
+  margin-top: 0;
+  max-width: 350px;
+  margin-left: 0;
 }
 #profile textarea {
   width: 100%;
@@ -605,7 +628,7 @@ button.btn.btn-white {
 }
 #profile .userInfo {
   text-align: center;
-  margin-top: 50px;
+  /*margin-top: 50px;*/
 }
 /********************************************
                   REQUESTS
@@ -636,7 +659,7 @@ button.btn.btn-white {
 /********************************************
                   MEDIA QUERIES
 ********************************************/
-@media screen and (min-width: 525px) {
+@media screen and (min-width: 550px) {
   #search .allProjects .card {
     width: 100%;
   }
@@ -664,6 +687,7 @@ button.btn.btn-white {
     width: 50%;
     float: left;
     border: 2px dotted #000;
+    height: 235px;
   }
   #playTrack {
     text-align: center;
@@ -678,6 +702,7 @@ button.btn.btn-white {
     background-color: #fff;
     border: 2px dotted #000;
     padding: .8em;
+    height: 235px;
     /*width: 234px;*/
   }
   #search .background {

@@ -58,10 +58,12 @@ const User = mongoose.model( 'User', {
 
 const File = mongoose.model('File', {
   _id: { type: String, required: true, unique: true }, // file hash name
+  created: Date,
   originalName: { type: String, required: true },
   owner: String, // username
   path: String,
-  project: ObjectId
+  project: ObjectId,
+  type: String
 });
 
 const Project = mongoose.model('Project', {
@@ -572,18 +574,162 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
 
 });
 
-// ********************************
-//         CREATE/UPLOAD NEW FILE
-// *******************************
-app.post('/api/upload/:username/:projectid', upload.single('file'), function(req, res) {
 
-  console.log('reached this API', req.params);
+
+// ******************************************************
+//         CREATE/UPLOAD NEW USER AVATAR FILE
+// *****************************************************
+app.post('/api/upload/avatar/user/:username', upload.single('file'), function(request, response) {
+
+  var username = request.params.username;
+
+  var myFile = request.file;
+  // console.log('this is the file:', myFile);
+
+  var originalName = myFile.originalname;
+  var filename = myFile.filename;
+  var path = myFile.path;
+  var destination = myFile.destination;
+  var size = myFile.size;
+  var mimetype = myFile.mimetype;
+  var extension = originalName.split(".").pop();
+  var fileType = null;
+
+  // offer 1 types => img file
+  console.log('exten???', extension);
+
+  var allImages = ["png", "jpg", "jpeg", "bmp", "tiff", "gif", "tiff"];
+
+  if (allImages.indexOf(extension.toLowerCase()) > -1) {
+    fileType = "image";
+    console.log("Heaven");
+  } else {
+    console.log("Hell");
+    return response.json({
+      message: "File is unsupported. Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tif."
+    });
+  }
+
+  var newFile = new File({
+    _id: filename,
+    created: new Date(),
+    originalName: originalName,
+    owner: username,
+    path: path,
+    project: null,
+    type: fileType
+  });
+
+  newFile.save();
+
+  console.log('ending Audio');
+
+  User.update({
+      _id: username
+    }, {
+      $set: {
+        avatar: filename
+      }
+    })
+    .then(function(userInfo) {
+      console.log('user user user......info', userInfo);
+      return response.json({
+        message: 'sucesss adding new avatar to user info in db'
+      })
+    })
+    .catch(function(err) {
+      console.log('encountered err saving image file to db...', err.message);
+    });
+
+});
+
+
+
+
+// ******************************************************
+//         CREATE/UPLOAD NEW PROJECT AVATAR FILE
+// *****************************************************
+app.post('/api/upload/avatar/project/:projectid/:username', upload.single('file'), function(request, response) {
+
+  console.log('project avatar API');
+
+  var projectId = request.params.projectid;
+  var username = request.params.username;
+
+  var myFile = request.file;
+  // console.log('this is the file:', myFile);
+
+  var originalName = myFile.originalname;
+  var filename = myFile.filename;
+  var path = myFile.path;
+  var destination = myFile.destination;
+  var size = myFile.size;
+  var mimetype = myFile.mimetype;
+  var extension = originalName.split(".").pop();
+  var fileType = null;
+
+  // offer 1 types => img file
+  console.log('exten???', extension);
+
+  var allImages = ["png", "jpg", "jpeg", "bmp", "tiff", "gif", "tif"];
+
+  if (allImages.indexOf(extension.toLowerCase()) > -1) {
+    fileType = "image";
+    console.log("Heaven");
+  } else {
+    console.log("Hell");
+    return response.json({
+      message: "File is unsupported. Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tiff."
+    });
+  }
+
+  var newFile = new File({
+    _id: filename,
+    created: new Date(),
+    originalName: originalName,
+    owner: username,
+    path: path,
+    project: projectId,
+    type: fileType
+  });
+
+  newFile.save();
+
+  console.log('ending AVATAR FOR PROJECTS');
+
+  Project.update({
+      _id: projectId
+    }, {
+      $set: {
+        avatar: filename
+      }
+    })
+    .then(function(projectInfo) {
+      console.log('project......info', projectInfo);
+      return response.json({
+        message: 'sucesss adding new avatar to project in db'
+      })
+    })
+    .catch(function(err) {
+      console.log('encountered err saving project avatar file to db...', err.message);
+    });
+
+});
+
+
+
+// *****************************************************
+//         CREATE/UPLOAD NEW DOCUMENT/ AUDIO FILES
+// ****************************************************
+app.post('/api/upload/:username/:projectid', upload.single('file'), function(request, response) {
+
+  console.log('inside AUDIO');
 
   // hard-coded for now
-  var username = req.params.username;
-  var projectId = req.params.projectid;
+  var username = request.params.username;
+  var projectId = request.params.projectid;
 
-  var myFile = req.file;
+  var myFile = request.file;
   console.log('this is the file:', myFile);
   var originalName = myFile.originalname;
   var filename = myFile.filename;
@@ -591,12 +737,33 @@ app.post('/api/upload/:username/:projectid', upload.single('file'), function(req
   var destination = myFile.destination;
   var size = myFile.size;
   var mimetype = myFile.mimetype;
+  var extension = originalName.split(".").pop();
+  var fileType = null;
+  // offer 2 types => docs or audio files
+
+  var allDocs = ["doc", "docx", "txt", "pdf", "rtf"];
+  var allAudios = ["mp3", "wav", "m4a"];
+
+  if (allDocs.indexOf(extension.toLowerCase()) > -1) {
+    console.log("Heaven");
+    fileType = "document";
+  } else if (allAudios.indexOf(extension.toLowerCase()) > -1) {
+    fileType = "audio";
+    console.log("Hell");
+  } else {
+    return response.json({
+      message: "File is unsupported. Please choose a file with one of the following extensions: doc, docx, txt, pdf, rtf, mp3, wav, m4a."
+    });
+  }
 
   var newFile = new File({
     _id: filename,
+    created: new Date(),
     originalName: originalName,
     owner: username,
-    path: path
+    path: path,
+    project: projectId,
+    type: fileType
   });
 
   newFile.save();
@@ -623,6 +790,26 @@ app.post('/api/upload/:username/:projectid', upload.single('file'), function(req
     })
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ********************************
 //              LOGIN
