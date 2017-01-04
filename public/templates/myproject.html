@@ -1,6 +1,7 @@
 <div id="projectDetails" class="clear">
 
   <div ng-class="{ fullWidth: project.members.indexOf(rootUsername) < 0, left: project.members.indexOf(rootUsername) > -1 }">
+
     <div class="editButtons" ng-show="project.members.indexOf(rootUsername) > -1">
       <button ng-class="{ hide: edit, showBtn: !edit }" ng-click="editProject()" class="btn btn-primary">Edit Project</button>
       <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="cancelProjectEdit()" class="btn btn-white" name="button">Cancel</button>
@@ -34,17 +35,8 @@
       </div>
     </div>
 
-    <!-- <div ng-show="!edit">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <strong>Description:</strong>
-        </div>
-        <div class="panel-body">{{project.description}}</p>
-        </div>
-      </div>
-    </div> -->
-
     <div ng-show="!edit" class="projectTypes">
+
       <div class="panel panel-default">
         <div class="panel-heading">
           <strong>Description:</strong>
@@ -53,32 +45,38 @@
         </div>
       </div>
 
-      <div class="well clear">
+      <div class="panel panel-default clear">
         <!-- <h2 ng-hide="((project.existingTypes.lyrics === false) && (project.existingTypes.production === false) && (project.existingTypes.melody === false) && (project.existingTypes.voice === false))">Already has:</h2> -->
-        <h2>Already Has:</h2>
-        <ul>
+        <div class="panel-heading">
+          <h2>Already Has:</h2>
+        </div>
+        <ul class="panel-body">
           <li ng-repeat="(type, checked) in project.existingTypes" ng-show="project.existingTypes[type]">{{type}}</li>
         </ul>
         <!-- <p>None at this time...</p> -->
       </div>
 
-      <div class="well clear">
-        <h2 ng-show="project.seekingTypes">Seeking:</h2>
+      <div class="panel panel-default clear">
+        <div class="panel-heading">
+          <h2 ng-show="project.seekingTypes">Seeking:</h2>
+        </div>
         <!-- <div ng-repeat="(type, checked) in project.seekingTypes">
           <p ng-show="project.seekingTypes[type]">{{type}}</p>
         </div> -->
         <!-- <p ng-show="project.seekingTypes.length === 0">None at this time...</p> -->
-        <ul ng-repeat="(type, checked) in project.seekingTypes">
-          <li ng-show="project.seekingTypes[type]">{{type}}</li>
+        <ul class="panel-body">
+          <li ng-repeat="(type, checked) in project.seekingTypes" ng-show="project.seekingTypes[type]">{{type}}</li>
         </ul>
         <!-- <p ng-show="!something">None at this time...</p> -->
       </div>
 
-      <div>
-        <h2>Project Samples:</h2>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>Project Samples:</h2>
+        </div>
         <p ng-show="project.files.length < 1">None at this time.</p>
         <div ng-repeat="file in allFiles">
-          <div class="well">
+          <div class="panel-body">
             <p><strong>{{file.originalName}}</strong></p>
             <p class="muted">Uploaded by <span><a class="red" ui-sref="profile({ username: file.owner })">{{file.owner}}</a></span> on {{ file.created | date : "MMM dd, yyyy"}}</p>
             <div ng-if="file.type === 'audio'">
@@ -100,30 +98,32 @@
 
     <div ng-show="edit" class="editProjectInfo">
 
-      <form ng-controller="ProjectAvatarController">
-        <h3 class="muted tinyP">Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tif.</h3>
+      <form class="image" ng-controller="ProjectAvatarController">
+        <h3>Upload New Project Image</h3>
+        <p class="muted tinyP">Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tif.</p>
         <div class="fileDiv">
           <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
           <input type="file" nv-file-select="" uploader="uploader" />
           <button type="button" class="upload btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-              Upload New Project Image
+              Upload Image
           </button>
         </div>
       </form>
 
       <form class="files" ng-controller="FileController">
         <h3>Upload Project Samples</h3>
-        <!-- <input type="hidden" ng-model="projectId" value="projectInfo._id"> -->
+        <p class="muted tinyP">Please choose a file with one of the following extensions: doc, docx, txt, pdf, rtf, mp3, wav, m4a.</p>
+        <div class="fileDiv">
         <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
         <input type="file" nv-file-select="" uploader="uploader" />
         <button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
-            Upload Sample
+            Upload File
         </button>
       </form>
 
       <div class="">
         <div ng-repeat="file in allFiles">
-          <div class="well">
+          <div class="panel panel-body">
             <p>{{file.originalName}}</p>
             <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>
           </div>
@@ -132,53 +132,63 @@
 
       <div class="row">
         <div class="col-xs-12">
-          <div class="well">
-            <h2>Description</h2>
-            <textarea ng-model="project.description" rows="8" cols="80"></textarea>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2>Description</h2>
+            </div>
+            <textarea class="panel-body" ng-model="project.description" rows="8" cols="80"></textarea>
           </div>
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-6">
-          <div class="well">
-            <h2>Has:</h2>
-            <div class="">
-              <label for="melody">Melody</label>
-              <input ng-model="hasMelody" type="checkbox" name="melody" value="melody">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2>Has:</h2>
             </div>
-            <div class="">
-              <label for="lyrics">Lyrics</label>
-              <input ng-model="hasLyrics" type="checkbox" name="lyrics" value="lyrics">
-            </div>
-            <div class="">
-              <label for="voice">Voice</label>
-              <input ng-model="hasVoice" type="checkbox" name="voice" value="voice">
-            </div>
-            <div class="">
-              <label for="production">Production</label>
-              <input ng-model="hasProduction" type="checkbox" name="production" value="production">
+            <div class="panel-body">
+              <div class="">
+                <label for="melody">Melody</label>
+                <input ng-model="hasMelody" type="checkbox" name="melody" value="melody">
+              </div>
+              <div class="">
+                <label for="lyrics">Lyrics</label>
+                <input ng-model="hasLyrics" type="checkbox" name="lyrics" value="lyrics">
+              </div>
+              <div class="">
+                <label for="voice">Voice</label>
+                <input ng-model="hasVoice" type="checkbox" name="voice" value="voice">
+              </div>
+              <div class="">
+                <label for="production">Production</label>
+                <input ng-model="hasProduction" type="checkbox" name="production" value="production">
+              </div>
             </div>
           </div>
         </div>
         <div class="col-sm-6">
-          <div class="well">
-            <h2>Needs:</h2>
-            <div class="">
-              <label for="melody">Melody</label>
-              <input ng-model="needsMelody" type="checkbox" name="melody" value="melody">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2>Needs:</h2>
             </div>
-            <div class="">
-              <label for="lyrics">Lyrics</label>
-              <input ng-model="needsLyrics" type="checkbox" name="lyrics" value="lyrics">
-            </div>
-            <div class="">
-              <label for="voice">Voice</label>
-              <input ng-model="needsVoice" type="checkbox" name="voice" value="voice">
-            </div>
-            <div class="">
-              <label for="production">Production</label>
-              <input ng-model="needsProduction" type="checkbox" name="production" value="production">
+            <div class="panel-body">
+              <div class="">
+                <label for="melody">Melody</label>
+                <input ng-model="needsMelody" type="checkbox" name="melody" value="melody">
+              </div>
+              <div class="">
+                <label for="lyrics">Lyrics</label>
+                <input ng-model="needsLyrics" type="checkbox" name="lyrics" value="lyrics">
+              </div>
+              <div class="">
+                <label for="voice">Voice</label>
+                <input ng-model="needsVoice" type="checkbox" name="voice" value="voice">
+              </div>
+              <div class="">
+                <label for="production">Production</label>
+                <input ng-model="needsProduction" type="checkbox" name="production" value="production">
+              </div>
             </div>
           </div>
         </div>
