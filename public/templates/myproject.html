@@ -105,6 +105,11 @@
         </div>
       </form>
 
+      <div ng-show="projectAvatar !== null" class="panel panel-body">
+        <p>{{projectAvatar.originalName}}</p>
+        <button ng-click="deleteProjectAvatar(projectAvatar._id)" class="btn btn-default">Delete</button>
+      </div>
+
       <form class="files" ng-controller="FileController">
         <h3>Upload Project Samples</h3>
         <p class="muted tinyP">Please choose a file with one of the following extensions: doc, docx, txt, pdf, rtf, mp3, wav, m4a.</p>

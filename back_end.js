@@ -472,7 +472,7 @@ app.post('/api/signup', function(request, response) {
         password: hash,
         joined: new Date(),
         bio: "",
-        avatar: "user_avatar.png",
+        avatar: "default_user_avatar.png",
         musicanType: [],
         projects: [],
         requests: [],
@@ -542,9 +542,10 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
 
   // console.log('PARAMS?', request.params);
 
-  if (username === 'undefined') {
+  if (username === 'undefined' || username === null) {
     Project.findOne({ _id: projectId })
       .then(function(projectInfo) {
+        console.log('VIOLET');
         var projectFiles = projectInfo.files;
         return [ File.find({
           _id: {
@@ -553,6 +554,7 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
         }), projectInfo ];
       })
       .spread(function(allFiles, projectInfo) {
+        console.log('GREEN');
         return response.json({
           allFiles: allFiles,
           projectInfo: projectInfo
@@ -560,10 +562,10 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
       })
       .catch(function(err) {
         console.log('encountered err retrieving project details:', err.message);
-        response.status(500);
-        response.json({
-          error: err.message
-        });
+        // response.status(500);
+        // response.json({
+        //   error: err.message
+        // });
       })
   }
 
@@ -596,6 +598,9 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
       console.log('projectInfo::', projectInfo.files);
       var projectFiles = projectInfo.files;
       var projectComments = projectInfo.comments;
+
+      var projectAvatar = projectInfo.avatar;
+
       return [projectInfo, alreadyRequested, File.find({
         _id: {
           $in: projectFiles
@@ -604,16 +609,17 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
         _id: {
           $in: projectComments
         }
-      }) ];
+      }), File.findOne({ _id: userAvatar }) ];
     })
-    .spread(function(projectInfo, alreadyRequested, allFiles, allComments) {
+    .spread(function(projectInfo, alreadyRequested, allFiles, allComments, projectAvatar) {
       console.log('all the files::', allFiles);
       return response.json({
         allFiles: allFiles,
         allComments: allComments,
         projectInfo: projectInfo,
         alreadyRequested: alreadyRequested,
-        editMode: editMode
+        editMode: editMode,
+        projectAvatar: projectAvatar
       });
     })
     .catch(function(err) {
@@ -623,6 +629,7 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
         error: err.message
       });
     });
+
 
 });
 
@@ -1054,20 +1061,27 @@ app.get('/api/profile/:username', function(request, response) {
 
       // an array of project ids
       var allProjects = userInfo.projects;
+      var userAvatar = userInfo.avatar;
+
       console.log('user projects:', allProjects);
+      console.log('user avatar', userInfo.avatar);
+
 
       return [ userInfo, Project.find({
         _id: {
           $in: allProjects
         }
-      })];
+      }), File.findOne({
+        _id: userAvatar
+      }) ];
 
     })
-    .spread(function(userInfo, allProjects) {
+    .spread(function(userInfo, allProjects, avatarInfo) {
       console.log('all user projects:', allProjects);
       return response.json({
         userInfo: userInfo,
-        allProjects: allProjects
+        allProjects: allProjects,
+        avatarInfo
       })
     })
     .catch(function(err) {
@@ -1077,6 +1091,79 @@ app.get('/api/profile/:username', function(request, response) {
         error: err.message
       });
     });
+
+});
+// *****************************************
+//          DELETE PROJECT AVATAR
+// ****************************************
+app.delete('/api/avatar/delete/project/:projectid/:projectavatarid', function(request, response) {
+
+  var projectId = request.params.projectid;
+  var projectAvatarId = request.params.projectavatarid;
+
+  // 1. delete the project avatar from the file table
+  // 2. update the project avatar to use the default project avatar
+
+  bluebird.all([
+    File.remove({ _id: projectAvatarId}),
+      Project.update({
+        _id: projectId
+      }, {
+        $set: {
+          avatar: "default_project_avatar.png"
+        }
+      })
+   ])
+   .then(function(removedFile, updatedProjectInfo) {
+     return response.json({
+       message: "success removing project avatar from db"
+     })
+   })
+   .catch(function() {
+     console.log('encountered errors deleting profile avatar:', err.message);
+     response.status(500);
+     response.json({
+       error: err.message
+     });
+   });
+
+});
+
+// *****************************************
+//          DELETE USER AVATAR
+// ****************************************
+app.delete('/api/user/avatar/delete/:avatarid/:username', function(request, response) {
+
+  // console.log('delete AVATAR BUTTON', request.params);
+
+  var avatarId = request.params.avatarid;
+  var username = request.params.username;
+
+  bluebird.all([
+    File.remove({ _id: avatarId }),
+    User.update({
+        _id: username
+      }, {
+        $set: {
+          avatar: "default_user_avatar.png"
+        }
+      })
+    ])
+    .then(function(removedFile, updatedUser) {
+      console.log('success deleting user avatar');
+      return response.json({
+        message: 'success deleting user avatar'
+      })
+    })
+    .catch(function(err) {
+      console.log('encountered errors deleting profile avatar:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
+    })
+
+
 
 });
 
@@ -1099,7 +1186,7 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
     name: results.name,
     created: new Date(),
     description: results.description,
-    avatar: 'note.png',
+    avatar: 'default_project_avatar.png',
     existingTypes: projectHas,
     seekingTypes: projectNeeds,
     files: [],
