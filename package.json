@@ -1,7 +1,7 @@
 {
-  "name": "updated_twitter",
+  "name": "musicollaboratory",
   "version": "1.0.0",
-  "description": "",
+  "description": "music collaboration app",
   "main": "back_end.js",
   "dependencies": {
     "bcrypt": "^1.0.1",

@@ -327,6 +327,10 @@ app.controller('FileController', function($timeout, $scope, $rootScope, $state, 
   //     console.info('onCompleteAll');
   //   }, 2000);
   // };
+  console.log('setting up onCompleteAll')
+  uploader.onCompleteAll = function() {
+    console.log('hello i am here');
+  }
 });
 
 // takes control of user avatars
