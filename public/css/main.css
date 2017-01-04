@@ -135,8 +135,9 @@ button.btn.btn-white {
 }*/
 #home #learn .guitarDiv {
   max-width: 350px;
-  text-align: center;
-  margin: auto;
+  /*text-align: center;
+  margin: auto;*/
+  float: left;
 }
 #home #learn img {
   width: 100%;
