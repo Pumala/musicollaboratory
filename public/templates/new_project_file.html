@@ -14,7 +14,7 @@
     </div>
   </form>
 
-  <div ng-show="allFiles.length > 0" class="well">
+  <div ng-show="allFiles.length > 0" class="panel panel-body">
     <div ng-repeat="file in allFiles">
       <p>{{file.originalName}}</p>
       <button class="btn btn-danger" ng-click="deleteFile(file._id)" name="button">Delete</button>

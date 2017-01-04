@@ -137,6 +137,7 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
   };
 
   service.getProjectDetails = function(projectId, edit) {
+    console.log('RED RED');
     var url = '/api/project/' + projectId + '/' + $rootScope.rootUsername + '/' + edit;
     console.log('URL?:', url);
     return $http({
@@ -183,7 +184,7 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
 
   service.FileUploadService = function(projectId) {
     console.log('project exists?:', projectId);
-    var url = "/api/project/file/upload/" + projectId;
+    var url = "/api/project/file/upload/new/" + projectId;
     return $http({
       method: 'GET',
       url: url
@@ -330,7 +331,11 @@ app.controller('FileController', function($timeout, $scope, $rootScope, $state, 
   console.log('setting up onCompleteAll')
   uploader.onCompleteAll = function() {
     console.log('hello i am here');
-  }
+    $state.reload();
+  };
+  uploader.onSuccessItem = function(fileItem, response, status, headers) {
+
+  };
 });
 
 // takes control of user avatars
@@ -369,7 +374,7 @@ app.controller('ProjectFileController', function($scope, MusicFactory, $state, $
 
   MusicFactory.FileUploadService($scope.projectId)
     .then(function(projectInfo) {
-      console.log('sucess sending project info!', projectInfo.data);
+      console.log('success sending project info!', projectInfo.data);
       $scope.projectInfo = projectInfo.data.projectInfo;
       $scope.allFiles = projectInfo.data.allFiles;
     })

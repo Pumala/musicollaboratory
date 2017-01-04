@@ -490,7 +490,7 @@ app.put('/api/logout', function(request, response) {
 // *******************************
 app.get('/api/project/:projectid/:username/:editmode', function(request, response) {
 
-  console.log('getting project details::', request.params);
+  console.log('getting RED project details::', request.params);
 
   var projectId = request.params.projectid;
   var username = request.params.username;
@@ -785,31 +785,18 @@ app.post('/api/upload/:username/:projectid', upload.single('file'), function(req
       });
 
     })
+    .then(function() {
+      response.json('ok');
+    })
     .catch(function(err) {
       console.log('encountered error saving file to user info:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     })
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ********************************
 //              LOGIN
@@ -1227,8 +1214,9 @@ app.put('/api/request/accept', function(request, response) {
 // ***********************************************************************
 //          GET PROJECT INFO AND FILES BELONGING TO THAT PROJECT
 // **********************************************************************
-app.get('/api/project/file/upload/:projectId', function(request, response) {
+app.get('/api/project/file/upload/new/:projectId', function(request, response) {
   console.log('.........YUP......', request.params);
+  console.log('RAINBOW RAINBOW RAINBOW');
   var projectId = request.params.projectId;
 
   Project.findOne({ _id: projectId })
