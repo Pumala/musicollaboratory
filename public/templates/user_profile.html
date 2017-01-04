@@ -6,12 +6,24 @@
 
   <div class="userInfo">
     <h1>{{userInfo._id}}'s Profile</h1>
-    <div class="photo">
-      <img class="avatar" ng-src="/images/{{userInfo.avatar}}" alt="">
+    <div ng-show="!edit" class="photo">
+      <img class="avatar" ng-src="/upload/{{userInfo.avatar}}" alt="">
       <p class="date muted">Joined {{ userInfo.joined | date : 'MMM yyyy'}}</p>
     </div>
     <div class="panelParent">
-      <textarea ng-show="edit" ng-model="description" rows="8" placeholder="Add a bio..."></textarea>
+      <div ng-show="edit">
+        <form ng-controller="UserAvatarController">
+          <h3 class="muted tinyP">Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tif.</h3>
+          <div class="fileDiv">
+            <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
+            <input type="file" nv-file-select="" uploader="uploader" />
+            <button type="button" class="upload btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+                Upload
+            </button>
+          </div>
+        </form>
+        <textarea ng-model="description" rows="8" placeholder="Add a bio..."></textarea>
+      </div>
       <div ng-show="!edit" class="panel panel-default">
         <div class="panel-heading">
           Bio:
@@ -30,21 +42,22 @@
 
   </div>
 
-  <div class="currentProjects">
-    <h2 class="red dotted">Current Projects</h2>
+  <div class="currentProjects clear">
+    <h2 class="red">Current Projects</h2>
+    <hr class="dotted">
     <div class="noProjects" ng-show="checkCurrentProjects() === true">
       <p>None at this time...</p>
     </div>
     <div class="clear listProjects">
       <div ng-repeat="project in allProjects" ng-show="!project.completed" class="clear project">
         <div class="clear">
-          <div class="pull-right" ng-show="project.files.length > 0">
+          <div class="pull-right" ng-show="isAudioFile(project.files[0])">
             <i ng-click="getAudioUrl(project.files[0], project.name, project._id)" class="fa fa-3x fa-play-circle" aria-hidden="true"></i>
           </div>
           <h4><a class="red" ui-sref="myproject({ project_id: project._id})">{{project.name}}</a></h4>
           <p class="muted">{{project.created | date : "MMM dd, yyyy"}}</p>
         </div>
-        <img class="pull-left clear" ng-src="/images/{{project.avatar}}" alt="">
+        <img class="pull-left clear" ng-src="/upload/{{project.avatar}}" alt="">
         <div class="content pull-left">
           <p>{{project.description | limitTo : 80 : 0 }}...</p>
         </div>
@@ -52,24 +65,25 @@
     </div>
   </div>
 
-  <div class="completedProjects">
-    <h2 class="red dotted">Completed Projects</h2>
+  <div class="completedProjects clear">
+    <h2 class="red">Completed Projects</h2>
+    <hr class="dotted">
     <div class="noProjects" ng-show="checkCompletedProjects() === false">
       <p>None at this time...</p>
     </div>
     <div class="clear listProjects">
       <div ng-model="anyCompleted" ng-repeat="project in allProjects" class="project clear" ng-show="project.completed">
         <div class="clear">
-          <h3><a class="red" ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
-          <p class="muted">{{project.created | date : "MMM dd, yyyy"}}</p>
-        </div>
-        <img class="clear pull-left" ng-src="/images/{{project.avatar}}" alt="">
-        <div class="content pull-left">
-          <p>{{project.description | limitTo : 80 : 0 }}...</p>
-          <div ng-show="project.files.length > 0">
+          <div class="pull-right" ng-show="isAudioFile(project.files[0])">
             <i ng-click="getAudioUrl(project.files[0], project.name, project._id)" class="fa fa-3x fa-play-circle" aria-hidden="true"></i>
             <!-- <audio controls audioplayer ng-src="{{getAudioUrl(value.files[0])}}"></audio> -->
           </div>
+          <h3><a class="red" ui-sref="myproject({ project_id: project._id })">{{project.name}}</a></h3>
+          <p class="muted">{{project.created | date : "MMM dd, yyyy"}}</p>
+        </div>
+        <img class="clear pull-left" ng-src="/upload/{{project.avatar}}" alt="">
+        <div class="content pull-left">
+          <p>{{project.description | limitTo : 80 : 0 }}...</p>
         </div>
       </div>
     </div>

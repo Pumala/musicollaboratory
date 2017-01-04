@@ -329,6 +329,25 @@ app.controller('FileController', function($timeout, $scope, $rootScope, $state, 
   // };
 });
 
+// takes control of user avatars
+app.controller('UserAvatarController', function($timeout, $scope, $rootScope, $state, FileUploader) {
+
+  var uploader = $scope.uploader = new FileUploader({
+    url: '/api/upload/avatar/user/' + $rootScope.rootUsername
+  });
+
+});
+
+// takes control of projects avatar
+app.controller('ProjectAvatarController', function($timeout, $scope, $rootScope, $state, FileUploader) {
+
+  console.log('id here?', $scope.projectId);
+  var uploader = $scope.uploader = new FileUploader({
+    url: '/api/upload/avatar/project/' + $scope.projectId + '/' + $rootScope.rootUsername
+  });
+
+});
+
 app.controller('ProjectFileController', function($scope, MusicFactory, $state, $stateParams, $rootScope) {
   console.log('params anyone?:', $stateParams);
   $scope.projectId = $stateParams.projectid;
@@ -496,6 +515,18 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
   //   }
   // };
 
+  $scope.allAudios = ["mp3", "wav", "m4a"];
+
+  $scope.isAudioFile = function(filename) {
+    var etx = filename.split(".").pop();
+    var index = $scope.allAudios.indexOf(etx);
+    if (index > -1) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   // makes a service call to pass data to the backend to render the user profile page
   MusicFactory.getUserProfile($scope.currUser)
     .then(function(results) {
@@ -605,6 +636,18 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
     $scope.audioTrack = $sce.trustAsResourceUrl('/upload/' + fileHash);
     $scope.currProjectName = currProjectName;
     $scope.currProjectId = currProjectId;
+  };
+
+  $scope.allAudios = ["mp3", "wav", "m4a"];
+
+  $scope.isAudioFile = function(filename) {
+    var etx = filename.split(".").pop();
+    var index = $scope.allAudios.indexOf(etx);
+    if (index > -1) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   // $scope.getAudioUrl = function(fileHash) {
