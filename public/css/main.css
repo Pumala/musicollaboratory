@@ -168,10 +168,12 @@ button.btn.btn-white {
 #home #learn .guitarDiv {
   max-width: 350px;
   text-align: center;
-  margin: auto;
+  /*margin: auto;*/
+  float: left;
 }
 #home #learn img {
   width: 100%;
+  margin: 0 0% 0 -20px;
 }
 #home section {
   margin: 3em 0 5em 0;
@@ -179,7 +181,16 @@ button.btn.btn-white {
 #home p {
   margin-top: 2.25em;
 }
-#getStarted {
+
+#learn p{
+  text-align: center;
+  width: 60%;
+  margin: auto;
+  line-height: 3em;
+}
+#getStarted p {
+  text-align: center;
+  line-height: 3em;
 
 }
 /********************************************
