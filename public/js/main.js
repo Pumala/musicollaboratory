@@ -859,24 +859,24 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
     .then(function(results) {
       console.log('updated PROJECT DETAIL info', results);
-      // $scope.edit = results.data.editMode;
-      // if ($scope.edit === "true") {
-      //   $scope.edit = true;
-      // } else {
-      //   $scope.edit = false;
-      // }
-      // console.log('comment is a what......', $scope.editComment);
-      // console.log('loading edit', $scope.edit);
-      // $scope.allFiles = results.data.allFiles;
-      // $scope.allComments = results.data.allComments;
-      // $scope.projectAvatar = results.data.projectAvatar;
-      //
-      // $scope.alreadyRequested = results.data.alreadyRequested;
-      // $scope.project = results.data.projectInfo;
-      // $scope.projectId = results.data.projectInfo._id;
-      // $scope.owner = results.data.projectInfo.owner;
-      // $scope.requestedTypes = {};
-      // $scope.isCompleted = $scope.project.completed;
+      $scope.edit = results.data.editMode;
+      if ($scope.edit === "true") {
+        $scope.edit = true;
+      } else {
+        $scope.edit = false;
+      }
+      console.log('comment is a what......', $scope.editComment);
+      console.log('loading edit', $scope.edit);
+      $scope.allFiles = results.data.allFiles;
+      $scope.allComments = results.data.allComments;
+      $scope.projectAvatar = results.data.projectAvatar;
+
+      $scope.alreadyRequested = results.data.alreadyRequested;
+      $scope.project = results.data.projectInfo;
+      $scope.projectId = results.data.projectInfo._id;
+      $scope.owner = results.data.projectInfo.owner;
+      $scope.requestedTypes = {};
+      $scope.isCompleted = $scope.project.completed;
     })
     .catch(function(err) {
       console.log('encountered errors loading my projects detail page', err.message);

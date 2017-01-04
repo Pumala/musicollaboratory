@@ -609,7 +609,7 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
         _id: {
           $in: projectComments
         }
-      }), File.findOne({ _id: userAvatar }) ];
+      }), File.findOne({ _id: projectAvatar }) ];
     })
     .spread(function(projectInfo, alreadyRequested, allFiles, allComments, projectAvatar) {
       console.log('all the files::', allFiles);

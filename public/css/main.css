@@ -116,7 +116,8 @@ button.btn.btn-white {
 .banner h1 {
   padding: 2em 0;
   margin: 0 1.25em;
-  font-size: 2.25em;
+  font-size: 1.75em;
+  line-height: 1.5em;
 }
 .banner a {
   font-weight: bold;
@@ -193,35 +194,37 @@ button.btn.btn-white {
   text-align: center;
   margin-left: 30px;
   float: right;
+  margin-bottom: 2em;
 }
 #home #getStarted .lyricsDiv img{
   width: 250px;
   border-radius: 50%;
 }
 #home #getStarted .melodyDiv img{
-  width: 300px;
+  /*width: 300px;*/
+  width: 100%;
   border-radius: 50%;
 }
 #home #learn img {
   width: 100%;
-  margin: 0 0% 0 -20px;
+  /*margin: 0 0% 0 -20px;*/
 }
-#home section {
-  margin: 3em 0 5em 0;
+#home h2 {
+  font-size: 1.75em;
 }
-#home p {
+#home section:first-child {
+  margin-top: 4em;
+}
+/*#home p {
   margin-top: 2.25em;
-}
+}*/
 
-#learn p{
+#home #learn p, #home #getStarted p {
+  font-size: 1.2em;
   text-align: center;
-  width: 60%;
-  margin: auto;
-  line-height: 3em;
-}
-#getStarted p {
-  /*text-align: center;*/
-  line-height: 3em;
+  /*width: 60%;*/
+  margin: 2em auto;
+  line-height: 2em;
 }
 /********************************************
               LOGIN / SIGN UP PAGE
@@ -705,7 +708,15 @@ button.btn.btn-white {
 }
 #requests h1 {
   font-size: 1.5em;
-  margin: 1em auto 1.5em auto;
+  margin: 1em auto 1em auto;
+}
+#requests .dotted {
+  border-top: 2px dotted #000;
+  max-width: 250px;
+}
+#requests form input {
+  float: left;
+  margin-right: .5em;
 }
 #requests .inbound,
 #requests .outbound {
@@ -723,10 +734,25 @@ button.btn.btn-white {
   display: inline-block;
   background-color: #6922ff;
 }
+#requests h3 {
+  font-size: 1.1em;
+}
+#requests a {
+  font-size: 1em;
+}
+#requests .panel-heading button {
+  font-size: .9em;
+  padding: .5em;
+}
+/*#requests*/
 /********************************************
                   MEDIA QUERIES
 ********************************************/
 @media screen and (min-width: 550px) {
+  #requests .panel-heading button {
+    font-size: 1em;
+    padding: .75em;
+  }
   #search .allProjects .card {
     width: 100%;
   }
@@ -808,7 +834,24 @@ button.btn.btn-white {
   #profile .project:first-child {
     border: 2px dotted #000;
   }
+  .banner h1 {
+    font-size: 2.75em;
+    line-height: 1.5em;
+  }
+  #home h2 {
+    font-size: 2.5em;
+  }
+  #home #learn p, #home #getStarted p {
+    font-size: 1.35em;
+    line-height: 2.5em;
+  }
 }
+@media screen and (min-width: 768px) {
+  #newProject {
+    height: 100%;
+  }
+}
+
 @media screen and (min-width: 825px) {
   #profile .project {
     width: 33.333333%;
@@ -862,8 +905,6 @@ button.btn.btn-white {
     text-align: center;
     /*margin-bottom: 1em;*/
   }
-}
-@media screen and (min-width: 825px) {
   #projectDetails .comments {
     background-color: whitesmoke;
     padding: 1em;
