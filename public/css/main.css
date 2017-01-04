@@ -166,10 +166,41 @@ button.btn.btn-white {
   transition: .3s;
 }*/
 #home #learn .guitarDiv {
-  max-width: 350px;
+  max-width: 275px;
+  text-align: center;
+  float: left;
+}
+#home #getStarted .melodyDiv {
+  max-width: 275px;
+  text-align: center;
+  /*margin: auto;*/
+  float: right;
+}
+#home #getStarted .voiceDiv {
+  max-width: 275px;
   text-align: center;
   /*margin: auto;*/
   float: left;
+}
+#home #getStarted .voiceDiv img{
+  width: 250px;
+  /* height: 422px; */
+  border-radius: 20%;
+}
+
+#home #getStarted .lyricsDiv {
+  max-width: 275px;
+  text-align: center;
+  margin-left: 30px;
+  float: right;
+}
+#home #getStarted .lyricsDiv img{
+  width: 250px;
+  border-radius: 50%;
+}
+#home #getStarted .melodyDiv img{
+  width: 300px;
+  border-radius: 50%;
 }
 #home #learn img {
   width: 100%;
@@ -189,9 +220,8 @@ button.btn.btn-white {
   line-height: 3em;
 }
 #getStarted p {
-  text-align: center;
+  /*text-align: center;*/
   line-height: 3em;
-
 }
 /********************************************
               LOGIN / SIGN UP PAGE
