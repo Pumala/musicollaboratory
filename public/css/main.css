@@ -589,6 +589,9 @@ button.btn.btn-white {
   margin-bottom: 1em;
   padding: .5em;
 }
+#profile .project:first-child {
+  border: 0;
+}
 #profile .project .content {
   width: 120px;
   margin-top: -2em;
@@ -760,6 +763,9 @@ button.btn.btn-white {
   #projectDetails .allComments textarea.edit {
     width: 50%;
     margin: 0 25%;
+  }
+  #profile .project:first-child {
+    border: 2px dotted #000;
   }
 }
 @media screen and (min-width: 825px) {
