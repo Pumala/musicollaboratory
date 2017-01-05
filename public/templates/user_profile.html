@@ -22,10 +22,10 @@
             </button>
           </div>
         </form>
-        <!-- <div class="panel panel-body">
-          <p>{{projectAvatar.originalName}}</p>
+        <div ng-show="avatarInfo" class="panel panel-body">
+          <p>{{avatarInfo.originalName}}</p>
           <button ng-click="deleteUserAvatar(avatarInfo._id)" class="btn btn-default">Delete</button>
-        </div> -->
+        </div>
         <textarea ng-model="description" rows="8" placeholder="Add a bio..."></textarea>
       </div>
       <div ng-show="!edit" class="panel panel-default">
