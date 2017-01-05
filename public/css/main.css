@@ -116,6 +116,9 @@ button.btn.btn-white {
 .logo-words {
   color: #FF5722;
 }
+.hideSmall {
+  display: none;
+}
 /********************************************
                   HOME PAGE
 ********************************************/
@@ -339,6 +342,9 @@ button.btn.btn-white {
 /********************************************
             PROJECTS DETAIL PAGE
 ********************************************/
+#projectDetails {
+  margin-bottom: 4em;
+}
 #projectDetails .left {
   margin: 1em;
 }
@@ -743,12 +749,12 @@ button.btn.btn-white {
 }
 #requests h2 {
   font-size: 1.25em;
-  border-top: 2px dotted #000;
+  /*border-top: 2px dotted #000;*/
   border-bottom: 2px dotted #000;
   padding: .5em 4em;
-  color: #fff;
+  /*color: #fff;*/
   display: inline-block;
-  background-color: #6922ff;
+  /*background-color: #6922ff;*/
 }
 #requests h3 {
   font-size: 1.1em;
@@ -866,6 +872,9 @@ button.btn.btn-white {
   #newProject {
     height: 100%;
   }
+  .hideSmall {
+    display: block;
+  }
 }
 
 @media screen and (min-width: 825px) {
@@ -934,7 +943,7 @@ button.btn.btn-white {
   }
   #projectDetails {
     /*width: 1055px;*/
-    margin: 1em auto;
+    margin: 1em auto 5em auto;
     position: relative;
   }
   #projectDetails .left {
@@ -957,6 +966,9 @@ button.btn.btn-white {
   #projectDetails, #search, #profile {
     width: 1050px;
     margin: auto;
+  }
+  #projectDetails {
+    margin-bottom: 4em;
   }
   #search .info {
     margin-left: 10%;

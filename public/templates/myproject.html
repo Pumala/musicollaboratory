@@ -178,7 +178,7 @@
       <p>Thanks. Your request was successfully sent.</p>
     </div>
 
-    <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0)" ng-submit="requestContribute()">
+    <form class="requests" ng-show="(!alreadyRequested) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0) && (!project.completed)" ng-submit="requestContribute()">
       <div class="well">
         <h2>Request to contribute</h2>
         <div class="select">
@@ -223,6 +223,13 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="editButtons">
+    <div class="showInline" ng-hide="(rootUsername !== project.owner) && (project.members.indexOf(rootUsername) === -1)">
+      <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-default">Mark as Completed</button>
+      <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-default">Unmark as Completed</button>
     </div>
   </div>
 
