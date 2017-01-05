@@ -76,7 +76,7 @@
         </div>
         <div class="panel-body">
           <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-          <h4>Interested in contributing toooo <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
           <ul class="options">
             <li ng-repeat="type in request.requestTypes">{{type}}</li>
           </ul>

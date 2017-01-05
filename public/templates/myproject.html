@@ -72,7 +72,9 @@
         <div class="panel-heading">
           <h2>Project Samples:</h2>
         </div>
-        <p ng-show="project.files.length < 1">None at this time.</p>
+        <div class="panel-body" ng-show="project.files.length < 1">
+          <p>None at this time.</p>
+        </div>
         <div class="projectFile" ng-repeat="file in allFiles">
           <div class="panel-body">
             <p><strong>{{file.originalName}}</strong></p>

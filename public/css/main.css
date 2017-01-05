@@ -638,9 +638,13 @@ button.btn.btn-white {
   display: inline-block;
   padding: .5em .75em;
 }
+#profile .panel-heading h2 {
+  font-weight: 500;
+  font-size: 1.25em;
+}
 #profile .project {
   border-top: 2px dotted #000;
-  margin-bottom: 1em;
+  /*margin-bottom: 1em;*/
   padding: .5em;
 }
 #profile .project:first-child {
@@ -960,5 +964,9 @@ button.btn.btn-white {
   }
   #projectDetails .allComments .right {
     width: 75%;
+  }
+  #profile .project .content {
+    width: 210px;
+    margin-left: 1em;
   }
 }

@@ -316,12 +316,17 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
+  // service.broadcastEditMode = function() {
+  //   $rootScope.$broadcast('newMessage', 'this is ENOUGH');
+  // };
+  // $rootScope.$broadcast('newMessage', 'this is ENOUGH')
+
   return service;
 
 });
 
 // need to reload page to reflect new and removed files!!
-app.controller('FileController', function($timeout, $scope, $rootScope, $state, FileUploader) {
+app.controller('FileController', function($timeout, $scope, MusicFactory, $rootScope, $state, FileUploader) {
   // var uploader = $scope.uploader = new FileUploader({
   //   url: '/upload'
   // });
@@ -331,13 +336,16 @@ app.controller('FileController', function($timeout, $scope, $rootScope, $state, 
   });
 
 
-
-
   // console.log('setting up onCompleteAll')
   uploader.onCompleteAll = function() {
     console.log('hello i am here');
-    $rootScope.$emit('editMode', true);
-    // $state.reload();
+    // $rootScope.$emit('editMode', true);
+    // $rootScope.$on('newEditMode', function(event, msg) {
+    //   console.log('hello hello: ', msg);
+    // });
+    $state.reload();
+    $scope.$emit('newEditMode', true);
+    console.log('meep Meep');
   };
   uploader.onSuccessItem = function(fileItem, response, status, headers) {
 
@@ -540,10 +548,12 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
   $scope.allAudios = ["mp3", "wav", "m4a"];
 
   $scope.isAudioFile = function(filename) {
-    var etx = filename.split(".").pop();
-    var index = $scope.allAudios.indexOf(etx);
-    if (index > -1) {
-      return true;
+    if (filename) {
+      var etx = filename.split(".").pop();
+      var index = $scope.allAudios.indexOf(etx);
+      if (index > -1) {
+        return true;
+      }
     } else {
       return false;
     }
@@ -676,10 +686,12 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
   $scope.allAudios = ["mp3", "wav", "m4a"];
 
   $scope.isAudioFile = function(filename) {
-    var etx = filename.split(".").pop();
-    var index = $scope.allAudios.indexOf(etx);
-    if (index > -1) {
-      return true;
+    if (filename) {
+      var etx = filename.split(".").pop();
+      var index = $scope.allAudios.indexOf(etx);
+      if (index > -1) {
+        return true;
+      }
     } else {
       return false;
     }
@@ -778,10 +790,22 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   $scope.production = false;
   $scope.editComment = false;
 
-  console.log('setting up');
-  $scope.$on('editMode', function(value) {
-    console.log('emitting this value: ', value);
+
+  $scope.$on('newEditMode', function(event, editVal) {
+    console.log('SEND OFF:', editVal);
+    $scope.edit = editVal;
   });
+
+  // $scope.talkToMe = function() {
+  // $rootScope.$broadcast('newEditMode', $scope.message);
+  // console.log('BYE BYE BYE');
+  // }
+
+
+  console.log('setting up');
+  // $scope.$on('editMode', function(value) {
+  //   console.log('emitting this value: ', value);
+  // });
 
 
 
@@ -863,11 +887,11 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
     .then(function(results) {
       console.log('updated PROJECT DETAIL info', results);
       $scope.edit = results.data.editMode;
-      if ($scope.edit === "true") {
-        $scope.edit = true;
-      } else {
-        $scope.edit = false;
-      }
+      // if ($scope.edit === "true") {
+      //   $scope.edit = true;
+      // } else {
+      //   $scope.edit = false;
+      // }
       console.log('comment is a what......', $scope.editComment);
       console.log('loading edit', $scope.edit);
       $scope.allFiles = results.data.allFiles;
