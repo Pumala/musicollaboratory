@@ -48,6 +48,9 @@ a.btn.btn-primary:hover, button.btn.btn-primary:hover {
   transition: 0.3s;
   background-color: #FFC107;
 }
+.pointer {
+  cursor: pointer;
+}
 .tinyP {
   font-size: .9em;
 }
@@ -531,8 +534,7 @@ button.btn.btn-white {
 /********************************************
                   SEARCH PAGE
 ********************************************/
-#search {
-  /*margin: 1em auto;*/
+#search, #profile {
   background-color: whitesmoke;
   padding-bottom: 12em;
 }

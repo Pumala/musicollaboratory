@@ -532,13 +532,12 @@ app.put('/api/logout', function(request, response) {
 // ********************************
 //          PROJECT DETAIL PAGE
 // *******************************
-app.get('/api/project/:projectid/:username/:editmode', function(request, response) {
+app.get('/api/project/:projectid/:username', function(request, response) {
 
   console.log('getting RED project details::', request.params);
 
   var projectId = request.params.projectid;
   var username = request.params.username;
-  var editMode = request.params.editmode;
 
   // console.log('PARAMS?', request.params);
 
@@ -618,7 +617,6 @@ app.get('/api/project/:projectid/:username/:editmode', function(request, respons
         allComments: allComments,
         projectInfo: projectInfo,
         alreadyRequested: alreadyRequested,
-        editMode: editMode,
         projectAvatar: projectAvatar
       });
     })
