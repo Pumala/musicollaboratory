@@ -316,12 +316,17 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
+  // service.broadcastEditMode = function() {
+  //   $rootScope.$broadcast('newMessage', 'this is ENOUGH');
+  // };
+  // $rootScope.$broadcast('newMessage', 'this is ENOUGH')
+
   return service;
 
 });
 
 // need to reload page to reflect new and removed files!!
-app.controller('FileController', function($timeout, $scope, $rootScope, $state, FileUploader) {
+app.controller('FileController', function($timeout, $scope, MusicFactory, $rootScope, $state, FileUploader) {
   // var uploader = $scope.uploader = new FileUploader({
   //   url: '/upload'
   // });
@@ -329,25 +334,13 @@ app.controller('FileController', function($timeout, $scope, $rootScope, $state, 
   var uploader = $scope.uploader = new FileUploader({
     url: '/api/upload/' + $rootScope.rootUsername + '/' + $scope.projectId
   });
-    // .then(function() {
-    //   console.log('wake up!');
-    // })
-    // .catch(function(err) {
-    //   console.log('NOOOOOO!');
-    // });
-  //
-  // uploader.uploadAll = function() {
-  //   $timeout(function () {
-  //     $state.reload();
-  //     // $state.go('myprojectuploader', { projectid: $scope.projectId });
-  //     console.log('proj iddd?:', $scope.projectId);
-  //     console.info('onCompleteAll');
-  //   }, 2000);
-  // };
-  console.log('setting up onCompleteAll')
+
+
+  // console.log('setting up onCompleteAll')
   uploader.onCompleteAll = function() {
     console.log('hello i am here');
-    $state.reload();
+    $scope.$emit('newEditMode', false);
+    console.log('meep Meep');
   };
   uploader.onSuccessItem = function(fileItem, response, status, headers) {
 
@@ -361,6 +354,12 @@ app.controller('UserAvatarController', function($timeout, $scope, $rootScope, $s
     url: '/api/upload/avatar/user/' + $rootScope.rootUsername
   });
 
+  uploader.onCompleteAll = function() {
+    console.log('in user avatar');
+    $scope.$emit('newEditMode', false);
+    console.log('pleep pleep');
+  };
+
 });
 
 // takes control of projects avatar
@@ -370,6 +369,11 @@ app.controller('ProjectAvatarController', function($timeout, $scope, $rootScope,
   var uploader = $scope.uploader = new FileUploader({
     url: '/api/upload/avatar/project/' + $scope.projectId + '/' + $rootScope.rootUsername
   });
+  uploader.onCompleteAll = function() {
+    console.log('hello i am here');
+    $scope.$emit('newEditMode', false);
+    console.log('new edit mode');
+  };
 
 });
 
@@ -377,10 +381,17 @@ app.controller('ProjectFileController', function($scope, MusicFactory, $state, $
   console.log('params anyone?:', $stateParams);
   $scope.projectId = $stateParams.projectid;
 
+  $scope.$on('newEditMode', function(event, editVal) {
+    console.log('listening here.....:', editVal);
+    console.log('nothing but leaves');
+
+    $scope.loadProjectFilePage();
+  });
+
   $scope.deleteFile = function(fileId) {
     MusicFactory.removeFile(fileId, $scope.projectId)
       .then(function() {
-        $state.reload();
+        $scope.loadProjectFilePage();
         console.log('success deleting file!');
       })
       .catch(function(err) {
@@ -388,15 +399,21 @@ app.controller('ProjectFileController', function($scope, MusicFactory, $state, $
       });
   }
 
-  MusicFactory.FileUploadService($scope.projectId)
-    .then(function(projectInfo) {
-      console.log('success sending project info!', projectInfo.data);
-      $scope.projectInfo = projectInfo.data.projectInfo;
-      $scope.allFiles = projectInfo.data.allFiles;
-    })
-    .catch(function(err) {
-      console.log('err in ProjectFileController', err.stack);
-    })
+  $scope.loadProjectFilePage = function() {
+    MusicFactory.FileUploadService($scope.projectId)
+      .then(function(projectInfo) {
+        console.log('success sending project info!', projectInfo.data);
+        $scope.projectInfo = projectInfo.data.projectInfo;
+        $scope.allFiles = projectInfo.data.allFiles;
+      })
+      .catch(function(err) {
+        console.log('err in ProjectFileController', err.stack);
+      });
+  };
+
+  // call this initially when page loads
+  $scope.loadProjectFilePage();
+
 });
 
 app.controller('HomeController', function($scope, $state) {
@@ -410,83 +427,100 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
   $scope.username = $stateParams.username;
   $scope.typeRequest = {};
 
-  MusicFactory.getRequests()
-    .then(function(results) {
-      console.log('pending.....', results);
-      $scope.receiveRequests = results.data.receiveRequests;
-      $scope.receiveProjects = results.data.receiveProjects;
-      $scope.sendRequests = results.data.sendRequests;
-      $scope.sendProjects = results.data.sendProjects;
+  $scope.loadRequestPage = function() {
+    MusicFactory.getRequests()
+      .then(function(results) {
+        console.log('pending.....', results);
+        $scope.receiveRequests = results.data.receiveRequests;
+        $scope.receiveProjects = results.data.receiveProjects;
+        $scope.sendRequests = results.data.sendRequests;
+        $scope.sendProjects = results.data.sendProjects;
 
-      $scope.receiveRequests.forEach(function(request, index) {
-        $scope.receiveProjects.forEach(function(project) {
-          if (String(request.projectId) === String(project._id)) {
-            request.projectName = project.name;
-          } else {
-            console.log('NOPEE');
-          }
+        $scope.receiveRequests.forEach(function(request, index) {
+          $scope.receiveProjects.forEach(function(project) {
+            if (String(request.projectId) === String(project._id)) {
+              request.projectName = project.name;
+              request.acceptedRequestTypes = {};
+            } else {
+              console.log('NOPEE');
+            }
+          });
         });
+
+        $scope.sendRequests.forEach(function(request, index) {
+          $scope.sendProjects.forEach(function(project) {
+            if (String(request.projectId) === String(project._id)) {
+              request.projectName = project.name;
+            } else {
+              console.log('NOPEE');
+            }
+          });
+        });
+
+        console.log('receiving:', $scope.receiveRequests);
+        console.log('sending:', $scope.sendRequests);
+
+      })
+      .catch(function(err) {
+        console.log('err getting requests:', err.message);
       });
 
-      $scope.sendRequests.forEach(function(request, index) {
-        $scope.sendProjects.forEach(function(project) {
-          if (String(request.projectId) === String(project._id)) {
-            request.projectName = project.name;
-          } else {
-            console.log('NOPEE');
-          }
-        });
+  };
+
+  // load request page initially
+  $scope.loadRequestPage();
+
+  $scope.declineRequest = function(requestId) {
+    console.log('UMMMM:', requestId);
+    MusicFactory.deleteRequest(requestId)
+      .then(function(results) {
+        console.log('success deleting request::', results);
+        $scope.loadRequestPage();
+      })
+      .catch(function(err) {
+        console.log('error deleting request::', err.message);
       });
+  }
+  $scope.acceptRequest = function(requestId, projectId, username, projectName, acceptedRequestTypes) {
+    // console.log('hello: ', hello);
+    // console.log('type request obj::', $scope.typeRequest);
+    // console.log('RED type request obj::', $scope.request.acceptedRequestTypes);
 
-    })
-    .catch(function(err) {
-      console.log('err getting requests:', err.message);
-    });
+    var requestObj = {
+      requestId: requestId,
+      typeRequest: acceptedRequestTypes,
+      projectId: projectId,
+      username: username,
+      projectName: projectName
+    };
+    console.log('new reqest obj::', requestObj);
 
-    $scope.declineRequest = function(requestId) {
-      console.log('UMMMM:', requestId);
-      MusicFactory.deleteRequest(requestId)
-        .then(function(results) {
-          console.log('success deleting request::', results);
-          $state.reload();
-        })
-        .catch(function(err) {
-          console.log('error deleting request::', err.message);
-        });
-    }
-    $scope.acceptRequest = function(requestId, projectId, username, projectName) {
-      console.log('type request obj::', $scope.typeRequest);
-      var requestObj = {
-        requestId: requestId,
-        typeRequest: $scope.typeRequest,
-        projectId: projectId,
-        username: username,
-        projectName: projectName
-      };
-      console.log('new reqest obj::', requestObj);
-
-      MusicFactory.serviceAcceptRequest(requestObj)
-        .then(function(results) {
-          console.log('success accepting request::', results);
-          $state.reload();
-        })
-        .catch(function(err) {
-          console.log('error accepting request::', err.message);
-        });
-    }
+    MusicFactory.serviceAcceptRequest(requestObj)
+      .then(function(results) {
+        console.log('success accepting request::', results);
+        $scope.loadRequestPage();
+      })
+      .catch(function(err) {
+        console.log('error accepting request::', err.message);
+      });
+  }
 
 });
 
-// **************************************
-//          PLAY AUDIO CONTROLLER
-// *************************************
-// app.controller()
 // ********************************
 //          USER CONTROLLER
 // *******************************
 app.controller('UserController', function($scope, $sce, $state, $stateParams, MusicFactory) {
   $scope.currUser = $stateParams.username;
-  $scope.edit = false;
+
+  $scope.$on('newEditMode', function(event, editVal) {
+    console.log('SEND OFF:', editVal);
+    console.log('nothing but birds');
+
+    $scope.loadProfilePage();
+    $scope.edit = true;
+    console.log('edit mode:', $scope.edit);
+  });
 
   console.log('hello');
 
@@ -502,8 +536,9 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
     console.log($scope.description);
     MusicFactory.updateBio($scope.description)
     .then(function(results) {
-      $state.reload();
+      $scope.loadProfilePage();
       console.log('updated user bio:', results);
+      $scope.edit = false;
     })
     .catch(function(err) {
       console.log('encountered errors updating user bio:', err.message);
@@ -518,68 +553,50 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
     $scope.currProjectId = currProjectId;
   };
 
-  // $scope.checkCurrentProjects = function() {
-  //   var completedArr = $scope.allProjects.filter(function(project) {
-  //     return project.completed === true;
-  //   });
-  //   if (completedArr.length === 0) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // };
-  //
-  // $scope.checkCompletedProjects = function() {
-  //   var completedArr = $scope.allProjects.filter(function(project) {
-  //     return project.completed === true;
-  //   });
-  //   if (completedArr.length === 0) {
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // };
-
   $scope.allAudios = ["mp3", "wav", "m4a"];
 
   $scope.isAudioFile = function(filename) {
-    var etx = filename.split(".").pop();
-    var index = $scope.allAudios.indexOf(etx);
-    if (index > -1) {
-      return true;
+    if (filename) {
+      var etx = filename.split(".").pop();
+      var index = $scope.allAudios.indexOf(etx);
+      if (index > -1) {
+        return true;
+      }
     } else {
       return false;
     }
   };
 
   // makes a service call to pass data to the backend to render the user profile page
-  MusicFactory.getUserProfile($scope.currUser)
-    .then(function(results) {
-      console.log('user profile results:', results);
-      $scope.allProjects = results.data.allProjects;
-      $scope.userInfo = results.data.userInfo;
-      $scope.description = results.data.userInfo.bio.length === 0 ? "Add a bio..." : results.data.userInfo.bio;
-      $scope.avatarInfo = results.data.avatarInfo;
-    })
-    .catch(function(err) {
-      console.log('encountered errors retrieving user profile data', err.message);
-    });
+  $scope.loadProfilePage = function() {
+    MusicFactory.getUserProfile($scope.currUser)
+      .then(function(results) {
+        console.log('user profile results:', results);
+        $scope.allProjects = results.data.allProjects;
+        $scope.userInfo = results.data.userInfo;
+        $scope.description = results.data.userInfo.bio.length === 0 ? "Add a bio..." : results.data.userInfo.bio;
+        $scope.avatarInfo = results.data.avatarInfo;
+      })
+      .catch(function(err) {
+        console.log('encountered errors retrieving user profile data', err.message);
+      });
+  };
 
-    $scope.deleteUserAvatar = function(avatarId) {
-      console.log('avatar id right....', avatarId);
-      MusicFactory.deleteCurrUserAvatar(avatarId)
-        .then(function(results) {
-          $state.reload();
-          console.log('success deleting user avatar');
-        })
-        .catch(function(err) {
-          console.log('experienced err deleting user avatar');
-        });
-    };
+  // load page initially
+  $scope.loadProfilePage();
 
-    // $scope.getAudioUrl = function(fileHash) {
-    //   return $sce.trustAsResourceUrl('/upload/' + fileHash);
-    // };
+  $scope.deleteUserAvatar = function(avatarId) {
+    console.log('avatar id right....', avatarId);
+    MusicFactory.deleteCurrUserAvatar(avatarId)
+      .then(function(results) {
+        $scope.loadProfilePage();
+        $scope.edit = true;
+        console.log('success deleting user avatar');
+      })
+      .catch(function(err) {
+        console.log('experienced err deleting user avatar');
+      });
+  };
 
 });
 
@@ -679,18 +696,16 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
   $scope.allAudios = ["mp3", "wav", "m4a"];
 
   $scope.isAudioFile = function(filename) {
-    var etx = filename.split(".").pop();
-    var index = $scope.allAudios.indexOf(etx);
-    if (index > -1) {
-      return true;
+    if (filename) {
+      var etx = filename.split(".").pop();
+      var index = $scope.allAudios.indexOf(etx);
+      if (index > -1) {
+        return true;
+      }
     } else {
       return false;
     }
   };
-
-  // $scope.getAudioUrl = function(fileHash) {
-  //   return $sce.trustAsResourceUrl('/upload/' + fileHash);
-  // };
 
   $scope.searchProjects = function() {
     var needsInfo = {
@@ -710,17 +725,23 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
   }
 
   $scope.reloadSearch = function() {
-    $state.reload();
+    $scope.loadAllProjectsPage();
   };
 
-  MusicFactory.allProjects()
-    .then(function(results) {
-      $scope.allProjects = results.data;
-      console.log('here are all the projects!!:', results);
-    })
-    .catch(function(err) {
-      console.log('encountered error loading all projects:', err.message);
-    });
+  $scope.loadAllProjectsPage = function() {
+    MusicFactory.allProjects()
+      .then(function(results) {
+        $scope.allProjects = results.data;
+        console.log('here are all the projects!!:', results);
+      })
+      .catch(function(err) {
+        console.log('encountered error loading all projects:', err.message);
+      });
+  };
+
+  // load all projects page initially
+  $scope.loadAllProjectsPage();
+
 });
 
 app.controller('ProjectsController', function($scope, $rootScope, $state) {
@@ -766,7 +787,7 @@ app.controller('NewProjectsController', function($scope, $stateParams, $state, F
       .catch(function(err) {
         console.log('encountered error adding new project::', err.message);
       });
-  }
+  };
 
 });
 
@@ -780,7 +801,19 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   $scope.voice = false;
   $scope.production = false;
   $scope.editComment = false;
-  // $scope.edit = false;
+
+  // $scope.talkToMe = function() {
+  // $rootScope.$broadcast('newEditMode', $scope.message);
+  // console.log('BYE BYE BYE');
+  // }
+
+
+  console.log('setting up');
+  // $scope.$on('editMode', function(value) {
+  //   console.log('emitting this value: ', value);
+  // });
+
+
 
   console.log('ID......', $scope.projectId);
   // console.log('EDIT.........', $scope.edit);
@@ -797,7 +830,10 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
     };
     MusicFactory.addNewComment(commentObj)
       .then(function(results) {
-        $state.reload();
+        // later on refactor this code by
+        // creating another api call
+        // where the backend makes a query and only passes the project comments
+        $scope.loadProjectDetails();
         console.log('successfully added comment to db');
       })
       .catch(function(err) {
@@ -811,7 +847,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
     MusicFactory.saveProjectComment(commentId, content)
       .then(function(results) {
         console.log('results updating comment from backend:', results);
-        $state.reload();
+        $scope.loadProjectDetails();
         console.log('successfully saved comment');
       })
       .catch(function(err) {
@@ -823,19 +859,18 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
     MusicFactory.removeComment(commentId)
       .then(function(results) {
         console.log('successfully deleted comment from db');
-        $state.reload();
+        $scope.loadProjectDetails();
       })
       .catch(function(err) {
         console.log('experienced err deleting comment to db:', err.message);
       });
-  }
-
+  };
 
   $scope.deleteProjectAvatar = function(projectAvatarId) {
     MusicFactory.deleteCurrProjectAvatar($scope.projectId, projectAvatarId)
       .then(function(results) {
         console.log('success deleting the project avatar');
-        $state.reload();
+        $scope.loadProjectDetails();
       })
       .catch(function(err) {
         console.log('error deleting the project avatar:', err.message);
@@ -845,7 +880,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   $scope.deleteFile = function(fileId) {
     MusicFactory.removeFile(fileId, $scope.projectId)
       .then(function() {
-        $state.reload();
+        $scope.loadProjectDetails();
         $scope.edit = true;
         // console.log('editing is....', $scope.edit);
         console.log('success deleting file!');
@@ -856,65 +891,65 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   }
   // console.log('edit status here', $scope.edit);
 
-  MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
-    .then(function(results) {
-      console.log('updated PROJECT DETAIL info', results);
-      // $scope.edit = results.data.editMode;
-      // if ($scope.edit === "true") {
-      //   $scope.edit = true;
-      // } else {
-      //   $scope.edit = false;
-      // }
-      // console.log('comment is a what......', $scope.editComment);
-      // console.log('loading edit', $scope.edit);
-      // $scope.allFiles = results.data.allFiles;
-      // $scope.allComments = results.data.allComments;
-      // $scope.projectAvatar = results.data.projectAvatar;
-      //
-      // $scope.alreadyRequested = results.data.alreadyRequested;
-      // $scope.project = results.data.projectInfo;
-      // $scope.projectId = results.data.projectInfo._id;
-      // $scope.owner = results.data.projectInfo.owner;
-      // $scope.requestedTypes = {};
-      // $scope.isCompleted = $scope.project.completed;
-    })
-    .catch(function(err) {
-      console.log('encountered errors loading my projects detail page', err.message);
-    });
+  $scope.loadProjectDetails = function() {
+    MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
+      .then(function(results) {
+        console.log('updated PROJECT DETAIL info', results);
+        // $scope.edit = results.data.editMode;
+        console.log('what is edit before?', $scope.edit);
+        // if ($scope.edit === "true") {
+        //   $scope.edit = true;
+        // } else {
+        //   $scope.edit = false;
+        // }
+        console.log('comment is a what......', $scope.editComment);
+        console.log('loading edit', $scope.edit);
+        // $scope.edit = false;
+        $scope.allFiles = results.data.allFiles;
+        $scope.allComments = results.data.allComments;
+        $scope.projectAvatar = results.data.projectAvatar;
+
+        $scope.alreadyRequested = results.data.alreadyRequested;
+        $scope.project = results.data.projectInfo;
+        $scope.projectId = results.data.projectInfo._id;
+        $scope.owner = results.data.projectInfo.owner;
+        $scope.requestedTypes = {};
+        $scope.isCompleted = $scope.project.completed;
+      })
+      .catch(function(err) {
+        console.log('encountered errors loading my projects detail page', err.message);
+      });
+  };
+
+  // load project details once when page loads
+  $scope.loadProjectDetails();
+
+  $scope.$on('newEditMode', function(event, editVal) {
+    console.log('SEND OFF:', editVal);
+    console.log('nothing but birds');
+
+    $scope.loadProjectDetails();
+    console.log('edit mode:', $scope.edit);
+  });
 
     $scope.editProject = function() {
-      $scope.hasMelody  = $scope.project.existingTypes.melody;
-      $scope.hasLyrics = $scope.project.existingTypes.lyrics;
-      $scope.hasVoice = $scope.project.existingTypes.voice;
-      $scope.hasProduction = $scope.project.existingTypes.production;
-      $scope.needsMelody = $scope.project.seekingTypes.melody;
-      $scope.needsLyrics = $scope.project.seekingTypes.lyrics;
-      $scope.needsVoice = $scope.project.seekingTypes.voice;
-      $scope.needsProduction = $scope.project.seekingTypes.production;
+      $scope.allHasTypes  = $scope.project.existingTypes;
+      $scope.allNeedsTypes = $scope.project.seekingTypes;
+
       $scope.edit = true;
     };
 
     $scope.cancelProjectEdit = function() {
       $scope.edit = false;
-      $state.reload();
+      $scope.loadProjectDetails();
     };
 
     $scope.saveProjectEdits = function(projectId) {
-      console.log('DESCRIPT???', $scope.project.description);
+
       var updatedProjectObj = {
         description: $scope.project.description,
-        has: {
-          melody: $scope.hasMelody,
-          lyrics: $scope.hasLyrics,
-          voice: $scope.hasVoice,
-          production: $scope.hasProduction
-        },
-        needs: {
-          melody: $scope.needsMelody,
-          lyrics: $scope.needsLyrics,
-          voice: $scope.needsVoice,
-          production: $scope.needsProduction
-        }
+        has: $scope.allHasTypes,
+        needs: $scope.allNeedsTypes
       };
       console.log('updated project???', updatedProjectObj);
 
@@ -922,7 +957,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
       .then(function(results) {
         $scope.edit = false;
         console.log('results updating project: ', results);
-        $state.reload();
+        $scope.loadProjectDetails();
       })
       .catch(function(err) {
         console.log('encountered errors updating project:', err.message);
@@ -944,7 +979,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
       MusicFactory.projectIsComplete(projectId, isCompleted)
         .then(function(results) {
           console.log('any results marking project complete: ', results);
-          $state.reload();
+          $scope.loadProjectDetails();
         })
         .catch(function(err) {
           console.log('encountered errors marking project complete:', err.message);
@@ -971,7 +1006,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
       MusicFactory.sendRequest(requestTypes)
         .then(function(results) {
           console.log('here are the request results:', results);
-          $state.reload();
+          $scope.loadProjectDetails();
         })
         .catch(function(err) {
           console.log('error processing request to project owner:', err.message);

@@ -1,41 +1,89 @@
 <div id="requests" class="container">
   <h1 class="text-center">Messages Center</h1>
+  <hr class="dotted">
 
   <div class="inbound">
     <h2 class="thick red">Inbox</h2>
     <div class="noRequests" ng-show="receiveRequests.length === 0">
-      <p>None at this time...</p>
+      <h4>None at this time...</h4>
     </div>
-    <div ng-repeat="request in receiveRequests" class="well">
-      <h3>From: <a ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
-      <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-      <h4>Interested in contributing to <a ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
-      <form ng-repeat="type in request.requestTypes">
-        <label for="">{{type}}</label>
-        <input type="checkbox" ng-model="typeRequest[type]" name="" value="">
-      </form>
-      <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
-      <p>{{request.description}}</p>
-      <button class="btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.from, request.projectName)">Accept</button>
-      <a class="btn btn-danger" ng-click="declineRequest(request._id)">Decline</a>
+    <div ng-repeat="request in receiveRequests">
+
+      <div ng-show="request.request" class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
+          <button class="pull-right btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.from, request.projectName, request.acceptedRequestTypes)">Accept</button>
+          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Decline</button>
+        </div>
+        <div class="panel-body">
+          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <div class="options" ng-repeat="type in request.requestTypes">
+            <label for="">{{type}}</label>
+            <input type="checkbox" ng-model="request.acceptedRequestTypes[type]" name="" value="">
+          </div>
+          <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
+          <p>{{request.description}}</p>
+        </div>
+      </div>
+
+      <div ng-show="!request.request" class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Delete</button>
+        </div>
+        <div class="panel-body">
+          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <ul class="options" ng-repeat="type in request.requestTypes">
+            <li>{{type}}</li>
+          </ul>
+          <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
+          <p>{{request.description}}</p>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <div class="outbound">
     <h2 class="thick red">Outbox</h2>
     <div class="noRequests" ng-show="sendRequests.length === 0">
-      <p>None at this time...</p>
+      <h4>None at this time...</h4>
     </div>
-    <div ng-repeat="request in sendRequests" class="well">
-      <h3>To: <a ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
-      <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-      <h4>Interested in contributing to {{request.projectName}}:</h4>
-      <ul ng-repeat="type in request.requestTypes">
-        <li>{{type}}</li>
-      </ul>
-      <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
-      <p>{{request.description}}</p>
-      <a class="btn btn-danger" ng-click="declineRequest(request._id)">Delete</a>
+    <div ng-repeat="request in sendRequests">
+
+      <div ng-show="request.request" class="panel panel-default">
+        <div class="clear panel-heading">
+          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Delete</button>
+        </div>
+        <div class="panel-body">
+          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <ul>
+            <li ng-repeat="type in request.requestTypes">{{type}}</li>
+          </ul>
+          <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
+          <p>{{request.description}}</p>
+        </div>
+      </div>
+
+      <div ng-show="!request.request" class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Delete</button>
+        </div>
+        <div class="panel-body">
+          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <ul class="options">
+            <li ng-repeat="type in request.requestTypes">{{type}}</li>
+          </ul>
+          <p>{{request.description}}</p>
+        </div>
+      </div>
+
     </div>
   </div>
 

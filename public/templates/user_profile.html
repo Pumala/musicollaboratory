@@ -1,7 +1,7 @@
 <div id="profile" class="">
 
   <div class="pull-right requestBtn" ng-show="rootUsername === currUser">
-    <a ui-sref="requests({ username: rootUsername })" class="btn btn-default">My Requests</a>
+    <a ui-sref="requests({ username: rootUsername })" class="btn btn-default">My Messages</a>
   </div>
 
   <div class="userInfo">
@@ -22,15 +22,15 @@
             </button>
           </div>
         </form>
-        <!-- <div class="panel panel-body">
-          <p>{{projectAvatar.originalName}}</p>
+        <div ng-show="avatarInfo" class="panel panel-body">
+          <p>{{avatarInfo.originalName}}</p>
           <button ng-click="deleteUserAvatar(avatarInfo._id)" class="btn btn-default">Delete</button>
-        </div> -->
+        </div>
         <textarea ng-model="description" rows="8" placeholder="Add a bio..."></textarea>
       </div>
       <div ng-show="!edit" class="panel panel-default">
         <div class="panel-heading">
-          Bio:
+          <h2>Bio:</h2>
         </div>
         <div class="panel-body">
           {{description}}
