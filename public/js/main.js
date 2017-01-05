@@ -70,9 +70,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise('/');
 });
 
-app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $cookies) {
-  var service = {};
-
+app.run(function($rootScope, $cookies, $http, $state) {
   $rootScope.factoryCookieData = $cookies.getObject('cookieData') ? $cookies.getObject('cookieData') : null;
   console.log('factory cookies?:', $cookies.getObject('cookieData'));
   if ($rootScope.factoryCookieData) {
@@ -105,8 +103,13 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     })
     .catch(function(err) {
       console.log('err logging out:', err.message);
-    })
-  }
+    });
+  };
+
+})
+
+app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $cookies) {
+  var service = {};
 
   service.addNewProject = function(newProjectInfo) {
     var url = '/api/new/project';
@@ -136,9 +139,10 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
-  service.getProjectDetails = function(projectId, edit) {
+  service.getProjectDetails = function(projectId) {
     console.log('RED RED');
-    var url = '/api/project/' + projectId + '/' + $rootScope.rootUsername + '/' + edit;
+    console.log('project id is....', projectId);
+    var url = '/api/project/' + projectId + '/' + $rootScope.rootUsername;
     console.log('URL?:', url);
     return $http({
       method: 'GET',
@@ -316,6 +320,26 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
+  service.redirectProjectPage = function() {
+    if ($cookies.getObject("nextProjectUrl")) {
+      var redirectProjectId = $cookies.getObject("nextProjectUrl");
+      console.log('please: ', redirectProjectId);
+      $cookies.remove("nextProjectUrl");
+      $state.go('myproject', { project_id: redirectProjectId });
+    } else {
+      $state.go('profile', {username: $rootScope.rootUsername});
+    };
+  };
+
+  // if ($cookies.getObject("nextProjectUrl")) {
+  //   var redirectProjectId = $cookies.getObject("nextProjectUrl");
+  //   console.log('please: ', redirectProjectId);
+  //   $cookies.remove("nextProjectUrl");
+  //   $state.go('myproject', { project_id: redirectProjectId });
+  // } else {
+  //   $state.go('profile', {username: $rootScope.rootUsername});
+  // }
+
   // service.broadcastEditMode = function() {
   //   $rootScope.$broadcast('newMessage', 'this is ENOUGH');
   // };
@@ -417,7 +441,7 @@ app.controller('ProjectFileController', function($scope, MusicFactory, $state, $
 });
 
 app.controller('HomeController', function($scope, $state) {
-
+  console.log('hello');
 });
 
 // ********************************
@@ -626,7 +650,8 @@ app.controller('SignUpController', function($scope, $state, $rootScope, $cookies
         $cookies.putObject('cookieData', results.data.userInfo);
         $rootScope.factoryCookieData = $cookies.putObject('cookieData', results.data.userInfo);
 
-        $state.go('profile', { username: $rootScope.rootUsername});
+        // $state.go('profile', { username: $rootScope.rootUsername});
+        MusicFactory.redirectProjectPage();
       })
       .catch(function(err) {
         console.log('error submitting new user info:', err.message);
@@ -636,6 +661,12 @@ app.controller('SignUpController', function($scope, $state, $rootScope, $cookies
 });
 
 app.controller('LoginController', function($scope, $state, $cookies, $rootScope, MusicFactory) {
+
+  // if ($cookies.get("nextProjectUrl")) {
+  //   console.log('you have a cookie!');
+  //   var redirectProjectId = $cookies.get("nextProjectUrl");
+  //   console.log('curr project id:', redirectProjectId);
+  // }
 
   $scope.submitLogin = function() {
     var submitInfo = {
@@ -657,7 +688,18 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
         // $cookies.putObject('cookieData', userInfo);
         // $rootScope.factoryCookieData = userInfo;
         // console.log('success submitting login info', userInfo);
-        $state.go('profile', {username: $rootScope.rootUsername});
+
+        // if ($cookies.getObject("nextProjectUrl")) {
+        //   var redirectProjectId = $cookies.getObject("nextProjectUrl");
+        //   console.log('please: ', redirectProjectId);
+        //   $cookies.remove("nextProjectUrl");
+        //   $state.go('myproject', { project_id: redirectProjectId });
+        // } else {
+        //   $state.go('profile', {username: $rootScope.rootUsername});
+        // }
+
+        MusicFactory.redirectProjectPage();
+
       })
       .catch(function(err) {
         console.log('experienced err submitting login info:', err.message);
@@ -794,26 +836,28 @@ app.controller('NewProjectsController', function($scope, $stateParams, $state, F
 // ***********************************************************************
 //                        USER PROJECTS CONTROLLER
 // **********************************************************************
-app.controller('UserProjectsController', function($scope, $sce, $state, $stateParams, $rootScope, MusicFactory) {
+app.controller('UserProjectsController', function($scope, $sce, $cookies, $state, $stateParams, $rootScope, MusicFactory) {
+
   $scope.projectId = $stateParams.project_id;
+
+  if ($rootScope.rootUsername) {
+    console.log('user exists');
+  } else {
+    console.log('user does not exist');
+    // if user is not logged in
+    // save the project id they wanted to go to in a cookie
+    $cookies.putObject('nextProjectUrl', $scope.projectId)
+    $state.go("login");
+  };
+
+
   $scope.melody = false;
   $scope.lyrics = false;
   $scope.voice = false;
   $scope.production = false;
   $scope.editComment = false;
 
-  // $scope.talkToMe = function() {
-  // $rootScope.$broadcast('newEditMode', $scope.message);
-  // console.log('BYE BYE BYE');
-  // }
-
-
   console.log('setting up');
-  // $scope.$on('editMode', function(value) {
-  //   console.log('emitting this value: ', value);
-  // });
-
-
 
   console.log('ID......', $scope.projectId);
   // console.log('EDIT.........', $scope.edit);
@@ -892,7 +936,7 @@ app.controller('UserProjectsController', function($scope, $sce, $state, $statePa
   // console.log('edit status here', $scope.edit);
 
   $scope.loadProjectDetails = function() {
-    MusicFactory.getProjectDetails($scope.projectId, $scope.edit)
+    MusicFactory.getProjectDetails($scope.projectId)
       .then(function(results) {
         console.log('updated PROJECT DETAIL info', results);
         // $scope.edit = results.data.editMode;
