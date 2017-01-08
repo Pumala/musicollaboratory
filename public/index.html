@@ -29,10 +29,13 @@
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="navbar-collapse">
+                  <ul class="hideSmall nav navbar-nav navbar-left">
+                      <li><a ng-if="rootUsername">Welcome {{rootUsername}}!</a></li>
+                  </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a ng-if="rootUsername" ui-sref="newproject">Create New Project</a></li>
                         <li><a ui-sref="search">Search</a></li>
-                        <li><a ng-if="rootUsername">Welcome {{rootUsername}}!</a></li>
+                        <!-- <li><a ng-if="rootUsername">Welcome {{rootUsername}}!</a></li> -->
                         <li><a ng-if="!rootUsername" ui-sref="signup">Sign up</a></li>
                         <li><a ng-if="!rootUsername" ui-sref="login">Log in</a></li>
                         <li><a ng-if="rootUsername" ui-sref="profile({username: rootUsername})">Profile</a></li>
