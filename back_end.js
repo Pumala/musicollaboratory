@@ -995,7 +995,7 @@ app.post('/api/request/new', function(request, response) {
 // ********************************************
 //          RETRIEVE ALL USER REQUESTS
 // *******************************************
-app.get('/api/requests/:username', function(request, response) {
+app.get('/api/get/requests/:username', function(request, response) {
 
   var username = request.params.username;
 
@@ -1224,13 +1224,11 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
 
 });
 
-
 // ********************************
 //          DELETE REQUEST
 // *******************************
 app.delete('/api/request/delete/:requestid', function(request, response) {
 
-  console.log(request.params.requestid);
   var requestId = request.params.requestid;
 
   Message.remove({ _id: requestId })
@@ -1246,6 +1244,81 @@ app.delete('/api/request/delete/:requestid', function(request, response) {
         error: err.message
       });
     });
+
+});
+
+// ***************************************************************
+//          DELETE REQUEST and POST NEW MESSAGE ABOUT DECLINE
+// **************************************************************
+app.post('/api/request/decline', function(request, response) {
+
+  console.log('wanna delete and send decline:', request.body);
+  var requestInfo = request.body;
+
+  var newMessage = new Message({
+    projectId: requestInfo._id,
+    to: requestInfo.from,
+    from: requestInfo.to,
+    requestTypes: requestInfo.requestTypes,
+    description: 'Sorry, unfortunately your request to join ' + requestInfo.projectName + ' has been declined.',
+    date: new Date(),
+    request: false
+  });
+
+  bluebird.all([
+    newMessage.save(),
+    Message.remove({ _id: requestInfo._id }),
+    User.findOne({ _id: requestInfo.from }),
+    User.findOne({ _id: requestInfo.to })
+  ])
+  .spread(function(newMessage, deletedRequest, declinedUserInfo, projectOwnerInfo) {
+    console.log('new message here: ', newMessage);
+    console.log('user info here:', declinedUserInfo);
+    var messageId = newMessage._id;
+    var messagesArr = declinedUserInfo.requests;
+    messagesArr.push(messageId);
+
+    var projectOwnerRequests = projectOwnerInfo.requests;
+    console.log('project owner info', projectOwnerInfo);
+    console.log('array of project owner requests: ', projectOwnerRequests);
+    // remove the decline request from the project owner
+    var removeIndex = projectOwnerRequests.indexOf(requestInfo._id);
+    projectOwnerRequests.splice(removeIndex, 1);
+
+    console.log('updated array of project owner requests: ', projectOwnerRequests);
+
+    return [ User.update({
+        _id: requestInfo.from
+      }, {
+        $set: {
+          requests: messagesArr
+        }
+      }), User.update({
+        _id: requestInfo.to
+      }, {
+        $set: {
+          requests: projectOwnerRequests
+        }
+      })
+    ];
+
+  })
+  .spread(function(updatedUser, updatedProjectOwner) {
+    console.log('updated user: ', updatedUser);
+    console.log('updated project owner: ', updatedProjectOwner);
+
+    return response.json({
+      message: "hello we deleted the request from the db"
+    });
+  })
+  .catch(function(err) {
+    console.log('error attempting to delete request from db:', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
+  });
+
 });
 
 // ****************************************************

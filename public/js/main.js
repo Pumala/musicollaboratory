@@ -196,10 +196,20 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
   };
 
   service.getRequests = function() {
-    var url = '/api/requests/' + $rootScope.rootUsername;
+    console.log('on my goodnesss.....');
+    var url = '/api/get/requests/' + $rootScope.rootUsername;
     return $http({
       method: 'GET',
       url: url
+    });
+  };
+
+  service.declineRequest = function(requestInfo) {
+    var url = '/api/request/decline';
+    return $http({
+      method: 'POST',
+      url: url,
+      data: requestInfo
     });
   };
 
@@ -232,6 +242,7 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
   };
 
   service.deleteProject = function(projectId) {
+    console.log('do you know WHAT');
     var url = '/api/remove/project/' + projectId;
     return $http({
       method: 'DELETE',
@@ -494,17 +505,30 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
   // load request page initially
   $scope.loadRequestPage();
 
-  $scope.declineRequest = function(requestId) {
-    console.log('UMMMM:', requestId);
+  // delete request
+  $scope.deleteRequest = function(requestId) {
     MusicFactory.deleteRequest(requestId)
       .then(function(results) {
-        console.log('success deleting request::', results);
+        console.log('success deleting the old request::', results);
         $scope.loadRequestPage();
       })
       .catch(function(err) {
         console.log('error deleting request::', err.message);
       });
-  }
+  };
+
+  $scope.declineRequest = function(requestInfo) {
+    console.log('hellowwww');
+    MusicFactory.declineRequest(requestInfo)
+      .then(function(results) {
+        console.log('success deleting the old request::', results);
+        $scope.loadRequestPage();
+      })
+      .catch(function(err) {
+        console.log('error deleting request::', err.message);
+      });
+  };
+
   $scope.acceptRequest = function(requestId, projectId, username, projectName, acceptedRequestTypes) {
     // console.log('hello: ', hello);
     // console.log('type request obj::', $scope.typeRequest);

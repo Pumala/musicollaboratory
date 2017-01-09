@@ -73,7 +73,7 @@ ul.panel-body {
   padding-left: 3.5em;
 }
 .panel-body, textarea.panel-body {
-  background-color: #d2d2d2;
+  background-color: #e7e7e7;
 }
 .panel-default>.panel-heading {
   background-color: #cccbcb;
@@ -631,11 +631,14 @@ button.btn.btn-white {
                   PROFILE
 ********************************************/
 #profile {
-  margin: 2em auto 20em auto;
-  width: 92%;
+  /*margin: 2em auto 20em auto;*/
+  width: 100%;
+  padding: 1em;
+  /*width: 92%;*/
 }
 #profile h1 {
   font-size: 1.5em;
+  margin: 0;
 }
 #profile .currentProjects h2,
 #profile .completedProjects h2 {
@@ -675,7 +678,7 @@ button.btn.btn-white {
   width: 100px;
 }
 #profile .requestBtn {
-  margin-top: -10px;
+  /*margin-top: -10px;*/
   /*margin: 1em auto 4em auto;
   text-align: center;*/
 }
@@ -878,6 +881,22 @@ button.btn.btn-white {
 }
 
 @media screen and (min-width: 825px) {
+  #requests {
+    margin: 0 auto;
+    padding-top: 2.5em;
+  }
+  #requests h1 {
+    margin: 0;
+  }
+  #requests .inbound, #requests .outbound {
+    width: 50%;
+    padding: 2%;
+    float: left;
+  }
+  #requests .inboundMessages, #requests .outboundMessages {
+    overflow-y: auto;
+    height: 500px;
+  }
   #profile .project {
     width: 33.333333%;
   }
@@ -981,6 +1000,6 @@ button.btn.btn-white {
   }
   #profile .project .content {
     width: 210px;
-    margin-left: 1em;
+    /*margin-left: 1em;*/
   }
 }

@@ -7,13 +7,14 @@
     <div class="noRequests" ng-show="receiveRequests.length === 0">
       <h4>None at this time...</h4>
     </div>
-    <div ng-repeat="request in receiveRequests">
 
-      <div ng-show="request.request" class="panel panel-default">
+    <div class="inboundMessages">
+
+      <div ng-repeat="request in receiveRequests" ng-show="request.request" class="panel panel-default">
         <div class="panel-heading">
           <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
           <button class="pull-right btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.from, request.projectName, request.acceptedRequestTypes)">Accept</button>
-          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Decline</button>
+          <button class="pull-right btn btn-danger" ng-click="declineRequest(request)">Decline</button>
         </div>
         <div class="panel-body">
           <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
@@ -27,10 +28,10 @@
         </div>
       </div>
 
-      <div ng-show="!request.request" class="panel panel-default">
+      <div ng-repeat="request in receiveRequests" ng-show="!request.request" class="panel panel-default">
         <div class="panel-heading">
           <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Delete</button>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(request._id)">Delete</button>
         </div>
         <div class="panel-body">
           <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
@@ -44,6 +45,7 @@
       </div>
 
     </div>
+
   </div>
 
   <div class="outbound">
@@ -51,12 +53,13 @@
     <div class="noRequests" ng-show="sendRequests.length === 0">
       <h4>None at this time...</h4>
     </div>
-    <div ng-repeat="request in sendRequests">
 
-      <div ng-show="request.request" class="panel panel-default">
+    <div class="outboundMessages">
+
+      <div ng-repeat="request in sendRequests" ng-show="request.request" class="panel panel-default">
         <div class="clear panel-heading">
           <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Delete</button>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(request._id)">Delete</button>
         </div>
         <div class="panel-body">
           <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
@@ -69,10 +72,10 @@
         </div>
       </div>
 
-      <div ng-show="!request.request" class="panel panel-default">
+      <div ng-repeat="request in sendRequests" ng-show="!request.request" class="panel panel-default">
         <div class="panel-heading">
           <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="declineRequest(request._id)">Delete</button>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(request._id)">Delete</button>
         </div>
         <div class="panel-body">
           <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
