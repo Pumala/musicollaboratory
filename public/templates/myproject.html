@@ -178,7 +178,7 @@
       <p>Thanks. Your request was successfully sent.</p>
     </div>
 
-    <form class="requests" ng-show="(userInfo.requests.indexOf(project._id) === -1) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0) && (!project.completed)" ng-submit="requestContribute()">
+    <form class="requests" ng-show="(userInfo.requests.indexOf(project._id) < 0) && (rootUsername !== project.owner) && (project.members.indexOf(rootUsername) < 0) && (!project.completed)" ng-submit="requestContribute()">
       <div class="well">
         <h2>Request to contribute</h2>
         <div class="select">
