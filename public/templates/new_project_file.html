@@ -5,6 +5,7 @@
 
   <form ng-controller="FileController">
     <h3 class="muted">Samples can be lyrics, melodies, and song tracks. You'll have a chance to add more files later if you're not ready.</h3>
+    <p class="tinyP muted">Please choose a file with one of the following extensions: doc, docx, txt, pdf, rtf, mp3, wav, m4a.</p>
     <div class="fileDiv">
       <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
       <input type="file" nv-file-select="" uploader="uploader" />
