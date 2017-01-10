@@ -41,20 +41,6 @@ app.use(express.static('public'));
 mongoose.connect('mongodb://localhost/musicollab_db');
 
 // Schemas
-// const User = mongoose.model( 'User', {
-//   _id: { type: String, required: true, unique: true }, // username
-//   firstName: { type: String, required: true },
-//   lastName: { type: String, required: true },
-//   email: { type: String, required: true },
-//   password: { type: String },
-//   joined: Date,
-//   bio: String,
-//   avatar: String,
-//   musicanType: [String], // Melody, Lyrics, Voice, Production
-//   projects: [ ObjectId ], // Project Id
-//   requests: [ ObjectId ], // Request Id
-//   token: { id: String, expires: Date } // token
-// });
 const User = mongoose.model( 'User', {
   _id: { type: String, required: true, unique: true }, // username
   firstName: { type: String, required: true },
@@ -106,8 +92,6 @@ const Project = mongoose.model('Project', {
   comments: [ObjectId]
 });
 
-// comments: [12313132131312313]
-
 const Comment = mongoose.model('Comment', {
   content: String,
   date: Date,
@@ -124,15 +108,6 @@ const Message = mongoose.model('Message', {
     date: Date,
     request: Boolean
 });
-
-// const Message = mongoose.model('Message', {
-//     projectId: ObjectId,
-//     to: { type: String, required: true },
-//     from: { type: String, required: true },
-//     requestTypes: Object, // Melody, Lyrics, Voice, Production
-//     description: String,
-//     date: Date
-// });
 
 // TO DO !!!!!!!!!!!!!!!!
 // update project detail page => edit project page
@@ -160,11 +135,6 @@ function getTypes(typesArr) {
 //          ADD NEW COMMENT TO PROJECT
 // ******************************************
 app.post('/api/comment/new', function(request, response) {
-  // const Comment = mongoose.model('Comment', {
-  //   content: String,
-  //   date: Date,
-  //   author: String
-  // });
 
   var author = request.body.author;
   var content = request.body.content;
@@ -1522,7 +1492,7 @@ app.put('/api/request/accept', function(request, response) {
 
   var newOutbox = new Message({
       projectId: projectId,
-      projectName: projectName, 
+      projectName: projectName,
       to: username,
       from: projectOwner,
       requestTypes: acceptedTypes2, // Melody, Lyrics, Voice, Production
