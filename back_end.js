@@ -41,6 +41,20 @@ app.use(express.static('public'));
 mongoose.connect('mongodb://localhost/musicollab_db');
 
 // Schemas
+// const User = mongoose.model( 'User', {
+//   _id: { type: String, required: true, unique: true }, // username
+//   firstName: { type: String, required: true },
+//   lastName: { type: String, required: true },
+//   email: { type: String, required: true },
+//   password: { type: String },
+//   joined: Date,
+//   bio: String,
+//   avatar: String,
+//   musicanType: [String], // Melody, Lyrics, Voice, Production
+//   projects: [ ObjectId ], // Project Id
+//   requests: [ ObjectId ], // Request Id
+//   token: { id: String, expires: Date } // token
+// });
 const User = mongoose.model( 'User', {
   _id: { type: String, required: true, unique: true }, // username
   firstName: { type: String, required: true },
@@ -52,7 +66,9 @@ const User = mongoose.model( 'User', {
   avatar: String,
   musicanType: [String], // Melody, Lyrics, Voice, Production
   projects: [ ObjectId ], // Project Id
-  requests: [ ObjectId ], // Request Id
+  inbox: [ ObjectId ], // Request Id
+  outbox: [ ObjectId ],
+  requests: [ ObjectId ],
   token: { id: String, expires: Date } // token
 });
 
@@ -90,7 +106,7 @@ const Project = mongoose.model('Project', {
   comments: [ObjectId]
 });
 
-comments: [12313132131312313]
+// comments: [12313132131312313]
 
 const Comment = mongoose.model('Comment', {
   content: String,
@@ -100,6 +116,7 @@ const Comment = mongoose.model('Comment', {
 
 const Message = mongoose.model('Message', {
     projectId: ObjectId,
+    projectName: String,
     to: { type: String, required: true },
     from: { type: String, required: true },
     requestTypes: [String], // Melody, Lyrics, Voice, Production
@@ -475,6 +492,8 @@ app.post('/api/signup', function(request, response) {
         avatar: "default_user_avatar.png",
         musicanType: [],
         projects: [],
+        inbox: [],
+        outbox: [],
         requests: [],
         token: { id: randomToken, expires: expiresDate}
       });
@@ -569,54 +588,34 @@ app.get('/api/project/:projectid/:username', function(request, response) {
   }
 
   // make a query to check if user has already requested to contribute
-  User.findOne({ _id: username })
-    .then(function(userInfo) {
-      var userRequests = userInfo.requests;
-      console.log('what am i doing',userInfo);
-
-      return Message.find({
-        _id: {
-          $in: userRequests
-        }
-      });
-    })
-    .then(function(userRequestInfo) {
-      // console.log('INFO INFO INFO:', userRequestInfo);
-      var alreadyRequested = false;
-
-      userRequestInfo.forEach(function(request) {
-        if (String(request.projectId) === String(projectId)) {
-          console.log('YES YES YES YES');
-          alreadyRequested = true;
-        }
-      });
-
-      return [ Project.findOne({ _id: projectId }), alreadyRequested]
-    })
-    .spread(function(projectInfo, alreadyRequested) {
-      console.log('projectInfo::', projectInfo.files);
+  bluebird.all([
+      Project.findOne({ _id: projectId }),
+      User.findOne({ _id: username })
+    ])
+    .spread(function(projectInfo, userInfo) {
       var projectFiles = projectInfo.files;
       var projectComments = projectInfo.comments;
 
       var projectAvatar = projectInfo.avatar;
 
-      return [projectInfo, alreadyRequested, File.find({
-        _id: {
-          $in: projectFiles
-        }
-      }), Comment.find({
-        _id: {
-          $in: projectComments
-        }
-      }), File.findOne({ _id: projectAvatar }) ];
+      return [ projectInfo, userInfo, File.find({
+          _id: {
+            $in: projectFiles
+          }
+        }), Comment.find({
+          _id: {
+            $in: projectComments
+          }
+        }), File.findOne({ _id: projectAvatar })
+      ];
     })
-    .spread(function(projectInfo, alreadyRequested, allFiles, allComments, projectAvatar) {
+    .spread(function(projectInfo, userInfo, allFiles, allComments, projectAvatar) {
       console.log('all the files::', allFiles);
       return response.json({
         allFiles: allFiles,
         allComments: allComments,
         projectInfo: projectInfo,
-        alreadyRequested: alreadyRequested,
+        userInfo: userInfo,
         projectAvatar: projectAvatar
       });
     })
@@ -627,6 +626,70 @@ app.get('/api/project/:projectid/:username', function(request, response) {
         error: err.message
       });
     });
+
+
+  // // make a query to check if user has already requested to contribute
+  // User.findOne({ _id: username })
+  //   .then(function(userInfo) {
+  //     var userRequests = userInfo.requests;
+  //     console.log('what am i doing',userInfo);
+  //     console.log('Project id :', projectId);
+  //
+  //     return Message.find({
+  //       _id: {
+  //         $in: userRequests
+  //       }
+  //     });
+  //   })
+  //   .then(function(userRequestInfo) {
+  //     // console.log('INFO INFO INFO:', userRequestInfo);
+  //     // var alreadyRequested = false;
+  //     // console.log('BE GOOD');
+  //     // console.log(userRequestInfo);
+  //     // userRequestInfo.forEach(function(request) {
+  //     // console.log('GOT YOUR NOSE!');
+  //     //   if (String(request.projectId) === String(projectId)) {
+  //     //     console.log('YES YES YES YES');
+  //     //     alreadyRequested = true;
+  //     //   }
+  //     // });
+  //
+  //     return [ Project.findOne({ _id: projectId }), alreadyRequested]
+  //   })
+  //   .spread(function(projectInfo, alreadyRequested) {
+  //     console.log('projectInfo::', projectInfo.files);
+  //     var projectFiles = projectInfo.files;
+  //     var projectComments = projectInfo.comments;
+  //
+  //     var projectAvatar = projectInfo.avatar;
+  //
+  //     return [projectInfo, alreadyRequested, File.find({
+  //       _id: {
+  //         $in: projectFiles
+  //       }
+  //     }), Comment.find({
+  //       _id: {
+  //         $in: projectComments
+  //       }
+  //     }), File.findOne({ _id: projectAvatar }) ];
+  //   })
+  //   .spread(function(projectInfo, alreadyRequested, allFiles, allComments, projectAvatar) {
+  //     console.log('all the files::', allFiles);
+  //     return response.json({
+  //       allFiles: allFiles,
+  //       allComments: allComments,
+  //       projectInfo: projectInfo,
+  //       alreadyRequested: alreadyRequested,
+  //       projectAvatar: projectAvatar
+  //     });
+  //   })
+  //   .catch(function(err) {
+  //     console.log(err.message);
+  //     response.status(500);
+  //     response.json({
+  //       error: err.message
+  //     });
+  //   });
 
 
 });
@@ -940,6 +1003,7 @@ app.post('/api/request/new', function(request, response) {
   var requestTypes = data.request;
   var projectId = data.projectId;
   var description = data.description;
+  var projectName = data.projectName;
 
   var requestTypes = getTypes([requestTypes]);
 
@@ -948,8 +1012,9 @@ app.post('/api/request/new', function(request, response) {
   console.log(sender);
   console.log('types: ', requestTypes);
 
-  var newMessage = new Message({
+  var newInbox = new Message({
     projectId: projectId,
+    projectName: projectName,
     to: projectOwner,
     from: sender,
     requestTypes: requestTypes,
@@ -958,22 +1023,53 @@ app.post('/api/request/new', function(request, response) {
     request: true
   });
 
-  bluebird.all([ User.findOne({ _id: sender }), newMessage.save() ])
-    .spread(function(userInfo, newRequest) {
-      var requestId = newRequest._id;
-      var userRequests = userInfo.requests;
+  var newOutbox = new Message({
+    projectId: projectId,
+    projectName: projectName,
+    to: projectOwner,
+    from: sender,
+    requestTypes: requestTypes,
+    description: description,
+    date: new Date(),
+    request: true
+  });
 
-      userRequests.push(requestId);
-      console.log(userRequests);
-      return User.update({
-        _id: sender
-      }, {
-        $set: {
-          requests: userRequests
-        }
-      });
+  bluebird.all([
+      User.findOne({ _id: projectOwner }),
+      User.findOne({ _id: sender }),
+      newInbox.save(),
+      newOutbox.save()
+    ])
+    .spread(function(projectOwnerInfo, userInfo, newOutbox, newInbox) {
+      var newOutboxId = newOutbox._id;
+      var userOutbox = userInfo.outbox;
+      var userRequests = userInfo.requests;
+      userRequests.push(projectId);
+
+      var newInboxId = newInbox._id;
+      var projectOwnerInbox = projectOwnerInfo.inbox;
+
+      userOutbox.push(newOutboxId);
+      projectOwnerInbox.push(newInboxId);
+
+      // console.log(userRequests);
+      return [ User.update({
+          _id: sender
+        }, {
+          $set: {
+            outbox: userOutbox,
+            requests: userRequests
+          }
+        }), User.update({
+          _id: projectOwner
+        }, {
+          $set: {
+            inbox: projectOwnerInbox
+          }
+        })
+      ];
     })
-    .then(function(updatedUser) {
+    .spread(function(updatedUser, updatedProjectOwner) {
       return response.json({
         message: 'success adding new request!'
       })
@@ -999,51 +1095,83 @@ app.get('/api/get/requests/:username', function(request, response) {
 
   var username = request.params.username;
 
-  bluebird.all([
-    Message.find({ from: username}),
-    Message.find({ to: username })
-  ])
-    .spread(function(sendRequests, receiveRequests) {
+  User.findOne({ _id: username })
+    .then(function(userInfo) {
+      var userInbox = userInfo.inbox;
+      var userOutbox = userInfo.outbox;
 
-      var sendProjectsArr = [];
+      console.log('inbox inbox inbox:', userInbox);
 
-      sendRequests.forEach(function(request) {
-        sendProjectsArr.push(request.projectId);
-      });
-
-      var receiveProjectsArr = [];
-
-      receiveRequests.forEach(function(request) {
-        receiveProjectsArr.push(request.projectId);
-      });
-
-      return [ Project.find({
+      return [ Message.find({
         _id: {
-          $in: receiveProjectsArr
+          $in: userInbox
         }
-      }), Project.find({
-        _id: {
-          $in: sendProjectsArr
-        }
-      }), receiveRequests, sendRequests ];
-
+      }), Message.find({
+          _id: {
+            $in: userOutbox
+          }
+        })
+      ];
     })
-    .spread(function(receiveProjects, sendProjects, receiveRequests, sendRequests) {
-
+    .spread(function(inbox, outbox) {
       return response.json({
-        receiveProjects: receiveProjects,
-        sendProjects: sendProjects,
-        receiveRequests: receiveRequests,
-        sendRequests: sendRequests
+        inbox: inbox,
+        outbox: outbox
       });
     })
     .catch(function(err) {
-    console.log('error retrieving all the requests:', err.message);
-    response.status(500);
-    response.json({
-      error: err.message
+      console.log('error retrieving all the requests:', err.message);
+      response.status(500);
+      response.json({
+        error: err.message
+      });
     });
-    });
+
+  // bluebird.all([
+  //   Message.find({ from: username}),
+  //   Message.find({ to: username })
+  // ])
+  //   .spread(function(sendRequests, receiveRequests) {
+  //
+  //     var sendProjectsArr = [];
+  //
+  //     sendRequests.forEach(function(request) {
+  //       sendProjectsArr.push(request.projectId);
+  //     });
+  //
+  //     var receiveProjectsArr = [];
+  //
+  //     receiveRequests.forEach(function(request) {
+  //       receiveProjectsArr.push(request.projectId);
+  //     });
+  //
+  //     return [ Project.find({
+  //       _id: {
+  //         $in: receiveProjectsArr
+  //       }
+  //     }), Project.find({
+  //       _id: {
+  //         $in: sendProjectsArr
+  //       }
+  //     }), receiveRequests, sendRequests ];
+  //
+  //   })
+  //   .spread(function(receiveProjects, sendProjects, receiveRequests, sendRequests) {
+  //
+  //     return response.json({
+  //       receiveProjects: receiveProjects,
+  //       sendProjects: sendProjects,
+  //       receiveRequests: receiveRequests,
+  //       sendRequests: sendRequests
+  //     });
+  //   })
+  //   .catch(function(err) {
+  //     console.log('error retrieving all the requests:', err.message);
+  //     response.status(500);
+  //     response.json({
+  //       error: err.message
+  //     });
+  //   });
 
 });
 
@@ -1255,8 +1383,20 @@ app.post('/api/request/decline', function(request, response) {
   console.log('wanna delete and send decline:', request.body);
   var requestInfo = request.body;
 
-  var newMessage = new Message({
+  var newInbox = new Message({
     projectId: requestInfo._id,
+    projectName: requestInfo.projectName,
+    to: requestInfo.from,
+    from: requestInfo.to,
+    requestTypes: requestInfo.requestTypes,
+    description: 'Sorry, unfortunately your request to join ' + requestInfo.projectName + ' has been declined.',
+    date: new Date(),
+    request: false
+  });
+
+  var newOutbox = new Message({
+    projectId: requestInfo._id,
+    projectName: requestInfo.projectName,
     to: requestInfo.from,
     from: requestInfo.to,
     requestTypes: requestInfo.requestTypes,
@@ -1266,38 +1406,42 @@ app.post('/api/request/decline', function(request, response) {
   });
 
   bluebird.all([
-    newMessage.save(),
+    newInbox.save(),
+    newOutbox.save(),
     Message.remove({ _id: requestInfo._id }),
     User.findOne({ _id: requestInfo.from }),
     User.findOne({ _id: requestInfo.to })
   ])
-  .spread(function(newMessage, deletedRequest, declinedUserInfo, projectOwnerInfo) {
-    console.log('new message here: ', newMessage);
+  .spread(function(newInbox, newOutbox, deletedRequest, declinedUserInfo, projectOwnerInfo) {
     console.log('user info here:', declinedUserInfo);
-    var messageId = newMessage._id;
-    var messagesArr = declinedUserInfo.requests;
-    messagesArr.push(messageId);
+    var newInboxId = newInbox._id;
+    var userInbox = declinedUserInfo.inbox;
+    userInbox.push(newInboxId);
 
-    var projectOwnerRequests = projectOwnerInfo.requests;
-    console.log('project owner info', projectOwnerInfo);
-    console.log('array of project owner requests: ', projectOwnerRequests);
+    var projectOwnerOutbox = projectOwnerInfo.outbox;
+    var newOutboxId = newOutbox._id;
+    projectOwnerOutbox.push(newOutboxId);
+
+    console.log('project owner info', projectOwnerOutbox);
+
+    // console.log('array of project owner requests: ', projectOwnerRequests);
     // remove the decline request from the project owner
-    var removeIndex = projectOwnerRequests.indexOf(requestInfo._id);
-    projectOwnerRequests.splice(removeIndex, 1);
+    // var removeIndex = projectOwnerOutbox.indexOf(requestInfo._id);
+    // projectOwnerOutbox.splice(removeIndex, 1);
 
-    console.log('updated array of project owner requests: ', projectOwnerRequests);
+    console.log('updated array of project owner requests: ', projectOwnerOutbox);
 
     return [ User.update({
         _id: requestInfo.from
       }, {
         $set: {
-          requests: messagesArr
+          inbox: userInbox
         }
       }), User.update({
         _id: requestInfo.to
       }, {
         $set: {
-          requests: projectOwnerRequests
+          outbox: projectOwnerOutbox
         }
       })
     ];
@@ -1365,8 +1509,9 @@ app.put('/api/request/accept', function(request, response) {
 
   var note = "Your request for contributing " + acceptedTypes2 + " for " + projectName + " has been approved.";
 
-  var newMessage = new Message({
+  var newInbox = new Message({
       projectId: projectId,
+      projectName: projectName,
       to: username,
       from: projectOwner,
       requestTypes: acceptedTypes2, // Melody, Lyrics, Voice, Production
@@ -1375,15 +1520,34 @@ app.put('/api/request/accept', function(request, response) {
       request: false
   });
 
-  newMessage.save();
+  var newOutbox = new Message({
+      projectId: projectId,
+      projectName: projectName, 
+      to: username,
+      from: projectOwner,
+      requestTypes: acceptedTypes2, // Melody, Lyrics, Voice, Production
+      description: note,
+      date: new Date(),
+      request: false
+  });
 
 // delete request
   bluebird.all([
+    newInbox.save(),
+    newOutbox.save(),
     Message.remove({ _id: requestId }),
     Project.findOne( { _id: projectId}),
-    User.findOne( { _id: username} )
+    User.findOne({ _id: username }),
+    User.findOne({ _id: projectOwner }),
    ])
-    .spread(function(acceptRequest, acceptProject, acceptUser) {
+    .spread(function(newInbox, newOutbox, acceptRequest, acceptProject, acceptUser, projectOwner) {
+      var newInboxId = newInbox._id;
+      var newOutboxId = newOutbox._id;
+      var userInbox = acceptUser.inbox;
+      var projectOwnerOutbox = projectOwner.outbox;
+      projectOwnerOutbox.push(newOutboxId);
+      userInbox.push(newInboxId);
+
       console.log('project info:', acceptProject);
       console.log('USER INFO', acceptUser.projects);
 
@@ -1425,10 +1589,16 @@ app.put('/api/request/accept', function(request, response) {
         _id: username
         }, {
           $set: {
-            projects: projectsArr
+            projects: projectsArr,
+            inbox: userInbox
           }
-        }),
-        Project.update({
+        }), User.update({
+          _id: projectOwner
+          }, {
+            $set: {
+              outbox: projectOwnerOutbox
+            }
+          }), Project.update({
           _id: projectId
         }, {
           $set: {
@@ -1439,7 +1609,7 @@ app.put('/api/request/accept', function(request, response) {
         })
       ];
     })
-    .spread(function(updatedUser, updatedProject) {
+    .spread(function(updatedUser, updatedProjectOwner, updatedProject) {
       console.log('updated user:', updatedUser);
       console.log('updated project:', updatedProject);
 

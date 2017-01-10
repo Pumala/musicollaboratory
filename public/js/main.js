@@ -465,35 +465,40 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
   $scope.loadRequestPage = function() {
     MusicFactory.getRequests()
       .then(function(results) {
-        console.log('pending.....', results);
-        $scope.receiveRequests = results.data.receiveRequests;
-        $scope.receiveProjects = results.data.receiveProjects;
-        $scope.sendRequests = results.data.sendRequests;
-        $scope.sendProjects = results.data.sendProjects;
+        console.log("INBOX:", results.data.inbox);
+        console.log("OUTBOX:", results.data.outbox);
+        $scope.inbox = results.data.inbox;
+        $scope.outbox = results.data.outbox;
 
-        $scope.receiveRequests.forEach(function(request, index) {
-          $scope.receiveProjects.forEach(function(project) {
-            if (String(request.projectId) === String(project._id)) {
-              request.projectName = project.name;
-              request.acceptedRequestTypes = {};
-            } else {
-              console.log('NOPEE');
-            }
-          });
-        });
+        // console.log('pending.....', results);
+        // $scope.receiveRequests = results.data.receiveRequests;
+        // $scope.receiveProjects = results.data.receiveProjects;
+        // $scope.sendRequests = results.data.sendRequests;
+        // $scope.sendProjects = results.data.sendProjects;
+        //
+        // $scope.receiveRequests.forEach(function(request, index) {
+        //   $scope.receiveProjects.forEach(function(project) {
+        //     if (String(request.projectId) === String(project._id)) {
+        //       request.projectName = project.name;
+        //       request.acceptedRequestTypes = {};
+        //     } else {
+        //       console.log('NOPEE');
+        //     }
+        //   });
+        // });
+        //
+        // $scope.sendRequests.forEach(function(request, index) {
+        //   $scope.sendProjects.forEach(function(project) {
+        //     if (String(request.projectId) === String(project._id)) {
+        //       request.projectName = project.name;
+        //     } else {
+        //       console.log('NOPEE');
+        //     }
+        //   });
+        // });
 
-        $scope.sendRequests.forEach(function(request, index) {
-          $scope.sendProjects.forEach(function(project) {
-            if (String(request.projectId) === String(project._id)) {
-              request.projectName = project.name;
-            } else {
-              console.log('NOPEE');
-            }
-          });
-        });
-
-        console.log('receiving:', $scope.receiveRequests);
-        console.log('sending:', $scope.sendRequests);
+        // console.log('receiving:', $scope.receiveRequests);
+        // console.log('sending:', $scope.sendRequests);
 
       })
       .catch(function(err) {
@@ -519,6 +524,7 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
 
   $scope.declineRequest = function(requestInfo) {
     console.log('hellowwww');
+    console.log('reqestedInfo:', requestInfo);
     MusicFactory.declineRequest(requestInfo)
       .then(function(results) {
         console.log('success deleting the old request::', results);
@@ -977,7 +983,7 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
         $scope.allComments = results.data.allComments;
         $scope.projectAvatar = results.data.projectAvatar;
 
-        $scope.alreadyRequested = results.data.alreadyRequested;
+        $scope.userInfo = results.data.userInfo;
         $scope.project = results.data.projectInfo;
         $scope.projectId = results.data.projectInfo._id;
         $scope.owner = results.data.projectInfo.owner;
@@ -1067,7 +1073,8 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
         owner: $scope.owner,
         description: $scope.description,
         request: $scope.requestedTypes,
-        projectId: $scope.projectId
+        projectId: $scope.projectId,
+        projectName: $scope.project.name
       };
       console.log('here are the request types::', requestTypes);
 

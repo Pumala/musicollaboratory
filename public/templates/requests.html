@@ -10,37 +10,37 @@
 
     <div class="inboundMessages">
 
-      <div ng-repeat="request in receiveRequests" ng-show="request.request" class="panel panel-default">
+      <div ng-repeat="message in inbox" ng-show="message.request" class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
-          <button class="pull-right btn btn-success" ng-click="acceptRequest(request._id, request.projectId, request.from, request.projectName, request.acceptedRequestTypes)">Accept</button>
-          <button class="pull-right btn btn-danger" ng-click="declineRequest(request)">Decline</button>
+          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: message.from })"><strong>{{message.from}}</strong></a></h3>
+          <button class="pull-right btn btn-success" ng-click="acceptRequest(message._id, message.projectId, message.from, message.projectName, message.acceptedRequestTypes)">Accept</button>
+          <button class="pull-right btn btn-danger" ng-click="declineRequest(message)">Decline</button>
         </div>
         <div class="panel-body">
-          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
-          <div class="options" ng-repeat="type in request.requestTypes">
+          <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: message.projectId })">{{message.projectName}}</a>:</h4>
+          <div class="options" ng-repeat="type in message.requestTypes">
             <label for="">{{type}}</label>
-            <input type="checkbox" ng-model="request.acceptedRequestTypes[type]" name="" value="">
+            <input type="checkbox" ng-model="message.acceptedRequestTypes[type]" name="" value="">
           </div>
           <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
-          <p>{{request.description}}</p>
+          <p>{{message.description}}</p>
         </div>
       </div>
 
-      <div ng-repeat="request in receiveRequests" ng-show="!request.request" class="panel panel-default">
+      <div ng-repeat="message in inbox" ng-show="!message.request" class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: request.from })"><strong>{{request.from}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="deleteRequest(request._id)">Delete</button>
+          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: message.from })"><strong>{{message.from}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id)">Delete</button>
         </div>
         <div class="panel-body">
-          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
-          <ul class="options" ng-repeat="type in request.requestTypes">
+          <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: message.projectId })">{{message.projectName}}</a>:</h4>
+          <ul class="options" ng-repeat="type in message.requestTypes">
             <li>{{type}}</li>
           </ul>
           <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
-          <p>{{request.description}}</p>
+          <p>{{message.description}}</p>
         </div>
       </div>
 
@@ -56,34 +56,34 @@
 
     <div class="outboundMessages">
 
-      <div ng-repeat="request in sendRequests" ng-show="request.request" class="panel panel-default">
+      <div ng-repeat="message in outbox" ng-show="message.request" class="panel panel-default">
         <div class="clear panel-heading">
-          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="deleteRequest(request._id)">Delete</button>
+          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: message.to })"><strong>{{message.to}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id)">Delete</button>
         </div>
         <div class="panel-body">
-          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: message.projectId })">{{message.projectName}}</a>:</h4>
           <ul>
-            <li ng-repeat="type in request.requestTypes">{{type}}</li>
+            <li ng-repeat="type in message.requestTypes">{{type}}</li>
           </ul>
           <!-- <span ng-repeat="type in request.requestTypes">{{type}}, </span> -->
-          <p>{{request.description}}</p>
+          <p>{{message.description}}</p>
         </div>
       </div>
 
-      <div ng-repeat="request in sendRequests" ng-show="!request.request" class="panel panel-default">
+      <div ng-repeat="message in outbox" ng-show="!message.request" class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: request.to })"><strong>{{request.to}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="deleteRequest(request._id)">Delete</button>
+          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: message.to })"><strong>{{message.to}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id)">Delete</button>
         </div>
         <div class="panel-body">
-          <p>{{ request.date | date : 'MMM dd, yyyy'}}</p>
-          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: request.projectId })">{{request.projectName}}</a>:</h4>
+          <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>
+          <h4>Interested in contributing to <a class="red" ui-sref="myproject({ project_id: message.projectId })">{{message.projectName}}</a>:</h4>
           <ul class="options">
-            <li ng-repeat="type in request.requestTypes">{{type}}</li>
+            <li ng-repeat="type in message.requestTypes">{{type}}</li>
           </ul>
-          <p>{{request.description}}</p>
+          <p>{{message.description}}</p>
         </div>
       </div>
 
