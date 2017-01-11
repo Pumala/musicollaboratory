@@ -674,6 +674,9 @@ button.btn.btn-white {
   float: right;
   margin-top: -.5em
 }
+#profile .panelParent .fileDiv button {
+  margin: .5em;
+}
 #profile img {
   width: 100px;
 }
@@ -887,6 +890,9 @@ button.btn.btn-white {
   }
   #requests h1 {
     margin: 0;
+  }
+  #requests .header {
+    text-align: center;
   }
   #requests .inbound, #requests .outbound {
     width: 50%;

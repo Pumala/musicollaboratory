@@ -8,8 +8,8 @@
       <button ng-class="{ hide: !edit, showBtn: edit}" ng-click="saveProjectEdits(project._id)" class="btn btn-primary" name="button">Save</button>
       <div class="showInline" ng-hide="rootUsername !== project.owner">
         <button ng-click="deleteProject(project._id)" class="btn btn-default">Delete Project</button>
-        <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-purple">Mark as Completed</button>
-        <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-purple">Unmark as Completed</button>
+        <!-- <button ng-show="!isCompleted" ng-click="completeProject(project._id, true)" class="btn btn-purple">Mark as Completed</button>
+        <button ng-show="isCompleted" ng-click="completeProject(project._id, false)" class="btn btn-purple">Unmark as Completed</button> -->
       </div>
     </div>
 

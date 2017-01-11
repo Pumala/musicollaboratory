@@ -14,17 +14,17 @@
       <div ng-show="edit">
         <form ng-controller="UserAvatarController">
           <h3 class="muted tinyP">Please choose a file with one of the following extensions: png, jpg, txt, jpeg, bmp, tiff, gif, tif.</h3>
-          <div class="fileDiv">
+          <div class="clear fileDiv">
             <input type="hidden" ng-model="projectId" name="" value="{{projectInfo._id}}">
-            <input type="file" nv-file-select="" uploader="uploader" />
-            <button type="button" class="upload btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+            <input class="red" type="file" nv-file-select="" uploader="uploader" />
+            <button type="button" class="pull-left upload btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
                 Upload
             </button>
           </div>
         </form>
-        <div ng-show="avatarInfo" class="panel panel-body">
-          <p>{{avatarInfo.originalName}}</p>
-          <button ng-click="deleteUserAvatar(avatarInfo._id)" class="btn btn-default">Delete</button>
+        <div ng-show="avatarInfo" class="clear panel panel-body">
+          <p class="showInline pull-left">{{avatarInfo.originalName}}</p>
+          <button ng-click="deleteUserAvatar(avatarInfo._id)" class="pull-right btn btn-default">Delete</button>
         </div>
         <textarea ng-model="description" rows="8" placeholder="Add a bio..."></textarea>
       </div>

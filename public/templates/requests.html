@@ -3,7 +3,9 @@
   <hr class="dotted">
 
   <div class="inbound">
-    <h2 class="thick red">Inbox</h2>
+    <div class="header">
+      <h2 class="thick red">Inbox</h2>
+    </div>
     <div class="noRequests" ng-show="receiveRequests.length === 0">
       <h4>None at this time...</h4>
     </div>
@@ -49,7 +51,9 @@
   </div>
 
   <div class="outbound">
-    <h2 class="thick red">Outbox</h2>
+    <div class="header">
+      <h2 class="thick red">Outbox</h2>
+    </div>
     <div class="noRequests" ng-show="sendRequests.length === 0">
       <h4>None at this time...</h4>
     </div>
