@@ -540,10 +540,6 @@ button.btn.btn-white {
 /********************************************
                   SEARCH PAGE
 ********************************************/
-#search, #profile {
-  background-color: whitesmoke;
-  padding-bottom: 12em;
-}
 #playTrack {
   position: fixed;
   bottom: 0;
@@ -630,11 +626,13 @@ button.btn.btn-white {
 /********************************************
                   PROFILE
 ********************************************/
+#search, #profile {
+  background-color: whitesmoke;
+  padding-bottom: 12em;
+}
 #profile {
-  /*margin: 2em auto 20em auto;*/
   width: 100%;
   padding: 1em;
-  /*width: 92%;*/
 }
 #profile h1 {
   font-size: 1.5em;
