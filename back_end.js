@@ -109,17 +109,6 @@ const Message = mongoose.model('Message', {
     request: Boolean
 });
 
-// TO DO !!!!!!!!!!!!!!!!
-// update project detail page => edit project page
-// update request center page !!!!
-
-// const AuthToken = mongoose.model('AuthToken', {
-//   _id: { type: String, required: true, unique: true },
-//   expires: { type: Date, required: true }
-// });
-
-// require('./experiment/file.js')(app);
-
 function getTypes(typesArr) {
   var arr = [];
   for(var i = 0; i < typesArr.length; i++) {
@@ -253,7 +242,6 @@ app.post('/api/search/projects', function(request, response) {
     })
     .then(function(results) {
       console.log('HELLO!!!!');
-      // console.log('projects results:', results);
       return response.json(results);
     })
     .catch(function(err) {
@@ -263,17 +251,6 @@ app.post('/api/search/projects', function(request, response) {
         error: err.message
       });
     });
-
-  // Project.find({
-  //     $or: conditions
-  //   })
-  //   .then(function(results) {
-  //     console.log('projects results:', results);
-  //     return response.json(results);
-  //   })
-  //   .catch(function(err) {
-  //     console.log('error querying for projects:', err.message);
-  //   });
 
 });
 
@@ -528,8 +505,6 @@ app.get('/api/project/:projectid/:username', function(request, response) {
   var projectId = request.params.projectid;
   var username = request.params.username;
 
-  // console.log('PARAMS?', request.params);
-
   if (username === 'undefined' || username === null) {
     Project.findOne({ _id: projectId })
       .then(function(projectInfo) {
@@ -550,11 +525,11 @@ app.get('/api/project/:projectid/:username', function(request, response) {
       })
       .catch(function(err) {
         console.log('encountered err retrieving project details:', err.message);
-        // response.status(500);
-        // response.json({
-        //   error: err.message
-        // });
-      })
+        response.status(500);
+        response.json({
+          error: err.message
+        });
+      });
   }
 
   // make a query to check if user has already requested to contribute
@@ -596,71 +571,6 @@ app.get('/api/project/:projectid/:username', function(request, response) {
         error: err.message
       });
     });
-
-
-  // // make a query to check if user has already requested to contribute
-  // User.findOne({ _id: username })
-  //   .then(function(userInfo) {
-  //     var userRequests = userInfo.requests;
-  //     console.log('what am i doing',userInfo);
-  //     console.log('Project id :', projectId);
-  //
-  //     return Message.find({
-  //       _id: {
-  //         $in: userRequests
-  //       }
-  //     });
-  //   })
-  //   .then(function(userRequestInfo) {
-  //     // console.log('INFO INFO INFO:', userRequestInfo);
-  //     // var alreadyRequested = false;
-  //     // console.log('BE GOOD');
-  //     // console.log(userRequestInfo);
-  //     // userRequestInfo.forEach(function(request) {
-  //     // console.log('GOT YOUR NOSE!');
-  //     //   if (String(request.projectId) === String(projectId)) {
-  //     //     console.log('YES YES YES YES');
-  //     //     alreadyRequested = true;
-  //     //   }
-  //     // });
-  //
-  //     return [ Project.findOne({ _id: projectId }), alreadyRequested]
-  //   })
-  //   .spread(function(projectInfo, alreadyRequested) {
-  //     console.log('projectInfo::', projectInfo.files);
-  //     var projectFiles = projectInfo.files;
-  //     var projectComments = projectInfo.comments;
-  //
-  //     var projectAvatar = projectInfo.avatar;
-  //
-  //     return [projectInfo, alreadyRequested, File.find({
-  //       _id: {
-  //         $in: projectFiles
-  //       }
-  //     }), Comment.find({
-  //       _id: {
-  //         $in: projectComments
-  //       }
-  //     }), File.findOne({ _id: projectAvatar }) ];
-  //   })
-  //   .spread(function(projectInfo, alreadyRequested, allFiles, allComments, projectAvatar) {
-  //     console.log('all the files::', allFiles);
-  //     return response.json({
-  //       allFiles: allFiles,
-  //       allComments: allComments,
-  //       projectInfo: projectInfo,
-  //       alreadyRequested: alreadyRequested,
-  //       projectAvatar: projectAvatar
-  //     });
-  //   })
-  //   .catch(function(err) {
-  //     console.log(err.message);
-  //     response.status(500);
-  //     response.json({
-  //       error: err.message
-  //     });
-  //   });
-
 
 });
 
@@ -1052,10 +962,6 @@ app.post('/api/request/new', function(request, response) {
       });
     });
 
-
-
-  // return "request was added to db....."
-
 });
 
 // ********************************************
@@ -1096,52 +1002,6 @@ app.get('/api/get/requests/:username', function(request, response) {
         error: err.message
       });
     });
-
-  // bluebird.all([
-  //   Message.find({ from: username}),
-  //   Message.find({ to: username })
-  // ])
-  //   .spread(function(sendRequests, receiveRequests) {
-  //
-  //     var sendProjectsArr = [];
-  //
-  //     sendRequests.forEach(function(request) {
-  //       sendProjectsArr.push(request.projectId);
-  //     });
-  //
-  //     var receiveProjectsArr = [];
-  //
-  //     receiveRequests.forEach(function(request) {
-  //       receiveProjectsArr.push(request.projectId);
-  //     });
-  //
-  //     return [ Project.find({
-  //       _id: {
-  //         $in: receiveProjectsArr
-  //       }
-  //     }), Project.find({
-  //       _id: {
-  //         $in: sendProjectsArr
-  //       }
-  //     }), receiveRequests, sendRequests ];
-  //
-  //   })
-  //   .spread(function(receiveProjects, sendProjects, receiveRequests, sendRequests) {
-  //
-  //     return response.json({
-  //       receiveProjects: receiveProjects,
-  //       sendProjects: sendProjects,
-  //       receiveRequests: receiveRequests,
-  //       sendRequests: sendRequests
-  //     });
-  //   })
-  //   .catch(function(err) {
-  //     console.log('error retrieving all the requests:', err.message);
-  //     response.status(500);
-  //     response.json({
-  //       error: err.message
-  //     });
-  //   });
 
 });
 
@@ -1394,11 +1254,6 @@ app.post('/api/request/decline', function(request, response) {
 
     console.log('project owner info', projectOwnerOutbox);
 
-    // console.log('array of project owner requests: ', projectOwnerRequests);
-    // remove the decline request from the project owner
-    // var removeIndex = projectOwnerOutbox.indexOf(requestInfo._id);
-    // projectOwnerOutbox.splice(removeIndex, 1);
-
     console.log('updated array of project owner requests: ', projectOwnerOutbox);
 
     return [ User.update({
@@ -1632,17 +1487,6 @@ app.get('/api/project/file/upload/new/:projectId', function(request, response) {
       });
     });
 
-  // Project.findOne({ _id: projectId })
-  //   .then(function(projInfo) {
-  //     return response.json({
-  //       projInfo: projInfo
-  //     });
-  //     // console.log(projInfo);
-  //   })
-  //   .catch(function(err) {
-  //     console.log('encountered errors retrieving project data form upload:', err.message);
-  //   });
-
 });
 
 // *****************************************
@@ -1687,17 +1531,7 @@ app.delete('/api/:projectid/file/remove/:fileid', function(request, response) {
         error: err.message
       });
     });
-  // File.remove({ _id: fileId })
-  //   .then(function(removedFile) {
-  //     return response.json({
-  //       message: 'success deleting file!'
-  //     });
-  //   })
-  //   .catch(function(err) {
-  //     console.log('error removing file....', err.message);
-  //   });
 
-  // console.log('file ID:', fileId);
 });
 
 app.listen(3000, function() {
