@@ -43,7 +43,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
   })
   .state({
     name: 'requests',
-    url: '/profile/{username}/requests',
+    url: '/profile/{username}/messages',
     templateUrl: 'templates/requests.html',
     controller: 'RequestsController'
   })
