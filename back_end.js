@@ -129,6 +129,7 @@ app.post('/api/comment/new', function(request, response) {
   var content = request.body.content;
   var projectId = request.body.projectId;
 
+  // create a new instnace of a comment and save it to a variable
   var newComment = new Comment({
     content: content,
     date: new Date(),
@@ -136,6 +137,7 @@ app.post('/api/comment/new', function(request, response) {
   });
 
   // save new comment to the db
+  // find the project the comment was posted in
   bluebird.all([ newComment.save(), Project.findOne({ _id: projectId }) ])
     .spread(function(comment, project) {
       // assign comment id to a variable
@@ -146,7 +148,7 @@ app.post('/api/comment/new', function(request, response) {
       // add the comment id to the project comments array
       projectComments.push(commentId);
 
-      // update the projects comments in the db
+      // update the projects comments array in the db to include new comment
       return Project.update({
           _id: projectId
         }, {
@@ -173,23 +175,49 @@ app.post('/api/comment/new', function(request, response) {
 // ****************************************
 //         DELETE COMMENT FROM DB
 // ***************************************
-app.delete('/api/comment/delete/:commentid', function(request, response) {
+app.delete('/api/comment/delete/:commentid/:projectid', function(request, response) {
 
   var commentId = request.params.commentid;
+  var projectId = request.params.projectid;
 
-  Comment.remove({ _id: commentId })
-    .then(function(results) {
-      return response.json({
-        message: 'successfully deleted comment from db'
-      });
-    })
-    .catch(function(err) {
-      console.log('experienced err deleting comment from db', err.message);
-      response.status(500);
-      response.json({
-        error: err.message
-      });
+  // remove the comment from the db
+  // find the project the comment belongs to
+  bluebird.all([
+    Comment.remove({ _id: commentId }),
+    Project.findOne({ _id: projectId })
+  ])
+  .then(function(removedComment, projectInfo) {
+    // save the project comments to a variable
+    var projectComments = projectInfo.comments;
+
+    // find the index of the comment id in the projects comments array
+    var removeIndex = projectComments.indexOf(commentId);
+    // remove the comment id from the projects comments array by the index
+    projectComments.splice(removeIndex, 1);
+
+    // update the project info with the updated projects comments
+    // that no longer has the comment id in it
+    return Project.update({
+      _id: projectId
+    }, {
+      $set: {
+        comments: projectComments
+      }
     });
+
+  })
+  .then(function(updatedProject) {
+    return response.json({
+      message: 'successfully deleted comment from db'
+    });
+  })
+  .catch(function(err) {
+    console.log('experienced err deleting comment from db', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
+  });
 
 });
 
@@ -198,9 +226,11 @@ app.delete('/api/comment/delete/:commentid', function(request, response) {
 // *******************************
 app.get('/api/search/allprojects', function(request, response) {
 
+  // for now we find projects (max 20) in the db
   Project.find().limit(20)
     .then(function(allProjects) {
       console.log('all the projects:', allProjects);
+      // send all the projects to the front end
       return response.json(allProjects)
     })
     .catch(function(err) {
@@ -232,48 +262,56 @@ app.post('/api/search/projects', function(request, response) {
     }
   };
 
+  // find projects that meet any of the conditions (types) and is not yet completed
   Project.find({
-      $or: conditions,
-      $and: [
-        {
+    $or: conditions,
+    $and: [
+      {
         completed: false
       }
-      ]
-    })
-    .then(function(results) {
-      console.log('HELLO!!!!');
-      return response.json(results);
+    ]
+  })
+  .then(function(results) {
+    console.log('HELLO!!!!');
+    return response.json(results);
+  })
+  .catch(function(err) {
+    console.log('error querying for projects:', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
+  });
+
+});
+
+// ********************************************************************
+//          DELETE PROJECT AND REMOVE PROJECT ID FROM USER PROJECTS
+// *******************************************************************
+app.put('/api/remove/project', function(request, response) {
+
+  var projectId = request.body._id;
+  var projectMembers = request.body.members;
+
+  // below make 2 QUERIES
+  // 1. update all users that have the project id in their projects array with the project id removed
+  // 2. remove the project from the db
+  bluebird.all([ User.update(
+      {},
+      { $pull: { projects: projectId } },
+      { multi: true }
+      ), Project.remove({ _id: projectId })
+    ])
+    .spread(function(updatedUsers, removedProject) {
+      return response.json("SUCCESS!!! removing project form db...");
     })
     .catch(function(err) {
-      console.log('error querying for projects:', err.message);
+      console.log('error removing project from db:', err.message);
       response.status(500);
       response.json({
         error: err.message
       });
     });
-
-});
-
-// ********************************
-//          DELETE PROJECT
-// *******************************
-app.delete('/api/remove/project/:projectid', function(request, response) {
-  console.log('PARAMS?',request.params);
-  var projectId = request.params.projectid;
-
-  Project.remove({ _id: projectId })
-    .then(function(removedProject) {
-      return response.json({
-        message: 'removed project from db'
-      })
-    })
-    .catch(function(err) {
-      console.log('encountered err removing project from db', err.message);
-      response.status(500);
-      response.json({
-        error: err.message
-      });
-    })
 
 });
 // *****************+++++++****************************

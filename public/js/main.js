@@ -241,12 +241,13 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
-  service.deleteProject = function(projectId) {
+  service.deleteProject = function(projectInfo) {
     console.log('do you know WHAT');
-    var url = '/api/remove/project/' + projectId;
+    var url = '/api/remove/project/';
     return $http({
-      method: 'DELETE',
-      url: url
+      method: 'PUT',
+      url: url,
+      data: projectInfo
     });
   };
 
@@ -295,8 +296,8 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
-  service.removeComment = function(commentId) {
-    var url = '/api/comment/delete/' + commentId;
+  service.removeComment = function(commentId, projectId) {
+    var url = '/api/comment/delete/' + commentId + '/' + projectId;
     return $http({
       method: 'DELETE',
       url: url
@@ -930,7 +931,7 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
     };
 
   $scope.deleteComment = function(commentId) {
-    MusicFactory.removeComment(commentId)
+    MusicFactory.removeComment(commentId, $scope.projectId)
       .then(function(results) {
         console.log('successfully deleted comment from db');
         $scope.loadProjectDetails();
@@ -971,11 +972,6 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
         console.log('updated PROJECT DETAIL info', results);
         // $scope.edit = results.data.editMode;
         console.log('what is edit before?', $scope.edit);
-        // if ($scope.edit === "true") {
-        //   $scope.edit = true;
-        // } else {
-        //   $scope.edit = false;
-        // }
         console.log('comment is a what......', $scope.editComment);
         console.log('loading edit', $scope.edit);
         // $scope.edit = false;
@@ -1039,7 +1035,8 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
     };
 
     $scope.deleteProject = function(projectId) {
-      MusicFactory.deleteProject(projectId)
+      console.log('lalalalalalala....', $scope.project);
+      MusicFactory.deleteProject($scope.project)
         .then(function(results) {
           console.log('any results removing project: ', results);
           $state.go('search');
