@@ -319,6 +319,8 @@ app.put('/api/remove/project', function(request, response) {
 // *****************+++++++***************************
 app.put('/api/comment/save', function(request, response) {
   console.log('saving comment::', request.body);
+
+  // update the comment content info
   Comment.update({
       _id: request.body.commentId
     }, {
@@ -347,6 +349,7 @@ app.put('/api/complete/project', function(request, response) {
   var projectId = request.body.projectId;
   var isCompleted = request.body.isCompleted;
 
+  // update the project completed status: boolean value
   Project.update({
       _id: projectId
     }, {
@@ -382,6 +385,7 @@ app.put('/api/edit/project', function(request, response) {
   var hasTypes = request.body.projectInfo.has;
   var needsTypes = request.body.projectInfo.needs;
 
+  // update a project's description, along with types it currently has and types they are seeking
   Project.update({
       _id: projectId
     }, {
@@ -415,6 +419,7 @@ app.put('/api/edit/user/bio', function(request, response) {
   var bio = request.body.bio;
   var username = request.body.username;
 
+  // update the user's bio content
   User.update({
       _id: username
     }, {
@@ -483,6 +488,7 @@ app.post('/api/signup', function(request, response) {
         token: { id: randomToken, expires: expiresDate}
       });
 
+      // save the new user to the db
       return newUser.save();
     })
     .then(function(newUser) {
@@ -512,6 +518,7 @@ app.put('/api/logout', function(request, response) {
   var username = request.body.username;
   var tokenId = request.body.token;
 
+  // update the user's token to an empty string and set its expirattion date to null
   User.update({
       _id: username
     }, {
@@ -538,39 +545,9 @@ app.put('/api/logout', function(request, response) {
 // *******************************
 app.get('/api/project/:projectid/:username', function(request, response) {
 
-  console.log('getting RED project details::', request.params);
-
   var projectId = request.params.projectid;
   var username = request.params.username;
 
-  if (username === 'undefined' || username === null) {
-    Project.findOne({ _id: projectId })
-      .then(function(projectInfo) {
-        console.log('VIOLET');
-        var projectFiles = projectInfo.files;
-        return [ File.find({
-          _id: {
-            $in: projectFiles
-          }
-        }), projectInfo ];
-      })
-      .spread(function(allFiles, projectInfo) {
-        console.log('GREEN');
-        return response.json({
-          allFiles: allFiles,
-          projectInfo: projectInfo
-        });
-      })
-      .catch(function(err) {
-        console.log('encountered err retrieving project details:', err.message);
-        response.status(500);
-        response.json({
-          error: err.message
-        });
-      });
-  }
-
-  // make a query to check if user has already requested to contribute
   bluebird.all([
       Project.findOne({ _id: projectId }),
       User.findOne({ _id: username })
@@ -611,8 +588,6 @@ app.get('/api/project/:projectid/:username', function(request, response) {
     });
 
 });
-
-
 
 // ******************************************************
 //         CREATE/UPLOAD NEW USER AVATAR FILE
