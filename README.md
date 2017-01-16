@@ -109,7 +109,7 @@ Users can create music projects, request to contribute to them and, if accepted,
 
   ![home](public/images/outbox_after_approval.png)
 
-#####  16. Messages Page (Signed in as kirk) => '/profile/:username:messsages'
+#####  16. Messages Page (Signed in as kirk) => '/profile/:username:messages'
 
   ![home](public/images/kirk_messages.png)
 
@@ -131,6 +131,107 @@ Users can create music projects, request to contribute to them and, if accepted,
 
 
 ## Code Snippets (backend)
+
+As we're adding comments in the back_end.js file, we're encountering places in our code that require a clean-up.
+
+#### Example 1:
+
+Before we made only a query to delete the project from the db. Then we realized we forgot to clean up all traces of it. For instance, the project was still connected to the old members of the project. So, we needed to make another query that removed the project id from these members' projects array.
+
+To accomplish this, we made a query to update all the members' projects arrays using the $pull operator. The $pull operator eliminates a specific value from the field that you choose. In the code below, we remove the projectId that is found anywhere in the members' projects arrays. We also set the multi parameter to true, which will allow us to update more than 1 document.
+
+```
+bluebird.all([ User.update(
+    {
+      _id: {
+      $in: projectMembers
+      }
+    },
+    { $pull: { projects: projectId } },
+    { multi: true }
+    ), Project.remove({ _id: projectId })
+  ])
+  .spread(function(updatedUsers, removedProject) {
+    return response.json("SUCCESS!!! removing project form db...");
+  })
+  .catch(function(err) {
+    console.log('error removing project from db:', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
+  });
+
+```
+
+For example, below.....
+
+#### Example 2:
+
+Here is another place that we refactored. Originally, we made a query to find the project info using the project id. That query then returns the project info. Afterward, we saved the return value to a variable and pushed the filename to the array ( project files). Then we proceeded to make another query to update the project's files.
+
+Original Code
+
+```
+bluebird.all([
+    newFile.save(),
+    Project.findOne({ _id: projectId })
+  ])
+  .spread(function(savedFile, projectInfo) {
+    var updatedFiles = projectInfo.files;
+
+    updatedFiles.push(filename); // add filename hash
+
+    return Project.update({
+      _id: projectId
+    }, {
+      $set: {
+        files: updatedFiles
+      }
+    });
+
+  })
+  .then(function(updatedProject) {
+    return response.json({
+      message: 'success saving new avatar to project in db'
+    });
+  })
+  .catch(function(err) {
+    console.log('encountered error saving file to user info:', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
+  });
+
+```
+
+However, there is a simpler query that can achieve all this. Instead of querying to find the project info, we can instead make a query to update the project with the new value using the $addToSet operator. The $addToSet operator allows us the ability to add new values to a field, such as the projects files array in this case.   
+
+Refactored Code
+
+```
+bluebird.all([
+    newFile.save(),
+    Project.update(
+      { _id: projectId },
+      { $addToSet: { files: filename } }
+    )
+  ])
+  .spread(function(savedFile, updatedProject) {
+    return response.json({
+      message: 'success saving new avatar to project in db'
+    });
+  })
+  .catch(function(err) {
+    console.log('encountered error saving file to user info:', err.message);
+    response.status(500);
+    response.json({
+      error: err.message
+    });
+  });
+
+```
 
 ## Code Snippets (frontend)
 

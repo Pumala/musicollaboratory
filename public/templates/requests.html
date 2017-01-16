@@ -32,8 +32,8 @@
 
       <div ng-repeat="message in inbox" ng-show="!message.request" class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: message.from })"><strong>{{message.from}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id)">Delete</button>
+          <h3 class="showInline">From: <a class="red" ui-sref="profile({ username: message.to })"><strong>{{message.from}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id, 'inbox', message.to)">Delete</button>
         </div>
         <div class="panel-body">
           <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>
@@ -62,8 +62,8 @@
 
       <div ng-repeat="message in outbox" ng-show="message.request" class="panel panel-default">
         <div class="clear panel-heading">
-          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: message.to })"><strong>{{message.to}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id)">Delete</button>
+          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: message.from })"><strong>{{message.to}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id, 'outbox', message.from)">Delete</button>
         </div>
         <div class="panel-body">
           <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>
@@ -78,8 +78,8 @@
 
       <div ng-repeat="message in outbox" ng-show="!message.request" class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: message.to })"><strong>{{message.to}}</strong></a></h3>
-          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id)">Delete</button>
+          <h3 class="showInline">To: <a class="red" ui-sref="profile({ username: message.from })"><strong>{{message.to}}</strong></a></h3>
+          <button class="pull-right btn btn-danger" ng-click="deleteRequest(message._id, 'outbox', message.from)">Delete</button>
         </div>
         <div class="panel-body">
           <p>{{ message.date | date : 'MMM dd, yyyy'}}</p>

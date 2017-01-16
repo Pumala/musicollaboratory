@@ -294,10 +294,14 @@ app.put('/api/remove/project', function(request, response) {
   var projectMembers = request.body.members;
 
   // below make 2 QUERIES
-  // 1. update all users that have the project id in their projects array with the project id removed
+  // 1. update all project members that have the project id in their projects array with the project id removed
   // 2. remove the project from the db
   bluebird.all([ User.update(
-      {},
+      {
+        _id: {
+        $in: projectMembers
+        }
+      },
       { $pull: { projects: projectId } },
       { multi: true }
       ), Project.remove({ _id: projectId })
@@ -518,7 +522,7 @@ app.put('/api/logout', function(request, response) {
   var username = request.body.username;
   var tokenId = request.body.token;
 
-  // update the user's token to an empty string and set its expirattion date to null
+  // update the user's token to an empty string and set its expiration date to null
   User.update({
       _id: username
     }, {
@@ -548,16 +552,20 @@ app.get('/api/project/:projectid/:username', function(request, response) {
   var projectId = request.params.projectid;
   var username = request.params.username;
 
+  // make 2 QUERIES
+  // 1. find the project info
+  // 2. find the user info
   bluebird.all([
       Project.findOne({ _id: projectId }),
       User.findOne({ _id: username })
     ])
     .spread(function(projectInfo, userInfo) {
+      // assign the project files, comments, and avatar to variables
       var projectFiles = projectInfo.files;
       var projectComments = projectInfo.comments;
-
       var projectAvatar = projectInfo.avatar;
 
+      // use the variables above in the queries below
       return [ projectInfo, userInfo, File.find({
           _id: {
             $in: projectFiles
@@ -570,7 +578,6 @@ app.get('/api/project/:projectid/:username', function(request, response) {
       ];
     })
     .spread(function(projectInfo, userInfo, allFiles, allComments, projectAvatar) {
-      console.log('all the files::', allFiles);
       return response.json({
         allFiles: allFiles,
         allComments: allComments,
@@ -597,7 +604,6 @@ app.post('/api/upload/avatar/user/:username', upload.single('file'), function(re
   var username = request.params.username;
 
   var myFile = request.file;
-  // console.log('this is the file:', myFile);
 
   var originalName = myFile.originalname;
   var filename = myFile.filename;
@@ -608,10 +614,8 @@ app.post('/api/upload/avatar/user/:username', upload.single('file'), function(re
   var extension = originalName.split(".").pop();
   var fileType = null;
 
-  // offer 1 types => img file
-  console.log('exten???', extension);
-
-  var allImages = ["png", "jpg", "jpeg", "bmp", "tiff", "gif", "tiff"];
+  // all the supported image extensions in an array
+  var allImages = ["png", "jpg", "jpeg", "bmp", "tif", "gif", "tiff"];
 
   if (allImages.indexOf(extension.toLowerCase()) > -1) {
     fileType = "image";
@@ -633,19 +637,15 @@ app.post('/api/upload/avatar/user/:username', upload.single('file'), function(re
     type: fileType
   });
 
-  newFile.save();
-
-  console.log('ending Audio');
-
-  User.update({
-      _id: username
-    }, {
-      $set: {
-        avatar: filename
-      }
-    })
-    .then(function(userInfo) {
-      console.log('user user user......info', userInfo);
+  bluebird.all([ newFile.save(), User.update({
+        _id: username
+      }, {
+        $set: {
+          avatar: filename
+        }
+      })
+    ])
+    .spread(function(savedFile, updatedUser) {
       return response.json({
         message: 'sucesss adding new avatar to user info in db'
       })
@@ -660,9 +660,6 @@ app.post('/api/upload/avatar/user/:username', upload.single('file'), function(re
 
 });
 
-
-
-
 // ******************************************************
 //         CREATE/UPLOAD NEW PROJECT AVATAR FILE
 // *****************************************************
@@ -674,7 +671,6 @@ app.post('/api/upload/avatar/project/:projectid/:username', upload.single('file'
   var username = request.params.username;
 
   var myFile = request.file;
-  // console.log('this is the file:', myFile);
 
   var originalName = myFile.originalname;
   var filename = myFile.filename;
@@ -684,9 +680,6 @@ app.post('/api/upload/avatar/project/:projectid/:username', upload.single('file'
   var mimetype = myFile.mimetype;
   var extension = originalName.split(".").pop();
   var fileType = null;
-
-  // offer 1 types => img file
-  console.log('exten???', extension);
 
   var allImages = ["png", "jpg", "jpeg", "bmp", "tiff", "gif", "tif"];
 
@@ -710,19 +703,15 @@ app.post('/api/upload/avatar/project/:projectid/:username', upload.single('file'
     type: fileType
   });
 
-  newFile.save();
-
-  console.log('ending AVATAR FOR PROJECTS');
-
-  Project.update({
-      _id: projectId
-    }, {
-      $set: {
-        avatar: filename
-      }
-    })
-    .then(function(projectInfo) {
-      console.log('project......info', projectInfo);
+  bluebird.all([ newFile.save(), Project.update({
+        _id: projectId
+      }, {
+        $set: {
+          avatar: filename
+        }
+      })
+    ])
+    .spread(function(savedFile, updatedProjectInfo) {
       return response.json({
         message: 'sucesss adding new avatar to project in db'
       })
@@ -737,21 +726,15 @@ app.post('/api/upload/avatar/project/:projectid/:username', upload.single('file'
 
 });
 
-
-
 // *****************************************************
 //         CREATE/UPLOAD NEW DOCUMENT/ AUDIO FILES
 // ****************************************************
 app.post('/api/upload/:username/:projectid', upload.single('file'), function(request, response) {
 
-  console.log('inside AUDIO');
-
-  // hard-coded for now
   var username = request.params.username;
   var projectId = request.params.projectid;
 
   var myFile = request.file;
-  console.log('this is the file:', myFile);
   var originalName = myFile.originalname;
   var filename = myFile.filename;
   var path = myFile.path;
@@ -760,8 +743,8 @@ app.post('/api/upload/:username/:projectid', upload.single('file'), function(req
   var mimetype = myFile.mimetype;
   var extension = originalName.split(".").pop();
   var fileType = null;
-  // offer 2 types => docs or audio files
 
+  // offer 2 types => docs or audio files
   var allDocs = ["doc", "docx", "txt", "pdf", "rtf"];
   var allAudios = ["mp3", "wav", "m4a"];
 
@@ -787,27 +770,22 @@ app.post('/api/upload/:username/:projectid', upload.single('file'), function(req
     type: fileType
   });
 
-  newFile.save();
 
-  // make a query to find the project for which the file belongs to
-  // then update its files array
-  Project.findOne({ _id: projectId })
-    .then(function(projectInfo) {
-      var updatedFiles = projectInfo.files;
 
-      updatedFiles.push(filename); // add filename hash
-
-      return Project.update({
-        _id: projectId
-      }, {
-        $set: {
-          files: updatedFiles
-        }
+  // make 2 QUERIES
+  // 1. save the file to the db
+  // 2. update the project files array (use the $addToSet operator to push the filename to the array)
+  bluebird.all([
+      newFile.save(),
+      Project.update(
+        { _id: projectId },
+        { $addToSet: { files: filename } }
+      )
+    ])
+    .spread(function(savedFile, updatedProject) {
+      return response.json({
+        message: 'sucesss saving new avatar to project in db'
       });
-
-    })
-    .then(function() {
-      response.json('ok');
     })
     .catch(function(err) {
       console.log('encountered error saving file to user info:', err.message);
@@ -815,7 +793,7 @@ app.post('/api/upload/:username/:projectid', upload.single('file'), function(req
       response.json({
         error: err.message
       });
-    })
+    });
 
 });
 
@@ -900,11 +878,6 @@ app.post('/api/request/new', function(request, response) {
 
   var requestTypes = getTypes([requestTypes]);
 
-  console.log('requesting these types....', typeof projectId);
-  console.log(projectOwner);
-  console.log(sender);
-  console.log('types: ', requestTypes);
-
   var newInbox = new Message({
     projectId: projectId,
     projectName: projectName,
@@ -928,38 +901,20 @@ app.post('/api/request/new', function(request, response) {
   });
 
   bluebird.all([
-      User.findOne({ _id: projectOwner }),
-      User.findOne({ _id: sender }),
       newInbox.save(),
       newOutbox.save()
     ])
-    .spread(function(projectOwnerInfo, userInfo, newOutbox, newInbox) {
+    .spread(function(newOutbox, newInbox) {
       var newOutboxId = newOutbox._id;
-      var userOutbox = userInfo.outbox;
-      var userRequests = userInfo.requests;
-      userRequests.push(projectId);
-
       var newInboxId = newInbox._id;
-      var projectOwnerInbox = projectOwnerInfo.inbox;
 
-      userOutbox.push(newOutboxId);
-      projectOwnerInbox.push(newInboxId);
-
-      // console.log(userRequests);
-      return [ User.update({
-          _id: sender
-        }, {
-          $set: {
-            outbox: userOutbox,
-            requests: userRequests
-          }
-        }), User.update({
-          _id: projectOwner
-        }, {
-          $set: {
-            inbox: projectOwnerInbox
-          }
-        })
+      return [ User.update(
+          {  _id: sender },
+          { $addToSet: { outbox: newOutboxId, requests: projectId } }
+        ), User.update(
+          {   _id: projectOwner },
+          { $addToSet: { inbox: newInboxId } }
+        )
       ];
     })
     .spread(function(updatedUser, updatedProjectOwner) {
@@ -988,8 +943,6 @@ app.get('/api/get/requests/:username', function(request, response) {
     .then(function(userInfo) {
       var userInbox = userInfo.inbox;
       var userOutbox = userInfo.outbox;
-
-      console.log('inbox inbox inbox:', userInbox);
 
       return [ Message.find({
         _id: {
@@ -1032,10 +985,6 @@ app.get('/api/profile/:username', function(request, response) {
       var allProjects = userInfo.projects;
       var userAvatar = userInfo.avatar;
 
-      console.log('user projects:', allProjects);
-      console.log('user avatar', userInfo.avatar);
-
-
       return [ userInfo, Project.find({
         _id: {
           $in: allProjects
@@ -1070,7 +1019,7 @@ app.delete('/api/avatar/delete/project/:projectid/:projectavatarid', function(re
   var projectId = request.params.projectid;
   var projectAvatarId = request.params.projectavatarid;
 
-  // 1. delete the project avatar from the file table
+  // 1. delete the project avatar from the db
   // 2. update the project avatar to use the default project avatar
 
   bluebird.all([
@@ -1086,7 +1035,7 @@ app.delete('/api/avatar/delete/project/:projectid/:projectavatarid', function(re
    .then(function(removedFile, updatedProjectInfo) {
      return response.json({
        message: "success removing project avatar from db"
-     })
+     });
    })
    .catch(function() {
      console.log('encountered errors deleting profile avatar:', err.message);
@@ -1102,8 +1051,6 @@ app.delete('/api/avatar/delete/project/:projectid/:projectavatarid', function(re
 //          DELETE USER AVATAR
 // ****************************************
 app.delete('/api/user/avatar/delete/:avatarid/:username', function(request, response) {
-
-  // console.log('delete AVATAR BUTTON', request.params);
 
   var avatarId = request.params.avatarid;
   var username = request.params.username;
@@ -1130,9 +1077,7 @@ app.delete('/api/user/avatar/delete/:avatarid/:username', function(request, resp
       response.json({
         error: err.message
       });
-    })
-
-
+    });
 
 });
 
@@ -1140,11 +1085,6 @@ app.delete('/api/user/avatar/delete/:avatarid/:username', function(request, resp
 //          CREATE NEW PROJECT
 // *******************************
 app.post('/api/new/project', upload.single('file'), function(request, response) {
-
-  console.log(request.body);
-
-  //  hard code for now until we have sign up/login functionality set up
-  // var owner = results.owner;
 
   var results = request.body;
   var owner = results.owner;
@@ -1164,18 +1104,16 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
     completed: false
   });
 
-  bluebird.all([ newProject.save(), User.findOne({ _id: owner }) ])
-    .spread(function(savedProject, userInfo) {
+  newProject.save()
+    .then(function(savedProject) {
 
       var projectId = savedProject._id;
-      var userProjects = userInfo.projects;
-      var updatedUserProjects = userProjects.concat([projectId]);
 
       return [ User.update({
           _id: owner
         }, {
-          $set: {
-            projects: updatedUserProjects
+          $addToSet: {
+            projects: projectId
           }
         }), projectId
       ];
@@ -1198,14 +1136,22 @@ app.post('/api/new/project', upload.single('file'), function(request, response) 
 // ********************************
 //          DELETE REQUEST
 // *******************************
-app.delete('/api/request/delete/:requestid', function(request, response) {
+app.delete('/api/request/delete/:requestid/:inbox_or_outbox/:user', function(request, response) {
 
+  var inboxOrOutbox = request.params.inbox_or_outbox;
   var requestId = request.params.requestid;
+  var userId = request.params.user;
 
-  Message.remove({ _id: requestId })
-    .then(function(deleteRequest) {
+  bluebird.all([
+      Message.remove({ _id: requestId }),
+      User.update(
+        { _id: userId },
+        { $pull: { inbox: requestId, outbox: requestId } }
+      )
+    ])
+    .spread(function(deleteRequest, updatedUser) {
       return response.json({
-        message: "hello we deleted the request from the db"
+        message: "we deleted the request from the db and from the user's " + inboxOrOutbox
       });
     })
     .catch(function(err) {
@@ -1223,7 +1169,6 @@ app.delete('/api/request/delete/:requestid', function(request, response) {
 // **************************************************************
 app.post('/api/request/decline', function(request, response) {
 
-  console.log('wanna delete and send decline:', request.body);
   var requestInfo = request.body;
 
   var newInbox = new Message({
@@ -1251,46 +1196,33 @@ app.post('/api/request/decline', function(request, response) {
   bluebird.all([
     newInbox.save(),
     newOutbox.save(),
-    Message.remove({ _id: requestInfo._id }),
-    User.findOne({ _id: requestInfo.from }),
-    User.findOne({ _id: requestInfo.to })
+    Message.remove({ _id: requestInfo._id })
   ])
-  .spread(function(newInbox, newOutbox, deletedRequest, declinedUserInfo, projectOwnerInfo) {
-    console.log('user info here:', declinedUserInfo);
+  .spread(function(newInbox, newOutbox, deletedRequest) {
+
     var newInboxId = newInbox._id;
-    var userInbox = declinedUserInfo.inbox;
-    userInbox.push(newInboxId);
-
-    var projectOwnerOutbox = projectOwnerInfo.outbox;
     var newOutboxId = newOutbox._id;
-    projectOwnerOutbox.push(newOutboxId);
-
-    console.log('project owner info', projectOwnerOutbox);
-
-    console.log('updated array of project owner requests: ', projectOwnerOutbox);
 
     return [ User.update({
         _id: requestInfo.from
       }, {
-        $set: {
-          inbox: userInbox
+        $addToSet: {
+          inbox: newInboxId
         }
       }), User.update({
         _id: requestInfo.to
       }, {
-        $set: {
-          outbox: projectOwnerOutbox
+        $addToSet: {
+          outbox: newOutboxId
         }
       })
     ];
 
   })
   .spread(function(updatedUser, updatedProjectOwner) {
-    console.log('updated user: ', updatedUser);
-    console.log('updated project owner: ', updatedProjectOwner);
 
     return response.json({
-      message: "hello we deleted the request from the db"
+      message: "we deleted the request from the db"
     });
   })
   .catch(function(err) {
@@ -1469,15 +1401,13 @@ app.put('/api/request/accept', function(request, response) {
 //          GET PROJECT INFO AND FILES BELONGING TO THAT PROJECT
 // **********************************************************************
 app.get('/api/project/file/upload/new/:projectId', function(request, response) {
-  console.log('.........YUP......', request.params);
-  console.log('RAINBOW RAINBOW RAINBOW');
+
   var projectId = request.params.projectId;
 
   Project.findOne({ _id: projectId })
     .then(function(projInfo) {
       var projFiles = projInfo.files;
 
-      console.log('..........files..........', projFiles);
       return [ File.find({
           _id: {
             $in: projFiles
@@ -1507,32 +1437,21 @@ app.get('/api/project/file/upload/new/:projectId', function(request, response) {
 // ****************************************
 app.delete('/api/:projectid/file/remove/:fileid', function(request, response) {
 
-  console.log(request.params);
-
   var projectId = request.params.projectid;
   var fileId = request.params.fileid;
 
   bluebird.all([
       File.remove({ _id: fileId }),
-      Project.findOne({ _id: projectId })
-    ])
-    .spread(function(removedFile, projectInfo) {
-      var projectFiles = projectInfo.files;
-      console.log('before', projectFiles);
-
-      var removeIndex = projectFiles.indexOf(fileId);
-      projectFiles.splice(removeIndex, 1);
-
-      return Project.update({
+      Project.update({
         _id: projectId
       }, {
-        $set: {
-          files: projectFiles
+        $pull: {
+          files: fileId
         }
-      });
+      })
+    ])
+    .spread(function(removedFile, updatedProject) {
 
-    })
-    .then(function(updatedProject) {
       return response.json({
         message: 'success deleting file!'
       });

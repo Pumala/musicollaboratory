@@ -213,8 +213,8 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     });
   };
 
-  service.deleteRequest = function(requestId) {
-    var url = '/api/request/delete/' + requestId;
+  service.deleteRequest = function(requestId, in_or_out, user) {
+    var url = '/api/request/delete/' + requestId + '/' + in_or_out + '/' + user;
     return $http({
       method: 'DELETE',
       url: url
@@ -512,8 +512,9 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
   $scope.loadRequestPage();
 
   // delete request
-  $scope.deleteRequest = function(requestId) {
-    MusicFactory.deleteRequest(requestId)
+  $scope.deleteRequest = function(requestId, in_or_out, user) {
+    console.log('who AM I???', user);
+    MusicFactory.deleteRequest(requestId, in_or_out, user)
       .then(function(results) {
         console.log('success deleting the old request::', results);
         $scope.loadRequestPage();
