@@ -1305,31 +1305,16 @@ app.put('/api/request/accept', function(request, response) {
   bluebird.all([
     newInbox.save(),
     newOutbox.save(),
-    Message.remove({ _id: requestId }),
     Project.findOne( { _id: projectId}),
-    User.findOne({ _id: username }),
     User.findOne({ _id: projectOwner }),
+    Message.remove({ _id: requestId })
    ])
-    .spread(function(newInbox, newOutbox, acceptRequest, acceptProject, acceptUser, projectOwner) {
+    .spread(function(newInbox, newOutbox, acceptProject, projectOwner, removedMessage) {
       var newInboxId = newInbox._id;
       var newOutboxId = newOutbox._id;
-      var userInbox = acceptUser.inbox;
-      var projectOwnerOutbox = projectOwner.outbox;
-      projectOwnerOutbox.push(newOutboxId);
-      userInbox.push(newInboxId);
-
-      console.log('project info:', acceptProject);
-      console.log('USER INFO', acceptUser.projects);
-
-      var projectMembers = acceptProject.members;
-      projectMembers.push(username);
-
-      console.log('updated members:', projectMembers);
 
       var projectSeekingObj = acceptProject.seekingTypes;
       var projectExistingObj = acceptProject.existingTypes;
-
-      console.log('current seeking types:', projectSeekingObj);
 
       // updates what the project is seeeking
       for (key in projectSeekingObj) {
@@ -1338,7 +1323,7 @@ app.put('/api/request/accept', function(request, response) {
             projectSeekingObj[key] = false;
           }
         }
-      }
+      };
 
       // update what types exist in the project
       for (key in projectExistingObj) {
@@ -1347,41 +1332,35 @@ app.put('/api/request/accept', function(request, response) {
             projectExistingObj[key] = true;
           }
         }
-      }
+      };
 
-      console.log('updated project seeking obj:', projectSeekingObj);
-      console.log('updated project existing obj:', projectExistingObj);
-
-      var projectsArr = acceptUser.projects;
-      projectsArr.push(projectId);
-
-      return [ User.update({
-        _id: username
-        }, {
-          $set: {
-            projects: projectsArr,
-            inbox: userInbox
-          }
-        }), User.update({
-          _id: projectOwner
-          }, {
-            $set: {
-              outbox: projectOwnerOutbox
+      return [ User.update(
+            { _id: username },
+            { $addToSet: {
+                projects: projectId,
+                inbox: newInboxId
+              }
             }
-          }), Project.update({
-          _id: projectId
-        }, {
-          $set: {
-            seekingTypes: projectSeekingObj,
-            existingTypes: projectExistingObj,
-            members: projectMembers
-          }
-        })
-      ];
+          ), User.update(
+            { _id: projectOwner },
+            { $addToSet: {
+                outbox: newOutboxId
+              }
+            }
+          ), Project.update(
+            { _id: projectId },
+            {
+              $addToSet: { members: username },
+              $set: {
+                seekingTypes: projectSeekingObj,
+                existingTypes: projectExistingObj
+              }
+            }
+          )
+        ];
+
     })
     .spread(function(updatedUser, updatedProjectOwner, updatedProject) {
-      console.log('updated user:', updatedUser);
-      console.log('updated project:', updatedProject);
 
       return response.json({
         message: "in accept, accepted the request from the db"
