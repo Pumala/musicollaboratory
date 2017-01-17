@@ -24,12 +24,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
     controller: "LoginController"
   })
   .state({
-    name: "projects",
-    url: "/projects",
-    templateUrl: "templates/allprojects.html",
-    controller: "ProjectsController"
-  })
-  .state({
     name: "search",
     url: "/search",
     templateUrl: "templates/search.html",
@@ -343,43 +337,22 @@ app.factory('MusicFactory', function($http, FileUploader, $rootScope, $state, $c
     };
   };
 
-  // if ($cookies.getObject("nextProjectUrl")) {
-  //   var redirectProjectId = $cookies.getObject("nextProjectUrl");
-  //   console.log('please: ', redirectProjectId);
-  //   $cookies.remove("nextProjectUrl");
-  //   $state.go('myproject', { project_id: redirectProjectId });
-  // } else {
-  //   $state.go('profile', {username: $rootScope.rootUsername});
-  // }
-
-  // service.broadcastEditMode = function() {
-  //   $rootScope.$broadcast('newMessage', 'this is ENOUGH');
-  // };
-  // $rootScope.$broadcast('newMessage', 'this is ENOUGH')
-
   return service;
 
 });
 
-// need to reload page to reflect new and removed files!!
 app.controller('FileController', function($timeout, $scope, MusicFactory, $rootScope, $state, FileUploader) {
-  // var uploader = $scope.uploader = new FileUploader({
-  //   url: '/upload'
-  // });
-  console.log('id here?', $scope.projectId);
+
   var uploader = $scope.uploader = new FileUploader({
     url: '/api/upload/' + $rootScope.rootUsername + '/' + $scope.projectId
   });
 
-
-  // console.log('setting up onCompleteAll')
   uploader.onCompleteAll = function() {
-    console.log('hello i am here');
     $scope.$emit('newEditMode', false);
-    console.log('meep Meep');
   };
-  uploader.onSuccessItem = function(fileItem, response, status, headers) {
 
+  uploader.onSuccessItem = function(fileItem, response, status, headers) {
+    // so far, do nothing
   };
 });
 
@@ -413,14 +386,13 @@ app.controller('ProjectAvatarController', function($timeout, $scope, $rootScope,
 
 });
 
+// ***************************************
+//          PROJECT FILE CONTROLLER
+// **************************************
 app.controller('ProjectFileController', function($scope, MusicFactory, $state, $stateParams, $rootScope) {
-  console.log('params anyone?:', $stateParams);
   $scope.projectId = $stateParams.projectid;
 
   $scope.$on('newEditMode', function(event, editVal) {
-    console.log('listening here.....:', editVal);
-    console.log('nothing but leaves');
-
     $scope.loadProjectFilePage();
   });
 
@@ -452,8 +424,11 @@ app.controller('ProjectFileController', function($scope, MusicFactory, $state, $
 
 });
 
+// ********************************
+//          HOME CONTROLLER
+// *******************************
 app.controller('HomeController', function($scope, $state) {
-  console.log('hello');
+  // so far, nothing happens here
 });
 
 // ********************************
@@ -470,42 +445,10 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
         console.log("OUTBOX:", results.data.outbox);
         $scope.inbox = results.data.inbox;
         $scope.outbox = results.data.outbox;
-
-        // console.log('pending.....', results);
-        // $scope.receiveRequests = results.data.receiveRequests;
-        // $scope.receiveProjects = results.data.receiveProjects;
-        // $scope.sendRequests = results.data.sendRequests;
-        // $scope.sendProjects = results.data.sendProjects;
-        //
-        // $scope.receiveRequests.forEach(function(request, index) {
-        //   $scope.receiveProjects.forEach(function(project) {
-        //     if (String(request.projectId) === String(project._id)) {
-        //       request.projectName = project.name;
-        //       request.acceptedRequestTypes = {};
-        //     } else {
-        //       console.log('NOPEE');
-        //     }
-        //   });
-        // });
-        //
-        // $scope.sendRequests.forEach(function(request, index) {
-        //   $scope.sendProjects.forEach(function(project) {
-        //     if (String(request.projectId) === String(project._id)) {
-        //       request.projectName = project.name;
-        //     } else {
-        //       console.log('NOPEE');
-        //     }
-        //   });
-        // });
-
-        // console.log('receiving:', $scope.receiveRequests);
-        // console.log('sending:', $scope.sendRequests);
-
       })
       .catch(function(err) {
         console.log('err getting requests:', err.message);
       });
-
   };
 
   // load request page initially
@@ -538,10 +481,6 @@ app.controller('RequestsController', function($scope, $stateParams, MusicFactory
   };
 
   $scope.acceptRequest = function(requestId, projectId, username, projectName, acceptedRequestTypes) {
-    // console.log('hello: ', hello);
-    // console.log('type request obj::', $scope.typeRequest);
-    // console.log('RED type request obj::', $scope.request.acceptedRequestTypes);
-
     var requestObj = {
       requestId: requestId,
       typeRequest: acceptedRequestTypes,
@@ -600,7 +539,7 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
       console.log('encountered errors updating user bio:', err.message);
     });
 
-  }
+  };
 
   $scope.getAudioUrl = function(fileHash, currProjectName, currProjectId) {
     console.log(fileHash);
@@ -694,12 +633,6 @@ app.controller('SignUpController', function($scope, $state, $rootScope, $cookies
 
 app.controller('LoginController', function($scope, $state, $cookies, $rootScope, MusicFactory) {
 
-  // if ($cookies.get("nextProjectUrl")) {
-  //   console.log('you have a cookie!');
-  //   var redirectProjectId = $cookies.get("nextProjectUrl");
-  //   console.log('curr project id:', redirectProjectId);
-  // }
-
   $scope.submitLogin = function() {
     var submitInfo = {
       username: $scope.username,
@@ -714,21 +647,6 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
         $rootScope.rootToken = $scope.userInfo.token.id;
         $cookies.putObject('cookieData', $scope.userInfo);
         $rootScope.factoryCookieData = $scope.userInfo;
-        // var userInfo = results.data.userInfo;
-        // $rootScope.rootUsername = userInfo._id;
-        // $rootScope.rootToken = userInfo.token.id;
-        // $cookies.putObject('cookieData', userInfo);
-        // $rootScope.factoryCookieData = userInfo;
-        // console.log('success submitting login info', userInfo);
-
-        // if ($cookies.getObject("nextProjectUrl")) {
-        //   var redirectProjectId = $cookies.getObject("nextProjectUrl");
-        //   console.log('please: ', redirectProjectId);
-        //   $cookies.remove("nextProjectUrl");
-        //   $state.go('myproject', { project_id: redirectProjectId });
-        // } else {
-        //   $state.go('profile', {username: $rootScope.rootUsername});
-        // }
 
         MusicFactory.redirectProjectPage();
 
@@ -739,16 +657,6 @@ app.controller('LoginController', function($scope, $state, $cookies, $rootScope,
   }
 
 });
-
-// PLAY AUDIO CONTROLLER
-// app.controller('PlayAudioController', function($scope, $sce) {
-//   $scope.getAudioUrl = function(fileHash, currProjectName, currProjectId) {
-//     console.log(fileHash);
-//     $scope.audioTrack = $sce.trustAsResourceUrl('/upload/' + fileHash);
-//     $scope.currProjectName = currProjectName;
-//     $scope.currProjectId = currProjectId;
-//   };
-// });
 
 // ********************************
 //          SEARCH CONTROLLER
@@ -798,15 +706,10 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
     });
   }
 
-  $scope.reloadSearch = function() {
-    $scope.loadAllProjectsPage();
-  };
-
   $scope.loadAllProjectsPage = function() {
     MusicFactory.allProjects()
       .then(function(results) {
         $scope.allProjects = results.data;
-        console.log('here are all the projects!!:', results);
       })
       .catch(function(err) {
         console.log('encountered error loading all projects:', err.message);
@@ -815,6 +718,10 @@ app.controller('SearchController', function($scope, $state, $rootScope, $sce, Mu
 
   // load all projects page initially
   $scope.loadAllProjectsPage();
+
+  $scope.reloadSearch = function() {
+    $scope.loadAllProjectsPage();
+  };
 
 });
 
@@ -1058,14 +965,7 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
         });
     };
 
-    // for now, hard code sender until we have a $rootScope username
-    // $scope.username = "Lulu";
-
     $scope.requestContribute = function() {
-
-      // console.log('TYPE????:', $scope.checked)
-
-      console.log('requestedTypes', $scope.requestedTypes);
       var requestTypes = {
         sender: $rootScope.rootUsername,
         owner: $scope.owner,
@@ -1084,6 +984,6 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
         .catch(function(err) {
           console.log('error processing request to project owner:', err.message);
         });
-    }
+    };
 
 });

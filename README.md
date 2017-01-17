@@ -235,8 +235,67 @@ bluebird.all([
 
 ## Code Snippets (frontend)
 
+#### Example 1:
 
+One of the more exciting things we learned in this project was how to have different controllers communicate to each other in AngularJS. One resource we used was this [article] (http://tangosource.com/blog/angular-js-controller-communication/). We definitely recommend checking this article because it provides a more in depth understanding of the different relationships between controllers.
+
+We wanted to have all the controllers that handle a file upload to tell the parent controller that they've uploaded a file. To achieve this, we have the child controller (the file uploader controller) emit an event every time a file is uploader.
+
+Below shows an example of a child controller emitting an event. Also noted, in this example, we're also using the Angular File Upload module. Here, after the file has uploaded, the controller emits an event called "newEditMode" and sends the value of false.
+
+```
+uploader.onCompleteAll = function() {
+  $scope.$emit('newEditMode', false);
+};
+```
+
+Meanwhile, the parent controller is listening for the event that is being emitted. Below shows an example from one of the parent controllers listening for the "newEditMode" event. Once the event is emitted, the parent controller that has been listening proceeds to execute the function. In this case, the parent controller calls the $scope.loadProjectFilePage function.
+
+```
+$scope.$on('newEditMode', function(event, editVal) {
+  $scope.loadProjectFilePage();
+});
+```
+
+#### Example 2: (Less $state.reload() )
+
+At first, upon discovering $state.reload(), we used this everywhere because we thought this was a simple fix. We used it after a user edits their projects, posts a comment, uploads a file... there were over 10 places we used it. We wanted to make a call to the back end that would make a new query and pass in the updated info. And we thought we could simply use $state.reload() to display the updated results. It turns out that this is actually an unwise alternative and that there are better approaches to display updated info on the page as $state.reload() is not smooth and does not help the user experience.
+
+Below shows an example of the Search Controller before the refactoring.
+
+Once we're in the Search Controller, the controller instantly calls the MusicFactory service, allProjects, which makes an API call to the back end. This then makes a query to send all the projects to the front end.
+
+```
+MusicFactory.allProjects()
+  .then(function(results) {
+    $scope.allProjects = results.data;
+  })
+  .catch(function(err) {
+    console.log('encountered error loading all projects:', err.message);
+  });
+```
+
+The code above is okay, but there other instances that the controller needs to make the same call. One way we handled this was storing the above code inside a $scope function, which will allow us the ability to call it anytime inside the controller as needed. Below shows an example of such. Also, since we still want to make the same call once we're in the controller, we simply call it once. The controller also makes the same call in the $scope.reloadSearch. Instead of using $state.reload(), we could just make the function accessible and be able to call it as needed. Avoiding #state.reload() when possible is better because then we can stay in the same state and do not change to a different state only to go back to the state that we came from.
+
+```
+$scope.loadAllProjectsPage = function() {
+  MusicFactory.allProjects()
+    .then(function(results) {
+      $scope.allProjects = results.data;
+    })
+    .catch(function(err) {
+      console.log('encountered error loading all projects:', err.message);
+    });
+};
+
+// load all projects page initially
+$scope.loadAllProjectsPage();
+
+$scope.reloadSearch = function() {
+  $scope.loadAllProjectsPage();
+};
+```
 
 ## Credits
-Kirk Abott,
+Kirk Abbott,
 Carolyn Lam
