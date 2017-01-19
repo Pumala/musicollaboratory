@@ -7,6 +7,10 @@ Create a music collaboration app.
 
 [Music Collaboration App] (http://musicollaboratory.com/)
 
+### Credits
+Kirk Abbott,
+Carolyn Lam
+
 ### Languages / Technologies used:
 
 * HTML
@@ -164,8 +168,6 @@ bluebird.all([ User.update(
 
 ```
 
-For example, below.....
-
 #### Example 2:
 
 Here is another place that we refactored. Originally, we made a query to find the project info using the project id. That query then returns the project info. Afterward, we saved the return value to a variable and pushed the filename to the array ( project files). Then we proceeded to make another query to update the project's files.
@@ -295,7 +297,3 @@ $scope.reloadSearch = function() {
   $scope.loadAllProjectsPage();
 };
 ```
-
-## Credits
-Kirk Abbott,
-Carolyn Lam
