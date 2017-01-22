@@ -517,15 +517,13 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
     console.log('edit mode:', $scope.edit);
   });
 
-  console.log('hello');
-
-  $scope.editBio = function() {
-    $scope.edit = true;
-  }
-
-  $scope.cancelEditBio = function() {
-    $scope.edit = false;
-  }
+  // $scope.editBio = function() {
+  //   $scope.edit = true;
+  // }
+  //
+  // $scope.cancelEditBio = function() {
+  //   $scope.edit = false;
+  // }
 
   $scope.saveBio = function() {
     console.log($scope.description);
@@ -533,7 +531,7 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
     .then(function(results) {
       $scope.loadProfilePage();
       console.log('updated user bio:', results);
-      $scope.edit = false;
+      // $scope.edit = false;
     })
     .catch(function(err) {
       console.log('encountered errors updating user bio:', err.message);

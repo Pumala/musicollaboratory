@@ -39,8 +39,8 @@
 
       <div class="clear" ng-show="rootUsername === currUser">
         <button ng-click="saveBio()" ng-show="edit" type="button" class="btn btn-success">Save</button>
-        <button ng-click="editBio()" ng-show="!edit" type="button" class="btn btn-default editBio">Edit</button>
-        <button ng-click="cancelEditBio()" ng-show="edit" type="button" class="btn btn-primary">Cancel</button>
+        <button ng-click="edit = true; origBio = description" ng-show="!edit" type="button" class="btn btn-default editBio">Edit</button>
+        <button ng-click="edit = false; description = origBio" ng-show="edit" type="button" class="btn btn-primary">Cancel</button>
       </div>
     </div>
 
