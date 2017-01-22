@@ -212,11 +212,11 @@
             <div class="pull-left right clear">
               <p ng-show="!editComment">{{comment.content}}</p>
               <div ng-show="rootUsername === comment.author" class="editButtons pull-right">
-                <button ng-show="!editComment" ng-click="editComment = true" class="btn btn-default">Edit</button>
+                <button ng-show="!editComment" ng-click="editComment = true; origComment = comment.content" class="btn btn-default">Edit</button>
 
                 <button ng-click="saveProjectComment(comment._id, comment.content)" ng-show="editComment" class="btn btn-purple">Save</button>
 
-                <button ng-click="editComment = false" ng-show="editComment" class="btn btn-default" name="button">Cancel</button>
+                <button ng-click="editComment = false; comment.content = origComment" ng-show="editComment" class="btn btn-default" name="button">Cancel</button>
                 <button ng-show="!editComment" class="btn btn-purple" ng-click="deleteComment(comment._id)">Delete</button>
               </div>
             </div>
