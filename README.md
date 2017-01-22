@@ -297,3 +297,14 @@ $scope.reloadSearch = function() {
   $scope.loadAllProjectsPage();
 };
 ```
+
+## Stretch Goals
+
+* Currently anyone can download audio files. We would update the code so only members have access.
+* Right now all the files are stored inside a folder. For small scale applications this is okay, however if we were to handle large files, we'd need to update to a more efficient storage system.
+* Styling can always be improved!
+* Focus on creating a better user experience. For instance, when a user encounters an error when trying to login or sign up, a message should be presented to them letting them know the reason why they cannot login or sign up.
+* Add functionality where members can send messages to anyone; not only just when making requests to join a project.
+* Create a chat application where users can message each other.
+* Update the profile page to reflect more info about the user. For example, maybe feature a section that shows all the recent history of the user.
+* Improve the search page to handle large search results. For instance, display a limit of 20 projects per page, and offer buttons users can click on to change pages when there are many project listings.

@@ -517,14 +517,6 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
     console.log('edit mode:', $scope.edit);
   });
 
-  // $scope.editBio = function() {
-  //   $scope.edit = true;
-  // }
-  //
-  // $scope.cancelEditBio = function() {
-  //   $scope.edit = false;
-  // }
-
   $scope.saveBio = function() {
     console.log($scope.description);
     MusicFactory.updateBio($scope.description)
