@@ -909,15 +909,18 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
   });
 
     $scope.editProject = function() {
-      $scope.allHasTypes  = $scope.project.existingTypes;
-      $scope.allNeedsTypes = $scope.project.seekingTypes;
+      $scope.origHasTypes  = jQuery.extend({}, $scope.project.existingTypes);
+      $scope.origNeedsTypes  = jQuery.extend({}, $scope.project.seekingTypes);
 
       $scope.edit = true;
+      $scope.origDescription = $scope.project.description;
     };
 
     $scope.cancelProjectEdit = function() {
       $scope.edit = false;
-      $scope.loadProjectDetails();
+      $scope.project.description = $scope.origDescription;
+      $scope.project.existingTypes = $scope.origHasTypes;
+      $scope.project.seekingTypes = $scope.origNeedsTypes;
     };
 
     $scope.saveProjectEdits = function(projectId) {

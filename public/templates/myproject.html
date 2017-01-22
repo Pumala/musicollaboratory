@@ -150,9 +150,9 @@
               <h2>Has:</h2>
             </div>
             <div class="panel-body">
-              <div ng-repeat="(key, val) in allHasTypes">
+              <div ng-repeat="(key, val) in project.existingTypes">
                 <label for="{{key}}">{{key}}</label>
-                <input ng-model="allHasTypes[key]" type="checkbox" name="" value="">
+                <input ng-model="project.existingTypes[key]" type="checkbox" name="" value="">
               </div>
             </div>
           </div>
@@ -163,9 +163,9 @@
               <h2>Needs:</h2>
             </div>
             <div class="panel-body">
-              <div ng-repeat="(key, val) in allNeedsTypes">
+              <div ng-repeat="(key, val) in project.seekingTypes">
                 <label for="{{key}}">{{key}}</label>
-                <input ng-model="allNeedsTypes[key]" type="checkbox" name="" value="">
+                <input ng-model="project.seekingTypes[key]" type="checkbox" name="" value="">
               </div>
             </div>
           </div>
