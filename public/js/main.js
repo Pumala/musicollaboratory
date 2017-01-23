@@ -806,6 +806,7 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
         // later on refactor this code by
         // creating another api call
         // where the backend makes a query and only passes the project comments
+        $scope.content = "";
         $scope.loadProjectDetails();
         console.log('successfully added comment to db');
       })
@@ -819,7 +820,6 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
     console.log('content:', content);
     MusicFactory.saveProjectComment(commentId, content)
       .then(function(results) {
-        console.log('results updating comment from backend:', results);
         $scope.loadProjectDetails();
         console.log('successfully saved comment');
       })
