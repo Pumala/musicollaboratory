@@ -8,10 +8,10 @@ Create a music collaboration app.
 [Music Collaboration App] (http://musicollaboratory.com/)
 
 ### Credits
-Kirk Abbott,
+[Kirk Abbott] (https://github.com/kirkabbott1),
 Carolyn Lam
 
-### Languages / Technologies used:
+### Languages / Frameworks / Technologies used:
 
 * HTML
 * CSS
@@ -89,11 +89,11 @@ Users can create music projects, request to contribute to them and, if accepted,
 
   ![home](public/images/search_projects_audio.png)
 
-#####  11. Sending a Request on Project Detail Page => '/project/projectid'
+#####  11. Sending a Request on Project Detail Page => '/project/:projectid'
 
   ![home](public/images/request_to_join.png)
 
-#####  12. Request Submitted => '/project/projectid'
+#####  12. Request Submitted => '/project/:projectid'
 
   ![home](public/images/request_submitted.png)
 
