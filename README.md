@@ -308,3 +308,11 @@ $scope.reloadSearch = function() {
 * Create a chat application where users can message each other.
 * Update the profile page to reflect more info about the user. For example, maybe feature a section that shows all the recent history of the user.
 * Improve the search page to handle large search results. For instance, display a limit of 20 projects per page, and offer buttons users can click on to change pages when there are many project listings.
+
+## Project History
+
+12/19/2016 - started project
+
+01/05/2017 - completed project
+
+* Note: additional touch ups and refactoring since project completion
