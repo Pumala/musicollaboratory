@@ -9,7 +9,7 @@ Create a music collaboration app.
 
 ### Credits
 [Kirk Abbott] (https://github.com/kirkabbott1),
-Carolyn Lam
+[Carolyn Lam] (https://github.com/Pumala)
 
 ### Languages / Frameworks / Technologies used:
 
