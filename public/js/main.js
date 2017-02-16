@@ -66,12 +66,12 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 app.run(function($rootScope, $cookies, $http, $state) {
   $rootScope.factoryCookieData = $cookies.getObject('cookieData') ? $cookies.getObject('cookieData') : null;
-  console.log('factory cookies?:', $cookies.getObject('cookieData'));
+  // console.log('factory cookies?:', $cookies.getObject('cookieData'));
   if ($rootScope.factoryCookieData) {
     $rootScope.rootUsername = $cookies.getObject('cookieData')._id;
-    $rootScope.rootToken = $cookies.getObject('cookieData').token.id;
-
-    console.log('root token???', $cookies.getObject('cookieData').token.id);
+    // $rootScope.rootToken = $cookies.getObject('cookieData').authToken.id;
+    // console.log('root token???', $cookies.getObject('cookieData').authToken);
+    // console.log('root user?', $rootScope.rootUsername);
   }
 
   $rootScope.rootLogout = function() {
@@ -522,7 +522,8 @@ app.controller('UserController', function($scope, $sce, $state, $stateParams, Mu
     MusicFactory.updateBio($scope.description)
     .then(function(results) {
       $scope.loadProfilePage();
-      console.log('updated user bio:', results);
+      $scope.edit = false;
+      // console.log('updated user bio:', results);
       // $scope.edit = false;
     })
     .catch(function(err) {
@@ -916,18 +917,16 @@ app.controller('UserProjectsController', function($scope, $sce, $cookies, $state
     };
 
     $scope.saveProjectEdits = function(projectId) {
-
       var updatedProjectObj = {
         description: $scope.project.description,
-        has: $scope.allHasTypes,
-        needs: $scope.allNeedsTypes
+        has: $scope.project.existingTypes,
+        needs: $scope.project.seekingTypes
       };
-      console.log('updated project???', updatedProjectObj);
-
+      // console.log('updated project???', updatedProjectObj);
       MusicFactory.saveEdits(projectId, updatedProjectObj)
       .then(function(results) {
         $scope.edit = false;
-        console.log('results updating project: ', results);
+        // console.log('results updating project: ', results);
         $scope.loadProjectDetails();
       })
       .catch(function(err) {
