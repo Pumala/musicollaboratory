@@ -5,11 +5,12 @@ Create a music collaboration app.
 
 ### Live Demo:
 
-[Music Collaboration App] (http://musicollaboratory.com/)
+[Music Collaboration App](http://musicollaboratory.com/)
 
 ### Credits
-[Kirk Abbott] (https://github.com/kirkabbott1),
-[Carolyn Lam] (https://github.com/Pumala)
+
+[Kirk Abbott](https://github.com/kirkabbott1),
+[Carolyn Lam](https://github.com/Pumala)
 
 ### Languages / Frameworks / Technologies used:
 
