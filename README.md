@@ -5,7 +5,7 @@ Create a music collaboration app.
 
 ### Live Demo:
 
-[Music Collaboration App](http://musicollaboratory.com/)
+[Music Collaboration App](http://www.musicollaboratory.com/)
 
 ### Credits
 
