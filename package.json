@@ -5,7 +5,7 @@
   "main": "back_end.js",
   "dependencies": {
     "angular-scroll": "^1.0.0",
-    "bcrypt": "^1.0.1",
+    "bcrypt": "^2.0.0",
     "bcrypt-promise": "^2.0.0",
     "bluebird": "^3.4.7",
     "body-parser": "^1.15.2",
